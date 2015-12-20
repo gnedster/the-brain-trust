@@ -2,20 +2,21 @@
   "name": "the-brain-trust",
   "description": "A collection of Slack Apps",
   "version": "0.0.1",
-  "repository":  {
-    "type" : "git",
-    "url" : "https://github.com/npm/npm.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/npm/npm.git"
   },
   "engines": {
     "node": "4.1.1",
-    "npm" : "2.14.4"
+    "npm": "2.14.4"
   },
-  "dependencies" : {
-      "connect" : "*",
-      "serve-static" : "*",
-      "body-parser" : "*",
-      "compression" : "*",
-      "html" :"*",
-      "botkit" : "*"
+  "dependencies": {
+    "body-parser": "*",
+    "botkit": "*",
+    "compression": "*",
+    "connect": "*",
+    "html": "*",
+    "path": "^0.12.7",
+    "serve-static": "*"
   }
 }
