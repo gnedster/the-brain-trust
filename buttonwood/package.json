@@ -11,13 +11,8 @@
     "npm": "2.14.4"
   },
   "dependencies": {
-    "body-parser": "*",
-    "botkit": "*",
-    "compression": "*",
-    "connect": "*",
-    "html": "*",
-    "path": "^0.12.7",
-    "serve-static": "*",
+    "botkit": "^0.0.4",
+    "lodash": "^3.10.1",
     "yahoo-finance": "^0.2.12"
   }
 }

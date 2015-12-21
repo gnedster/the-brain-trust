@@ -1,8 +1,9 @@
 var Botkit = require('./node_modules/botkit/lib/Botkit.js');
 var yahooFinance = require('yahoo-finance');
+var _ = require('lodash');
 
 var controller = Botkit.slackbot({
-  debug: false,
+  debug: false
 });
 
 var bot = controller.spawn(
@@ -11,70 +12,61 @@ var bot = controller.spawn(
   }
 ).startRTM();
 
+var priceTpl = _.template('*<%= symbol %>* (<%= name %>) last traded at *$<%= lastTradePriceOnly %>*.');
+var notFoundTpl = _.template('*<%= symbol %>* doesn\'t look like a valid symbol.');
 
-controller.hears(['hello','hi'],'direct_message,direct_mention,mention',function(bot,message) {
+/**
+ * Return usage information.
+ * @param  {Corebot} bot
+ * @param  {String} message
+ */
+controller.hears(['hello', 'hi'],'direct_message,direct_mention,mention',function(bot,message) {
+  var introduction =
+      "I am buttonwood, it's nice to meet you! " +
+      "Send me a stock ticker symbol like *$AAPL*, and I'll get that information for you. " +
+      "You can also get more than one symbol at a time.";
 
-  bot.api.reactions.add({
-    timestamp: message.ts,
-    channel: message.channel,
-    name: 'robot_face',
-  },function(err,res) {
+  controller.storage.users.get(message.user,function(err,user) {
+    if (user && user.name) {
+      bot.reply(message, "Hello " + user.name + "!" + introduction);
+    } else {
+      bot.reply(message, introduction);
+    }
+  });
+});
+
+/**
+ * Return stock information when a ticker symbol is provided.
+ * @param  {Corebot} bot
+ * @param  {String} message
+ */
+controller.hears(['(\$[A-z]*)'],'direct_message,direct_mention,mention',function(bot,message) {
+  var matches = message.text.match(/\$([A-z]*)/ig);
+  var symbols = _.compact(_.map(matches, function(symbol) {
+    return symbol.substring(1).toUpperCase();
+  }));
+
+  if (_.isEmpty(symbols)) {
+    return;
+  }
+
+  yahooFinance.snapshot({
+    symbols: symbols,
+    fields: ['s', 'n', 'l1'],
+  }, function (err, snapshot) {
     if (err) {
-      bot.botkit.log("Failed to add emoji reaction :(",err);
-    }
-  });
-
-
-  controller.storage.users.get(message.user,function(err,user) {
-    if (user && user.name) {
-      bot.reply(message,"Hello " + user.name+"! I am buttonwood.");
+      console.log(err);
+      bot.reply(message,"Sorry, something went terribly wrong.");
     } else {
-      bot.reply(message,"Hello. I am buttonwood.");
+      var messages = _.map(snapshot, function(data) {
+        if (_.isEmpty(data.name)) {
+          return notFoundTpl(data);
+        } else {
+          return priceTpl(data);
+        }
+      });
+
+      bot.reply(message, messages.join("\n"));
     }
   });
 });
-
-controller.hears(['call me (.*)'],'direct_message,direct_mention,mention',function(bot,message) {
-  var matches = message.text.match(/call me (.*)/i);
-  var name = matches[1];
-  controller.storage.users.get(message.user,function(err,user) {
-    if (!user) {
-      user = {
-        id: message.user,
-      };
-    }
-    user.name = name;
-    controller.storage.users.save(user,function(err,id) {
-      bot.reply(message,"Got it. I will call you " + user.name + " from now on.");
-    });
-  });
-});
-
-controller.hears(['what is my name','who am i'],'direct_message,direct_mention,mention',function(bot,message) {
-
-  controller.storage.users.get(message.user,function(err,user) {
-    if (user && user.name) {
-      bot.reply(message,"Your name is " + user.name);
-    } else {
-      bot.reply(message,"I don't know yet!");
-    }
-  });
-});
-
-function formatUptime(uptime) {
-  var unit = 'second';
-  if (uptime > 60) {
-    uptime = uptime / 60;
-    unit = 'minute';
-  }
-  if (uptime > 60) {
-    uptime = uptime / 60;
-    unit = 'hour';
-  }
-  if (uptime != 1) {
-    unit = unit +'s';
-  }
-
-  uptime = uptime + ' ' + unit;
-  return uptime;
-}

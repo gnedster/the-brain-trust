@@ -1,12 +1,15 @@
-# The Brain Trust
+# buttonwood
 
-  Welcome to the Brain Trust. We build Slack apps.
+buttonwood is a very simple Slackbot which provides information about
+a current stock price when a '$' followed by a combination of letters
+is written in a channel.
 
-## Getting started
+
+## Getting Started
+
+Running the bot is simple:
 
 ```js
 npm install
-node server.js
+token=<token> node bot.js
 ```
-  The application is then accessible at http://localhost:8080.
-
