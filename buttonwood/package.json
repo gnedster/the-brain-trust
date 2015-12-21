@@ -1,6 +1,6 @@
 {
-  "name": "the-brain-trust",
-  "description": "A collection of Slack Apps",
+  "name": "buttonwood",
+  "description": "A Slack app providing information about stocks.",
   "version": "0.0.1",
   "repository": {
     "type": "git",
