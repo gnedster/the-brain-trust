@@ -1,19 +1,37 @@
 extends ../layout
 
 block content
+  .row
+    .col-xs-8
+      h2 buttonwood
+    .col-xs-4.add-to-slack
+      a.pull-right(href='https://slack.com/oauth/authorize?scope=incoming-webhook,bot&client_id=16573442774.17151776516')
+        img(alt='Add to Slack', height='40', width='139', src='https://platform.slack-edge.com/img/add_to_slack.png', srcset='https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x')
+
   strong What is buttonwood?
 
   p.
     buttonwood is a #[a(href="https://slack.com") Slack] app that provides
     pricing information about stocks whenever a cash tag (like $AAPL)
-    is mentioned in a channel that buttonwood is in, or when mentioning or
-    directly talking to buttonwood.
+    is mentioned in a channel that @buttonwood is in, or when mentioning or
+    directly talking to @buttonwood.
 
-  strong Hmm... is that it?
+  strong What else?
 
   p.
-    Yes. In the future, we'd like to add alerts to help monitor large
+    In the future, we'd like to add alerts to help monitor large
     movements in stock prices, macroeconomic events, and company news. If you'd
     like to see additional features, e-mail us at
     #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].
+
+  strong It doesn't work
+
+  p E-mail us at #[a(href="mailto:support@the-brain-trust.com") support@the-brain-trust.com].
+
+  h3 Changelog
+
+  p
+    em December 21, 2015
+
+  p Initial release.
 

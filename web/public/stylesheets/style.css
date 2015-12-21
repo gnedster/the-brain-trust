@@ -9,3 +9,8 @@ a {
 .company-title {
   color: black;
 }
+
+.add-to-slack {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
