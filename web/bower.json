@@ -1,0 +1,21 @@
+{
+  "name": "web",
+  "description": "the brain trust website",
+  "main": "app.js",
+  "authors": [
+    "Ed Ng <ed.jk.ng@gmail.com>"
+  ],
+  "license": "None",
+  "homepage": "https://github.com/gnedster/the-brain-trust",
+  "moduleType": [
+    "node"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

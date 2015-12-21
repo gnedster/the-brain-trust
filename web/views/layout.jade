@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/bower_components/bower-sticky-footer/dist/css/sticky-footer.css')
+    script(type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js')
+    script(type='text/javascript' src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+  body
+    .container
+      h1
+        #[a.company-title(href="/") the brain trust]
+      block content
+  footer.footer
+    .container
+      p.text-muted all rights reserved | #[a(href="privacy-policy") privacy policy] | #[a(href="mailto:info@the-brain-trust.com") contact]

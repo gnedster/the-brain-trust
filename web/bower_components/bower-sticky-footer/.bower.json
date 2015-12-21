@@ -1,0 +1,37 @@
+{
+  "name": "bower-sticky-footer",
+  "version": "0.1.4",
+  "homepage": "https://github.com/SoftEng-HEIGVD/bower-sticky-footer",
+  "authors": [
+    "Olivier Liechti <olivier.liechti@wasabi-tech.com>"
+  ],
+  "description": "A bower component with the (customized) 'sticky footer' stylesheet offered by Bootstrap on their website",
+  "main": "dist/css/sticky-footer.css",
+  "keywords": [
+    "bootstrap",
+    "heigvd",
+    "template",
+    "sticky"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-css": "~3.3.4"
+  },
+  "_release": "0.1.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.4",
+    "commit": "1ae2210de336e8b45a6e86d98aeb62ea8b52c7e0"
+  },
+  "_source": "git://github.com/SoftEng-HEIGVD/bower-sticky-footer.git",
+  "_target": "~0.1.4",
+  "_originalSource": "sticky-footer",
+  "_direct": true
+}
