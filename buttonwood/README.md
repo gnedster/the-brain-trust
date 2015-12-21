@@ -8,7 +8,7 @@ channel.
 
 Running the bot is simple:
 
-```js
+```
 npm install
 token=<token> node bot.js
 ```
