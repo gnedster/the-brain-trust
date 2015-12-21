@@ -6,12 +6,18 @@ router.get('/', function(req, res, next) {
   res.render('index');
 });
 
+/* GET health. */
+router.get('/health', function(req, res, next) {
+  res.send('OK');
+});
+
+/* GET privacy policy. */
 router.get('/privacy-policy', function(req, res, next) {
   res.render('privacy-policy');
 });
 
-router.get('/health', function(req, res, next) {
-  res.send('OK');
+router.get('/buttonwood', function(req, res, next) {
+  res.render('buttonwood/index');
 });
 
 module.exports = router;
