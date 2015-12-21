@@ -17,6 +17,7 @@
     "connect": "*",
     "html": "*",
     "path": "^0.12.7",
-    "serve-static": "*"
+    "serve-static": "*",
+    "yahoo-finance": "^0.2.12"
   }
 }
