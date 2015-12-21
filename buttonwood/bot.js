@@ -12,8 +12,14 @@ var bot = controller.spawn(
   }
 ).startRTM();
 
-var priceTpl = _.template('*<%= symbol %>* (<%= name %>) last traded at *$<%= lastTradePriceOnly %>*.');
+var priceTpl = _.template(
+  ['*<%= symbol %>* (<%= name %>) last traded at *$<%= lastTradePriceOnly %>*.',
+   'https://finance.yahoo.com/q?s=<%= symbol %>'
+  ].join('\n')
+);
 var notFoundTpl = _.template('*<%= symbol %>* doesn\'t look like a valid symbol.');
+var introduction = ["I'm buttonwood, it's nice to meet you!",
+    "Type out a stock symbol like *$AAPL*, and I'll get the latest price for you."].join("\n");
 
 /**
  * Return usage information.
@@ -21,10 +27,6 @@ var notFoundTpl = _.template('*<%= symbol %>* doesn\'t look like a valid symbol.
  * @param  {String} message
  */
 controller.hears(['hello', 'hi'],'direct_message,direct_mention,mention',function(bot,message) {
-  var introduction =
-      "I am buttonwood, it's nice to meet you! " +
-      "Send me a stock ticker symbol like *$AAPL*, and I'll get that information for you. " +
-      "You can also get more than one symbol at a time.";
 
   controller.storage.users.get(message.user,function(err,user) {
     if (user && user.name) {
@@ -40,7 +42,7 @@ controller.hears(['hello', 'hi'],'direct_message,direct_mention,mention',functio
  * @param  {Corebot} bot
  * @param  {String} message
  */
-controller.hears(['(\$[A-z]*)'],'direct_message,direct_mention,mention',function(bot,message) {
+controller.hears(['(\$[A-z]*)'],'direct_message,direct_mention,mention,ambient',function(bot,message) {
   var matches = message.text.match(/\$([A-z]*)/ig);
   var symbols = _.compact(_.map(matches, function(symbol) {
     return symbol.substring(1).toUpperCase();
