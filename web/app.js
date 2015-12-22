@@ -7,6 +7,14 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 
+// Models
+var Team = require('./models/team');
+var Permission = require('./models/permission');
+
+// Set up the requisite tables.
+Team.sync();
+Permission.sync();
+
 var app = express();
 
 // view engine setup
@@ -55,6 +63,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

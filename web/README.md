@@ -8,7 +8,7 @@ Running the website should be simple.
 
 ```
 npm install
-DEBUG=web:* npm start
+NODE_ENV=development DEBUG=web:* npm start
 ```
 
 ## Runbook
