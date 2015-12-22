@@ -8,12 +8,18 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 
 // Models
-var Team = require('./models/team');
-var Permission = require('./models/permission');
+var SlackTeam = require('./models/SlackTeam');
+var SlackPermission = require('./models/SlackPermission');
+var SlackApplication = require('./models/SlackApplication');
 
 // Set up the requisite tables.
-Team.sync();
-Permission.sync();
+Promise.all([
+    SlackTeam.sync(),
+    SlackPermission.sync(),
+    SlackApplication.sync()
+  ]).then(function(){
+  console.log("DB set up complete.");
+});
 
 var app = express();
 

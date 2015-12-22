@@ -7,7 +7,8 @@
  * @return {Boolean}
  */
 function isDevelopment() {
-  return process.env.NODE_ENV === 'development';
+  return typeof process.env.NODE_ENV === 'undefined' ||
+    process.env.NODE_ENV === 'development';
 }
 
 /**
