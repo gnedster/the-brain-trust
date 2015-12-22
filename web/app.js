@@ -1,11 +1,26 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var util = require('./lib/util');
+var logger = util.logger;
 var routes = require('./routes/index');
+
+// Models
+var SlackTeam = require('./models/SlackTeam');
+var SlackPermission = require('./models/SlackPermission');
+var SlackApplication = require('./models/SlackApplication');
+
+// Set up the requisite tables.
+Promise.all([
+    SlackTeam.sync(),
+    SlackPermission.sync(),
+    SlackApplication.sync()
+  ]).then(function(){
+  logger.info('DB set up complete.');
+});
 
 var app = express();
 
@@ -15,7 +30,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(morgan("combined", { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -55,6 +70,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

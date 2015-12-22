@@ -9,12 +9,14 @@ html
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
     link(rel='stylesheet', href='/bower_components/bower-sticky-footer/dist/css/sticky-footer.css')
     link(rel='import', href='/bower_components/google-analytics/google-analytics.html')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+
   body
     google-analytics(code='UA-71658652-1')
     .container
       h1
-        #[a.company-title(href="/") the brain trust]
+        #[a.company-title(href='/') the brain trust]
       block content
   footer.footer
     .container
-      p.text-muted all rights reserved | #[a(href="privacy-policy") privacy policy] | #[a(href="mailto:info@the-brain-trust.com") contact]
+      p.text-muted all rights reserved | #[a(href='privacy-policy') privacy policy] | #[a(href='mailto:info@the-brain-trust.com') contact]
