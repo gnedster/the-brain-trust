@@ -1,0 +1,18 @@
+{
+  "rds": {
+    "database": "thebraintrust_development",
+    "username": "thebraintrust",
+    "password": "pwd",
+    "options" : {
+      "host": "localhost",
+      "dialect" : "postgres",
+      "port": 5432,
+      "charset": "utf8",
+      "pool": {
+        "max": 5,
+        "min": 0,
+        "idle": 10000
+      }
+    }
+  }
+}
