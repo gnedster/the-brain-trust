@@ -34,6 +34,12 @@ var logger = new (winston.Logger)({
   ]
 });
 
+logger.stream = {
+  write: function(message, encoding){
+    logger.info(message);
+  }
+};
+
 module.exports = {
   isDevelopment: isDevelopment,
   isProduction: isProduction,
