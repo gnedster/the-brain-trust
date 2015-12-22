@@ -2,7 +2,7 @@
   "rds": {
     "database": "thebraintrust_production",
     "options" : {
-      "host": "the-brain-trust.c1bsfzss4fcj.us-west-2.rds.amazonaws.com",
+      "host": "thebraintrust.c1bsfzss4fcj.us-west-2.rds.amazonaws.com",
       "dialect" : "postgres",
       "port": 5432,
       "charset": "utf8",
