@@ -24,9 +24,14 @@ function isProduction() {
 
 var logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)({'timestamp':true})
-  ],
-  level: (isProduction() === true) ? 'info' : 'debug'
+    new (winston.transports.Console)({
+      timestamp: true,
+      level: (isProduction() === true) ? 'info' : 'debug',
+      handleExceptions: true,
+      json: false,
+      colorize: true
+    })
+  ]
 });
 
 module.exports = {
