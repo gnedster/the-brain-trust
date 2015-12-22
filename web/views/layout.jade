@@ -2,12 +2,15 @@ doctype html
 html
   head
     title= title
+    script(type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js')
+    script(type='text/javascript' src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+    script(type='text/javascript' src='/bower_components/webcomponentsjs/webcomponents-lite.min.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
     link(rel='stylesheet', href='/bower_components/bower-sticky-footer/dist/css/sticky-footer.css')
-    script(type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js')
-    script(type='text/javascript' src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+    link(rel='import', href='/bower_components/google-analytics/google-analytics.html')
   body
+    google-analytics(code='UA-71658652-1')
     .container
       h1
         #[a.company-title(href="/") the brain trust]
