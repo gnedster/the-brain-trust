@@ -15,6 +15,14 @@ var SlackApplication = sequelize.define('SlackApplication', {
     type: Sequelize.STRING,
     field: 'authors'
   },
+  consumerKey: {
+    type: Sequelize.STRING,
+    field: 'consumer_key'
+  },
+  consumerSecret: {
+    type: Sequelize.STRING,
+    field: 'consumer_secret'
+  },
   disabled: {
     type: Sequelize.BOOLEAN,
     field: 'disabled',
