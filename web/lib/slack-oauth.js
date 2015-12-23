@@ -41,18 +41,15 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
   function findOneSlackPermission(teamId, slackApplicationId) {
     return SlackPermission.findOne({
       attributes: ['id'],
-      include: [{
-        model: SlackTeam,
-        where: { slack_id: results.team_id }
-      }, {
-        model: SlackApplication,
-        where: { id : this.slackApplication.id }
-      }]
+      where: {
+        slack_team_id: teamId,
+        slack_application_id : slackApplicationId
+      }
     });
   }
 
-  logger.info('Processing OAuth2 authorize response for: ' + req.originaUrl);
-
+  logger.info('Processing OAuth2 authorize response for: ' + req.originalUrl);
+  var self = this;
   var query = req.query;
 
   if ('code' in query) {
@@ -60,50 +57,54 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
     this.client.getOAuthAccessToken(
       query.code,
+      null,
       function (e, accessToken, refreshToken, results){
         logger.debug(results);
-        SlackTeam.findOrCreate({
-          where: {
-            slackId: results.team_id,
-            slackName: results.team_name
-          }
-        }).then(function(task) {
-          var slackTeam = task[0];
-          var attributes = {
-            slackTeamId: slackTeam.id,
-            slackApplicationId: this.slackApplication.id,
-            accessToken: results.access_token,
-            scope: results.scope,
-            incomingWebhook: results.incoming_webhook,
-            bot: results.incoming_webhook,
-            disabled: false,
-            disabledAt: null
-          };
 
-          findOneSlackPermission(results.team_id, this.slackApplication.id)
-            .then(function(task) {
-              var slackPermission = task[0];
-              if (_.isUndefined(slackPermission)) {
-                SlackPermission.create(attributes).then(function(){
-                  logger.debug('SlackPermission created.');
-                });
-              } else {
-                slackPermission.update(attributes).then(function(){
-                  logger.debug('SlackPermission updated.');
-                });
-              }
-            });
-        });
+        if (results.ok === true) {
+          SlackTeam.findOrCreate({
+            where: {
+              slackId: results.team_id,
+              slackName: results.team_name
+            }
+          }).then(function(task) {
+            var slackTeam = task[0];
+            var attributes = {
+              slackTeamId: slackTeam.id,
+              slackApplicationId: self.slackApplication.id,
+              accessToken: results.access_token,
+              scope: results.scope,
+              incomingWebhook: results.incoming_webhook,
+              bot: results.incoming_webhook,
+              disabled: false,
+              disabledAt: null
+            };
+
+            findOneSlackPermission(slackTeam.id, self.slackApplication.id)
+              .then(function(slackPermission) {
+                if (_.isNull(slackPermission)) {
+                  SlackPermission.create(attributes).then(function(){
+                    logger.debug('SlackPermission created.');
+                  });
+                } else {
+                  slackPermission.update(attributes).then(function(){
+                    logger.debug('SlackPermission updated.');
+                  });
+                }
+              });
+          });
+        } else {
+          logger.info("Could not create SlackPermission: " + results.error);
+        }
       }
     );
   } else {
     if (query.error === 'access_denied') {
       logger.info('Access was denied, disabling existing permissions, if any.');
 
-      findOneSlackPermission(results.team_id, this.slackApplication.id)
-        .then(function(task) {
-          var slackPermission = task[0];
-          if (_.isUndefined(slackPermission)) { return; }
+      findOneSlackPermission(results.team_id, self.slackApplication.id)
+        .then(function(slackPermission) {
+          if (_.isNull(slackPermission)) { return; }
 
           slackPermission.update({
             disabled: true,

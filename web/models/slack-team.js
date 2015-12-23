@@ -20,10 +20,4 @@ var SlackTeam = sequelize.define('SlackTeam', {
   freezeTableName: true
 });
 
-SlackTeam.belongsToMany(SlackApplication, {
-  through: SlackPermission,
-  otherKey: 'slack_application_id',
-  foreignKey: 'slack_team_id'
-});
-
 module.exports = SlackTeam;
