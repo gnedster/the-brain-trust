@@ -18,11 +18,13 @@ var SlackPermission = sequelize.define('SlackPermission', {
   },
   accessToken: {
     type: Sequelize.STRING,
-    field: 'access_token'
+    field: 'access_token',
+    allowNull : false
   },
   scope: {
     type: Sequelize.STRING,
-    field: 'scope'
+    field: 'scope',
+    allowNull : false
   },
   incomingWebhook: {
     type: Sequelize.JSON,
@@ -36,9 +38,23 @@ var SlackPermission = sequelize.define('SlackPermission', {
     type: Sequelize.BOOLEAN,
     field: 'disabled',
     defaultValue: false
+  },
+  disabledAt: {
+    type: Sequelize.DATE,
+    field: 'disabled_at'
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  instanceMethods: {
+    disable: function(slackPermission, done) {
+      slackPermission.update({
+        disabled: true,
+        disabledAt: new Date()
+      }).then(function(slackPermission){
+        done();
+      });
+    }
+  }
 });
 
 module.exports = SlackPermission;

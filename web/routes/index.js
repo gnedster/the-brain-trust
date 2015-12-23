@@ -16,8 +16,4 @@ router.get('/privacy-policy', function(req, res, next) {
   res.render('privacy-policy');
 });
 
-router.get('/buttonwood', function(req, res, next) {
-  res.render('buttonwood/index');
-});
-
 module.exports = router;

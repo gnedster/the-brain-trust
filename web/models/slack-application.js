@@ -8,12 +8,22 @@ var sequelize = require('../lib/sequelize');
 var SlackApplication = sequelize.define('SlackApplication', {
   name: {
     type: Sequelize.STRING,
-    allowNull : false,
-    field: 'name'
+    field: 'name',
+    allowNull : false
   },
   authors: {
     type: Sequelize.STRING,
     field: 'authors'
+  },
+  consumerKey: {
+    type: Sequelize.STRING,
+    field: 'consumer_key',
+    allowNull : false
+  },
+  consumerSecret: {
+    type: Sequelize.STRING,
+    field: 'consumer_secret',
+    allowNull : false
   },
   disabled: {
     type: Sequelize.BOOLEAN,

@@ -6,19 +6,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var util = require('./lib/util');
 var logger = util.logger;
-var routes = require('./routes/index');
-
-// Models
-var SlackTeam = require('./models/SlackTeam');
-var SlackPermission = require('./models/SlackPermission');
-var SlackApplication = require('./models/SlackApplication');
+var web = require('./routes/index');
+var buttonwood = require('./routes/buttonwood');
+var sequelize = require('./lib/sequelize');
 
 // Set up the requisite tables.
-Promise.all([
-    SlackTeam.sync(),
-    SlackPermission.sync(),
-    SlackApplication.sync()
-  ]).then(function(){
+sequelize.sync().then(function(){
   logger.info('DB set up complete.');
 });
 
@@ -38,7 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
 
-app.use('/', routes);
+app.use('/', web);
+app.use('/buttonwood', buttonwood);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
