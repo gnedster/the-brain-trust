@@ -1,6 +1,10 @@
 extends ../layout
 
 block content
-  h2 you're in.
+  h2 you're in
 
-  p Looks like you're all set up. Or you just went directly to this page.
+  p.
+    Looks like you're all set up for
+    #[a(href="/#{slackApplication.name}") #{slackApplication.name}]. Let us know
+    how we're doing at
+    #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].

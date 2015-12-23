@@ -1,4 +1,5 @@
 var express = require('express');
+var logger = require('../lib/util').logger;
 var router = express.Router();
 var SlackOAuth = require('../lib/slack-oauth');
 var SlackApplication = require('../models/slack-application');
@@ -9,11 +10,11 @@ router.get('/', function(req, res, next) {
 });
 
 /*
- * GET buttonwood/authorize. Should be the OAuth redirect uri and must
- * contain a code.
+ * GET buttonwood/authorize.
+ * Should be the OAuth redirect uri and must contain a code and state
  */
 router.get('/authorize', function(req, res, next) {
-  if ('code' in req.query) {
+  if ('code' in req.query && 'state' in req.query) {
     SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
@@ -23,8 +24,20 @@ router.get('/authorize', function(req, res, next) {
         consumerSecret: '0a94fc830fb4db0c37144103b9587cc1'
       }
     }).then(function(task) {
-      var slackOAuthClient = new SlackOAuth(task[0]);
-      slackOAuthClient.getOAuthAccessToken(req);
+      var slackApplication = task[0];
+      var slackOAuthClient = new SlackOAuth(slackApplication);
+      slackOAuthClient.getOAuthAccessToken(req)
+        .then(function() {
+          res.render('buttonwood/authorized', {
+            slackApplication: slackApplication
+          });
+        })
+        .catch(function(error) {
+          logger.error(error);
+          res.render('buttonwood/unauthorized', {
+            slackApplication: slackApplication
+          });
+        });
     });
   } else {
     var err = new Error('Not Found');

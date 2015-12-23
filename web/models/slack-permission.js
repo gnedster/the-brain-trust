@@ -44,7 +44,17 @@ var SlackPermission = sequelize.define('SlackPermission', {
     field: 'disabled_at'
   }
 }, {
-  freezeTableName: true
+  freezeTableName: true,
+  instanceMethods: {
+    disable: function(slackPermission, done) {
+      slackPermission.update({
+        disabled: true,
+        disabledAt: new Date()
+      }).then(function(slackPermission){
+        done();
+      });
+    }
+  }
 });
 
 module.exports = SlackPermission;
