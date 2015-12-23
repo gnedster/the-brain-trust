@@ -1,0 +1,32 @@
+{
+  "name": "web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "config": "^1.17.1",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "express": "~4.13.1",
+    "grunt": "^0.4.5",
+    "jade": "~1.11.0",
+    "lodash": "^3.10.1",
+    "morgan": "~1.6.1",
+<<<<<<< HEAD
+    "oauth": "^0.9.14",
+=======
+>>>>>>> origin/master
+    "pg": "^4.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.15.0",
+    "serve-favicon": "~2.3.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
