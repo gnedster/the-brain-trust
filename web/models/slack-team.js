@@ -1,6 +1,6 @@
 var Sequelize = require('sequelize');
-var SlackPermission = require('./SlackPermission');
-var SlackApplication = require('./SlackApplication');
+var SlackPermission = require('./slack-permission');
+var SlackApplication = require('./slack-application');
 var sequelize = require('../lib/sequelize');
 
 /**

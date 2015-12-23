@@ -36,6 +36,10 @@ var SlackPermission = sequelize.define('SlackPermission', {
     type: Sequelize.BOOLEAN,
     field: 'disabled',
     defaultValue: false
+  },
+  disabledAt: {
+    type: Sequelize.DATE,
+    field: 'disabled_at'
   }
 }, {
   freezeTableName: true

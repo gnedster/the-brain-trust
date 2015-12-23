@@ -9,9 +9,9 @@ var logger = util.logger;
 var routes = require('./routes/index');
 
 // Models
-var SlackTeam = require('./models/SlackTeam');
-var SlackPermission = require('./models/SlackPermission');
-var SlackApplication = require('./models/SlackApplication');
+var SlackTeam = require('./models/slack-team');
+var SlackPermission = require('./models/slack-permission');
+var SlackApplication = require('./models/slack-application');
 
 // Set up the requisite tables.
 Promise.all([
