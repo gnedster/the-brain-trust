@@ -1,7 +1,8 @@
-var url = require('url');
 var _ = require('lodash');
 var OAuth = require('oauth');
+var SlackApplication = require('../models/slack-application');
 var SlackPermission = require('../models/slack-permission');
+var SlackTeam = require('../models/slack-team');
 var util = require('./util');
 var logger = util.logger;
 
@@ -26,10 +27,10 @@ function SlackOAuth(slackApplication) {
 
 /**
  * Abstraction for getting the OAuth access token.
- * @param  {String} redirectUri The uri that was passed back by Slack.
+ * @param  {Request} redirectUri The uri that was passed back by Slack.
  * @return {Promise} A promise.
  */
-SlackOAuth.prototype.getOAuthAccessToken = function(redirectUri) {
+SlackOAuth.prototype.getOAuthAccessToken = function(req) {
   /**
    * Helper function to find a slackPermission based off of teamId and
    * slackApplicationId.
@@ -50,19 +51,15 @@ SlackOAuth.prototype.getOAuthAccessToken = function(redirectUri) {
     });
   }
 
-  logger.info('Processing OAuth2 authorize response for ' +
-    this.slackApplication.name
-  );
+  logger.info('Processing OAuth2 authorize response for: ' + req.originaUrl);
 
-  var urlObj = url.parse(redirectUri),
-      query = urlObj.query;
+  var query = req.query;
 
-  if (_.isUndefined(query.error)) {
+  if ('code' in query) {
     logger.info('Access was granted successfully.');
 
     this.client.getOAuthAccessToken(
       query.code,
-      {redirect_uri: redirectUri},
       function (e, accessToken, refreshToken, results){
         logger.debug(results);
         SlackTeam.findOrCreate({
@@ -70,7 +67,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(redirectUri) {
             slackId: results.team_id,
             slackName: results.team_name
           }
-        }).then(function(slackTeam) {
+        }).then(function(task) {
+          var slackTeam = task[0];
           var attributes = {
             slackTeamId: slackTeam.id,
             slackApplicationId: this.slackApplication.id,
@@ -83,7 +81,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(redirectUri) {
           };
 
           findOneSlackPermission(results.team_id, this.slackApplication.id)
-            .then(function(slackPermission) {
+            .then(function(task) {
+              var slackPermission = task[0];
               if (_.isUndefined(slackPermission)) {
                 SlackPermission.create(attributes).then(function(){
                   logger.debug('SlackPermission created.');
@@ -102,7 +101,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(redirectUri) {
       logger.info('Access was denied, disabling existing permissions, if any.');
 
       findOneSlackPermission(results.team_id, this.slackApplication.id)
-        .then(function(slackPermission) {
+        .then(function(task) {
+          var slackPermission = task[0];
           if (_.isUndefined(slackPermission)) { return; }
 
           slackPermission.update({

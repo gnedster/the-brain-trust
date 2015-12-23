@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var util = require('./lib/util');
 var logger = util.logger;
 var routes = require('./routes/index');
+var buttonwood = require('./routes/buttonwood');
 
 // Models
 var SlackTeam = require('./models/slack-team');
@@ -39,6 +40,7 @@ app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
 
 app.use('/', routes);
+app.use('/buttonwood', buttonwood);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
