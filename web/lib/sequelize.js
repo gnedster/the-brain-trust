@@ -8,8 +8,6 @@ var config = require('config');
 var rdsConfig = config.get('rds');
 var Sequelize = require('sequelize');
 
-var env = process.env.NODE_ENV;
-
 var username = util.isDevelopment() ? rdsConfig.username : process.env.RDS_USERNAME;
 var password = util.isDevelopment() ? rdsConfig.password : process.env.RDS_PASSWORD;
 

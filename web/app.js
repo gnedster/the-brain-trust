@@ -12,9 +12,13 @@ var sequelize = require('./lib/sequelize');
 var models = require('./models/index');
 
 // Set up the requisite tables.
-sequelize.sync().then(function(){
-  logger.info('DB set up complete.');
-});
+sequelize.sync()
+  .then(function(){
+    logger.info('DB set up complete.');
+  })
+  .catch(function(err){
+    logger.error(err);
+  });
 
 var app = express();
 
