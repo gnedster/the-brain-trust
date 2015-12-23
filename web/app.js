@@ -9,6 +9,7 @@ var logger = util.logger;
 var web = require('./routes/index');
 var buttonwood = require('./routes/buttonwood');
 var sequelize = require('./lib/sequelize');
+var models = require('./models/index');
 
 // Set up the requisite tables.
 sequelize.sync().then(function(){
