@@ -9,7 +9,8 @@ var SlackTeam = sequelize.define('SlackTeam', {
   slackId: {
     type: Sequelize.STRING,
     field: 'slack_id',
-    allowNull : false
+    allowNull : false,
+    unique : true
   },
   slackName: {
     type: Sequelize.STRING,

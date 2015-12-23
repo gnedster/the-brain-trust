@@ -19,7 +19,8 @@ var SlackPermission = sequelize.define('SlackPermission', {
   accessToken: {
     type: Sequelize.STRING,
     field: 'access_token',
-    allowNull : false
+    allowNull : false,
+    unique : true
   },
   scope: {
     type: Sequelize.STRING,

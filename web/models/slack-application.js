@@ -18,12 +18,14 @@ var SlackApplication = sequelize.define('SlackApplication', {
   consumerKey: {
     type: Sequelize.STRING,
     field: 'consumer_key',
-    allowNull : false
+    allowNull : false,
+    unique: true
   },
   consumerSecret: {
     type: Sequelize.STRING,
     field: 'consumer_secret',
-    allowNull : false
+    allowNull : false,
+    unique: true
   },
   disabled: {
     type: Sequelize.BOOLEAN,
