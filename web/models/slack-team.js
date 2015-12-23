@@ -1,6 +1,4 @@
 var Sequelize = require('sequelize');
-var SlackPermission = require('./slack-permission');
-var SlackApplication = require('./slack-application');
 var sequelize = require('../lib/sequelize');
 
 /**
@@ -21,5 +19,6 @@ var SlackTeam = sequelize.define('SlackTeam', {
 }, {
   freezeTableName: true
 });
+
 
 module.exports = SlackTeam;
