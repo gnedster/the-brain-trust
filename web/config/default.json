@@ -1,0 +1,21 @@
+{
+  "oauth" : {
+    "state": "B3us.UN!VdC6gwdMykmygs"
+  },
+  "rds": {
+    "options" : {
+      "dialect" : "postgres",
+      "port": 5432,
+      "charset": "utf8",
+      "pool": {
+        "max": 5,
+        "min": 0,
+        "idle": 10000
+      }
+    }
+  },
+  "error" : {
+    "404" : "this is not the page you are looking for",
+    "500" : "something went horribly wrong"
+  }
+}

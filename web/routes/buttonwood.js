@@ -1,3 +1,4 @@
+var config = require('config');
 var express = require('express');
 var logger = require('../lib/util').logger;
 var router = express.Router();
@@ -6,7 +7,7 @@ var SlackApplication = require('../models/slack-application');
 
 /* GET buttonwood. */
 router.get('/', function(req, res, next) {
-  res.render('buttonwood/index');
+  res.render('buttonwood/index', {state: config.get('oauth.state')});
 });
 
 /*
@@ -14,7 +15,8 @@ router.get('/', function(req, res, next) {
  * Should be the OAuth redirect uri and must contain a code and state
  */
 router.get('/authorize', function(req, res, next) {
-  if ('code' in req.query && 'state' in req.query) {
+  // TODO: Get rid of hardcoded state
+  if ('state' in req.query && req.query.state === config.get('oauth.state')) {
     SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
@@ -34,13 +36,25 @@ router.get('/authorize', function(req, res, next) {
         })
         .catch(function(error) {
           logger.error(error);
-          res.render('buttonwood/unauthorized', {
-            slackApplication: slackApplication
-          });
+
+          if (error.message === 'access_denied'){
+            res.render('buttonwood/unauthorized', {
+              slackApplication: slackApplication
+            });
+          } else {
+            res.render('buttonwood/error', {
+              slackApplication: slackApplication
+            });
+          }
         });
+    }).catch(function(error) {
+      logger.error(error);
+      var err = new Error(error);
+      err.status = 500;
+      next(err);
     });
   } else {
-    var err = new Error('Not Found');
+    var err = new Error('not found');
     err.status = 404;
     next(err);
   }
