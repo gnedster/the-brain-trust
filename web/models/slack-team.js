@@ -10,11 +10,13 @@ var sequelize = require('../lib/sequelize');
 var SlackTeam = sequelize.define('SlackTeam', {
   slackId: {
     type: Sequelize.STRING,
-    field: 'slack_id'
+    field: 'slack_id',
+    allowNull : false
   },
   slackName: {
     type: Sequelize.STRING,
-    field: 'slack_name'
+    field: 'slack_name',
+    allowNull : false
   }
 }, {
   freezeTableName: true

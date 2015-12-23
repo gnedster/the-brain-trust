@@ -18,11 +18,13 @@ var SlackPermission = sequelize.define('SlackPermission', {
   },
   accessToken: {
     type: Sequelize.STRING,
-    field: 'access_token'
+    field: 'access_token',
+    allowNull : false
   },
   scope: {
     type: Sequelize.STRING,
-    field: 'scope'
+    field: 'scope',
+    allowNull : false
   },
   incomingWebhook: {
     type: Sequelize.JSON,
