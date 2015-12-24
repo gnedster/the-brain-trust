@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var logger = require('./util').logger;
+var logger = require('./logger');
 var OAuth = require('oauth');
 var sequelize = require('./sequelize');
 var SlackApplication = require('../models/slack-application');

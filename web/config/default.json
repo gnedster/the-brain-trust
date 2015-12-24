@@ -2,7 +2,7 @@
   "oauth" : {
     "state": "B3us.UN!VdC6gwdMykmygs"
   },
-  "rds": {
+  "rds" : {
     "options" : {
       "dialect" : "postgres",
       "port": 5432,

@@ -3,6 +3,7 @@ var config = require('config');
 var cookieParser = require('cookie-parser');
 var express = require('express');
 var favicon = require('serve-favicon');
+var logger = require('./lib/logger');
 var morgan = require('morgan');
 var path = require('path');
 var util = require('./lib/util');
@@ -10,8 +11,6 @@ var util = require('./lib/util');
 // Routes
 var buttonwood = require('./routes/buttonwood');
 var web = require('./routes/index');
-
-var logger = util.logger;
 
 var app = express();
 
