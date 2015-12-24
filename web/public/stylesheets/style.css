@@ -10,7 +10,11 @@ a {
   color: black;
 }
 
-.add-to-slack {
-  margin-top: 15px;
-  margin-bottom: 15px;
+.slack-app-title {
+  margin-top: -10px;
+}
+
+.slack-app-title > .add-to-slack {
+  position: relative;
+  top: 15px;
 }
