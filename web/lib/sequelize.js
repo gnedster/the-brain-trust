@@ -3,18 +3,24 @@
  * module exports, there should be only one instance of this sqlClient.
  */
 
-var util = require('./util');
 var config = require('config');
+var logger = require('./logger');
 var rdsConfig = config.get('rds');
 var Sequelize = require('sequelize');
+var util = require('./util');
 
-var username = util.isDevelopment() ? rdsConfig.username : process.env.RDS_USERNAME;
-var password = util.isDevelopment() ? rdsConfig.password : process.env.RDS_PASSWORD;
+if (util.isDevelopment() === true) {
+  rdsConfig.username = process.env.RDS_USERNAME;
+  rdsConfig.password = process.env.RDS_PASSWORD;
+}
+
+logger.debug('starting rds connection with config:\n' +
+  JSON.stringify(rdsConfig, null, 2));
 
 var sequelize = new Sequelize(
   rdsConfig.database,
-  username,
-  password,
+  rdsConfig.username,
+  rdsConfig.password,
   rdsConfig.options
 );
 

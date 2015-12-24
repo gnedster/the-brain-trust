@@ -1,31 +1,23 @@
 /**
  * Initialize the database, run migrations.
  */
-var logger = require('../lib/util').logger;
+var _ = require('lodash');
+var logger = require('../lib/logger');
 var models = require('../models/index');
 var sequelize = require('../lib/sequelize');
 
 /**
- * Encapsulate logic to control database manipulaiton.
+ * Update the database with relevant models
  */
-function Db() {
-  this.ready = false;
-}
+sequelize.sync(_.merge({
+    logging: logger.stream.write
+  }))
+  .then(function(){
+    logger.info('db initialized.');
+  })
+  .catch(function(err){
+    logger.error(err);
+  });
 
-/**
- * Initialize the database
- * @param  {Object} options See sequelize options.
- */
-Db.prototype.sync = function(options) {
-  var self = this;
-  sequelize.sync(options)
-    .then(function(){
-      self.ready = true;
-      logger.info('DB set up complete.');
-    })
-    .catch(function(err){
-      logger.error(err);
-    });
-};
 
-module.exports = new Db();
+module.exports = sequelize;
