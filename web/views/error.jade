@@ -3,5 +3,5 @@ extends layout
 block content
   h2= message
   h3= error.status
-  if error
+  if error.stack
     pre #{error.stack}

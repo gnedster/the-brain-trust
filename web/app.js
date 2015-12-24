@@ -1,25 +1,17 @@
+var bodyParser = require('body-parser');
 var config = require('config');
+var cookieParser = require('cookie-parser');
 var express = require('express');
-var path = require('path');
 var favicon = require('serve-favicon');
 var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var path = require('path');
 var util = require('./lib/util');
-var logger = util.logger;
-var web = require('./routes/index');
-var buttonwood = require('./routes/buttonwood');
-var sequelize = require('./lib/sequelize');
-var models = require('./models/index');
 
-// Set up the requisite tables.
-sequelize.sync()
-  .then(function(){
-    logger.info('DB set up complete.');
-  })
-  .catch(function(err){
-    logger.error(err);
-  });
+// Routes
+var buttonwood = require('./routes/buttonwood');
+var web = require('./routes/index');
+
+var logger = util.logger;
 
 var app = express();
 
@@ -28,7 +20,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan("combined", { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -68,7 +60,7 @@ app.use(function(err, req, res, next) {
   res.status(errorCode);
   res.render('error', {
     message: config.get('error.' + errorCode) || err.message,
-    error: {}
+    error: { status: err.status }
   });
 });
 
