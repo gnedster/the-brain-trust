@@ -10,7 +10,6 @@ var sequelize = require('../lib/sequelize');
  */
 function Db() {
   this.ready = false;
-  this.error = false;
 }
 
 /**
