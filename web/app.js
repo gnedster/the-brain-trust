@@ -67,8 +67,7 @@ app.use(function(err, req, res, next) {
   var errorCode = err.status || 500;
   res.status(errorCode);
   res.render('error', {
-    message: config.get('error.' + errorCode) || err.message,
-    error: {}
+    message: config.get('error.' + errorCode) || err.message
   });
 });
 
