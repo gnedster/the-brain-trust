@@ -6,5 +6,10 @@
     "options" : {
       "host": "localhost"
     }
+  },
+  "sqs" : {
+    "accessKeyId": "DjvaGz9Xm.yr]3ag",
+    "secretAccessKey": "McU7YQ3t<nuCh7hB%X8^+fY#",
+    "region": "canada"
   }
 }
