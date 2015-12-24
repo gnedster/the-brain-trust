@@ -5,8 +5,15 @@
  */
 
 var app = require('../app');
+var db = require('../db/db');
 var debug = require('debug')('web:server');
 var http = require('http');
+
+/**
+ * Set up connection to database, initialize models, and run
+ * migrations.
+ */
+db.sync();
 
 /**
  * Get port from environment and store in Express.

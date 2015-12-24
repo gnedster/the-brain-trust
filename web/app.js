@@ -1,25 +1,17 @@
+var bodyParser = require('body-parser');
 var config = require('config');
+var cookieParser = require('cookie-parser');
 var express = require('express');
-var path = require('path');
 var favicon = require('serve-favicon');
 var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var path = require('path');
 var util = require('./lib/util');
-var logger = util.logger;
-var web = require('./routes/index');
-var buttonwood = require('./routes/buttonwood');
-var sequelize = require('./lib/sequelize');
-var models = require('./models/index');
 
-// Set up the requisite tables.
-sequelize.sync()
-  .then(function(){
-    logger.info('DB set up complete.');
-  })
-  .catch(function(err){
-    logger.error(err);
-  });
+// Routes
+var buttonwood = require('./routes/buttonwood');
+var web = require('./routes/index');
+
+var logger = util.logger;
 
 var app = express();
 
