@@ -61,7 +61,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
 /**
  * Process the return value of hitting the api/oauth.access endpoint of
- * Slack. Exposed on the prototype to allow for testing.
+ * Slack. Exposed on the prototype to allow for testing. It the responsibility
+ * of the application to remove entries which are no longer valid.
  * @private
  * @param  {Object} e            Always null.
  * @param  {String} accessToken  String for an access token.
