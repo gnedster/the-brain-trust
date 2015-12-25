@@ -15,7 +15,7 @@ var sqs = require('../lib/sqs');
 function SlackOAuth(slackApplication) {
   var oAuthConfig = config.get('oauth.slack');
 
-  logger.debug("starting connection with oauth:\n" +
+  logger.info("starting connection with oauth:\n" +
     JSON.stringify(oAuthConfig));
 
   this.slackApplication = slackApplication;
