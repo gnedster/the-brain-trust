@@ -12,7 +12,7 @@ var sqs = require('../lib/sqs');
 function sendSQSMessage(instance, options) {
   sqs.sendInstanceMessage(
     'slack-application',
-    'slack-permission changed',
+    'slack-permission created',
     instance);
 }
 
@@ -49,8 +49,7 @@ var SlackPermission = sequelize.define('SlackPermission', {
   }
 }, {
   hooks: {
-    afterCreate: sendSQSMessage,
-    afterUpdate: sendSQSMessage
+    afterCreate: sendSQSMessage
   }
 });
 
