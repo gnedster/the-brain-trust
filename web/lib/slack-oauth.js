@@ -1,10 +1,9 @@
 var _ = require('lodash');
+var config = require('config');
 var logger = require('./logger');
 var OAuth = require('oauth');
 var sequelize = require('./sequelize');
-var SlackApplication = require('../models/slack-application');
-var SlackPermission = require('../models/slack-permission');
-var SlackTeam = require('../models/slack-team');
+var sqs = require('../lib/sqs');
 
 /**
  * Create a OAuth2 client for Slack OAuth. Should adhere to
@@ -14,13 +13,18 @@ var SlackTeam = require('../models/slack-team');
  *                                  OAuth requests for.
  */
 function SlackOAuth(slackApplication) {
+  var oAuthConfig = config.get('oauth.slack');
+
+  logger.debug("starting connection with oauth:\n" +
+    JSON.stringify(oAuthConfig));
+
   this.slackApplication = slackApplication;
   this.client = new OAuth.OAuth2(
     slackApplication.consumerKey,
     slackApplication.consumerSecret,
-    'https://slack.com/',
-    'oauth/authorize',
-    'api/oauth.access',
+    oAuthConfig.baseSite,
+    oAuthConfig.authorizePath,
+    oAuthConfig.accessTokenPath,
     null
   );
 }
@@ -40,7 +44,7 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
       self.client.getOAuthAccessToken(
         query.code,
         null,
-        _.bind(self._processGetAuthAccessRequest, {
+        _.bind(self.processGetAuthAccessRequest, {
           slackApplication: self.slackApplication,
           resolve: resolve,
           reject: reject,
@@ -64,14 +68,14 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
  * @param  {String} refreshToken String for a refresh token.
  * @param  {Object} results      Object that is returned by Slack.
  */
-SlackOAuth.prototype._processGetAuthAccessRequest =
+SlackOAuth.prototype.processGetAuthAccessRequest =
   function(e, accessToken, refreshToken, results){
     var self = this;
     logger.debug(results);
 
     try {
       if (results && results.ok === true) {
-        SlackTeam.findOrCreate({
+        sequelize.models.SlackTeam.findOrCreate({
           where: {
             slackId: results.team_id,
             slackName: results.team_name
@@ -90,16 +94,16 @@ SlackOAuth.prototype._processGetAuthAccessRequest =
           };
 
           sequelize.transaction(function(t) {
-            return SlackPermission.findOne({
+            return sequelize.models.SlackPermission.findOne({
                 attributes: ['id'],
                 where: {
-                  slack_team_id: slackTeam.id,
-                  slack_application_id : self.slackApplication.id
+                  slackTeamId: attributes.slack_team_id,
+                  slackApplicationId : attributes.slack_application_id
                 }
               }, {transaction: t})
               .then(function(slackPermission) {
                 if (_.isNull(slackPermission)) {
-                  return SlackPermission.create(attributes, {transaction: t});
+                  return sequelize.models.SlackPermission.create(attributes, {transaction: t});
                 } else {
                   return slackPermission.update(attributes, {transaction: t});
                 }
@@ -110,11 +114,15 @@ SlackOAuth.prototype._processGetAuthAccessRequest =
             }).catch(function(err){
               self.reject(new Error(err));
             });
+        }).catch(function(err) {
+          self.reject(new Error(err));
         });
       } else {
-        self.reject(new Error(results.error));
+        self.reject(
+          new Error(_.isUndefined(results) ? 'No response' : results.error)
+          );
       }
-    } catch(err) {
+    } catch (err) {
       self.reject(err);
     }
   };

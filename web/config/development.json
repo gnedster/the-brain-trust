@@ -1,13 +1,13 @@
 {
   "rds": {
-    "database" : "thebraintrust_development",
-    "username" : "thebraintrust",
-    "password" : "pwd",
-    "options" : {
-      "host" : "localhost"
+    "database": "thebraintrust_development",
+    "username": "thebraintrust",
+    "password": "pwd",
+    "options": {
+      "host": "localhost"
     }
   },
-  "sqs" : {
+  "sqs": {
     "endpoint": "http://localhost:4568",
     "accessKeyId": "access key id",
     "secretAccessKey": "secret access key",

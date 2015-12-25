@@ -23,4 +23,9 @@ logger.stream = {
   }
 };
 
+// Log as soon as file is included.
+logger.info('starting in (' +
+  (process.env.NODE_ENV || 'development') +
+  ') mode');
+
 module.exports = logger;

@@ -8,18 +8,14 @@ var sequelize = require('../lib/sequelize');
 var SlackTeam = sequelize.define('SlackTeam', {
   slackId: {
     type: Sequelize.STRING,
-    field: 'slack_id',
     allowNull : false,
-    unique : true
+    field: 'slack_id'
   },
   slackName: {
     type: Sequelize.STRING,
-    field: 'slack_name',
-    allowNull : false
+    allowNull : false,
+    field: 'slack_name'
   }
-}, {
-  freezeTableName: true
 });
-
 
 module.exports = SlackTeam;
