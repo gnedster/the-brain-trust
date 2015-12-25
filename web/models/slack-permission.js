@@ -12,7 +12,7 @@ var sqs = require('../lib/sqs');
 function sendSQSMessage(instance, options) {
   sqs.sendInstanceMessage(
     'slack-application',
-    'SlackPermission changed',
+    'slack-permission changed',
     instance);
 }
 
