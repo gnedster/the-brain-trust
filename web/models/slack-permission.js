@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var logger = require('../lib/logger');
 var Sequelize = require('sequelize');
 var sequelize = require('../lib/sequelize');
@@ -10,25 +11,10 @@ var sqs = require('../lib/sqs');
  */
 function sendSQSMessage(instance, options) {
   logger.info('Sending message to SQS.');
-  var params = {
-    MessageBody: 'SlackPermission changed',
-    QueueUrl: 'STRING_VALUE',
-    DelaySeconds: 0,
-    MessageAttributes: {
-      slackPermission: {
-        DataType: 'String',
-        StringValue: JSON.stringify(instance)
-      }
-    }
-  };
-
-  sqs.sendMessage(params, function(err, data) {
-    if (err) {
-      logger.error(err, err.stack);
-    } else {
-      logger.log(data);
-    }
-  });
+  sqs.sendInstanceMessage(
+    'slack-application',
+    'SlackPermission changed',
+    instance);
 }
 
 /**
@@ -66,8 +52,7 @@ var SlackPermission = sequelize.define('SlackPermission', {
 }, {
   hooks: {
     afterCreate: sendSQSMessage,
-    afterUpdate: sendSQSMessage,
-    afterDestroy: sendSQSMessage
+    afterUpdate: sendSQSMessage
   }
 });
 

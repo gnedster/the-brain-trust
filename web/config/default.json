@@ -1,4 +1,8 @@
 {
+  "error" : {
+    "404" : "this is not the page you are looking for",
+    "500" : "something went horribly wrong"
+  },
   "oauth" : {
     "state": "B3us.UN!VdC6gwdMykmygs",
     "slack": {
@@ -24,10 +28,6 @@
         "timestamps": true
       }
     }
-  },
-  "error" : {
-    "404" : "this is not the page you are looking for",
-    "500" : "something went horribly wrong"
   },
   "sqs" : {
     "apiVersion" : "2012-11-05"
