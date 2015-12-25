@@ -35,7 +35,7 @@ function SlackOAuth(slackApplication) {
  * @return {Promise} A promise.
  */
 SlackOAuth.prototype.getOAuthAccessToken = function(req) {
-  logger.info('Processing OAuth2 authorize response for: ' + req.originalUrl);
+  logger.info('processing OAuth2 authorize response for: ' + req.originalUrl);
   var self = this;
   var query = req.query;
 
@@ -51,7 +51,7 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
         })
       );
     } else {
-      logger.error('An error was returned by Slack: ' + query.error);
+      logger.error('an error was returned by Slack: ' + query.error);
       reject(new Error(query.error));
     }
   });
@@ -93,23 +93,10 @@ SlackOAuth.prototype.processGetAuthAccessRequest =
             disabledAt: null
           };
 
-          sequelize.transaction(function(t) {
-            return sequelize.models.SlackPermission.findOne({
-                attributes: ['id'],
-                where: {
-                  slackTeamId: attributes.slack_team_id,
-                  slackApplicationId : attributes.slack_application_id
-                }
-              }, {transaction: t})
-              .then(function(slackPermission) {
-                if (_.isNull(slackPermission)) {
-                  return sequelize.models.SlackPermission.create(attributes, {transaction: t});
-                } else {
-                  return slackPermission.update(attributes, {transaction: t});
-                }
-              });
-            }).then(function(slackPermission){
-              logger.info('SlackPermission created/updated.');
+          sequelize.models.SlackPermission
+            .create(attributes)
+            .then(function(slackPermission){
+              logger.info('slack-permission created.');
               self.resolve(slackPermission);
             }).catch(function(err){
               self.reject(new Error(err));
@@ -119,7 +106,7 @@ SlackOAuth.prototype.processGetAuthAccessRequest =
         });
       } else {
         self.reject(
-          new Error(_.isUndefined(results) ? 'No response' : results.error)
+          new Error(_.isUndefined(results) ? 'no response' : results.error)
           );
       }
     } catch (err) {

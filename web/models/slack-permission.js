@@ -10,7 +10,6 @@ var sqs = require('../lib/sqs');
  * @param  {Object} options   Standard sequelize hook options
  */
 function sendSQSMessage(instance, options) {
-  logger.info('Sending message to SQS.');
   sqs.sendInstanceMessage(
     'slack-application',
     'SlackPermission changed',
