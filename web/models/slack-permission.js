@@ -1,30 +1,44 @@
+var _ = require('lodash');
+var logger = require('../lib/logger');
 var Sequelize = require('sequelize');
 var sequelize = require('../lib/sequelize');
+var sqs = require('../lib/sqs');
+
+/**
+ * Send a message to SQS indicating an alteration to SlackPermission
+ * @param  {Model}  instance  Instance of the altered SlackPermission
+ * @param  {Object} options   Standard sequelize hook options
+ */
+function sendSQSMessage(instance, options) {
+  sqs.sendInstanceMessage(
+    'slack-application',
+    'SlackPermission changed',
+    instance);
+}
 
 /**
  * The permissions granted by Slack teams for a given application.
  * @type {Model}
  */
 var SlackPermission = sequelize.define('SlackPermission', {
-  slackTeamId: {
-    type: Sequelize.INTEGER,
-    field: 'slack_team_id',
-    allowNull : false
-  },
   slackApplicationId: {
     type: Sequelize.INTEGER,
-    field: 'slack_application_id',
-    allowNull : false
+    allowNull : false,
+    field: 'slack_application_id'
+  },
+  slackTeamId: {
+    type: Sequelize.INTEGER,
+    allowNull : false,
+    field: 'slack_team_id'
   },
   accessToken: {
     type: Sequelize.STRING,
-    field: 'access_token',
     allowNull : false,
-    unique : true
+    unique : true,
+    field: 'access_token'
   },
   scope: {
     type: Sequelize.STRING,
-    field: 'scope',
     allowNull : false
   },
   incomingWebhook: {
@@ -32,29 +46,12 @@ var SlackPermission = sequelize.define('SlackPermission', {
     field: 'incoming_webhook'
   },
   bot: {
-    type: Sequelize.JSON,
-    field: 'bot'
-  },
-  disabled: {
-    type: Sequelize.BOOLEAN,
-    field: 'disabled',
-    defaultValue: false
-  },
-  disabledAt: {
-    type: Sequelize.DATE,
-    field: 'disabled_at'
+    type: Sequelize.JSON
   }
 }, {
-  freezeTableName: true,
-  instanceMethods: {
-    disable: function(slackPermission, done) {
-      slackPermission.update({
-        disabled: true,
-        disabledAt: new Date()
-      }).then(function(slackPermission){
-        done();
-      });
-    }
+  hooks: {
+    afterCreate: sendSQSMessage,
+    afterUpdate: sendSQSMessage
   }
 });
 

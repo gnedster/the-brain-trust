@@ -1,9 +1,9 @@
 var config = require('config');
 var express = require('express');
-var logger = require('../lib/util').logger;
+var logger = require('../lib/logger');
 var router = express.Router();
 var SlackOAuth = require('../lib/slack-oauth');
-var SlackApplication = require('../models/slack-application');
+var sequelize = require('../lib/sequelize');
 
 /* GET buttonwood. */
 router.get('/', function(req, res, next) {
@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
 router.get('/authorize', function(req, res, next) {
   // TODO: Get rid of hardcoded state
   if ('state' in req.query && req.query.state === config.get('oauth.state')) {
-    SlackApplication.findOrCreate({
+    sequelize.models.SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
         authors: 'the brain trust',
@@ -35,17 +35,20 @@ router.get('/authorize', function(req, res, next) {
           });
         })
         .catch(function(error) {
+          var page;
           logger.error(error);
 
-          if (error.message === 'access_denied'){
-            res.render('buttonwood/unauthorized', {
-              slackApplication: slackApplication
-            });
-          } else {
-            res.render('buttonwood/error', {
-              slackApplication: slackApplication
-            });
+          switch(error.message) {
+            case 'access_denied':
+              page = 'unauthorized';
+              break;
+            default:
+              page = 'error';
+              break;
           }
+          res.render('buttonwood/' + page, {
+            slackApplication: slackApplication
+          });
         });
     }).catch(function(error) {
       logger.error(error);

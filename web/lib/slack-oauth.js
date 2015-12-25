@@ -1,10 +1,9 @@
 var _ = require('lodash');
+var config = require('config');
 var logger = require('./logger');
 var OAuth = require('oauth');
 var sequelize = require('./sequelize');
-var SlackApplication = require('../models/slack-application');
-var SlackPermission = require('../models/slack-permission');
-var SlackTeam = require('../models/slack-team');
+var sqs = require('../lib/sqs');
 
 /**
  * Create a OAuth2 client for Slack OAuth. Should adhere to
@@ -14,13 +13,18 @@ var SlackTeam = require('../models/slack-team');
  *                                  OAuth requests for.
  */
 function SlackOAuth(slackApplication) {
+  var oAuthConfig = config.get('oauth.slack');
+
+  logger.debug("starting connection with oauth:\n" +
+    JSON.stringify(oAuthConfig));
+
   this.slackApplication = slackApplication;
   this.client = new OAuth.OAuth2(
     slackApplication.consumerKey,
     slackApplication.consumerSecret,
-    'https://slack.com/',
-    'oauth/authorize',
-    'api/oauth.access',
+    oAuthConfig.baseSite,
+    oAuthConfig.authorizePath,
+    oAuthConfig.accessTokenPath,
     null
   );
 }
@@ -31,7 +35,7 @@ function SlackOAuth(slackApplication) {
  * @return {Promise} A promise.
  */
 SlackOAuth.prototype.getOAuthAccessToken = function(req) {
-  logger.info('Processing OAuth2 authorize response for: ' + req.originalUrl);
+  logger.info('processing OAuth2 authorize response for: ' + req.originalUrl);
   var self = this;
   var query = req.query;
 
@@ -40,14 +44,14 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
       self.client.getOAuthAccessToken(
         query.code,
         null,
-        _.bind(self._processGetAuthAccessRequest, {
+        _.bind(self.processGetAuthAccessRequest, {
           slackApplication: self.slackApplication,
           resolve: resolve,
           reject: reject,
         })
       );
     } else {
-      logger.error('An error was returned by Slack: ' + query.error);
+      logger.error('an error was returned by Slack: ' + query.error);
       reject(new Error(query.error));
     }
   });
@@ -57,21 +61,22 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
 /**
  * Process the return value of hitting the api/oauth.access endpoint of
- * Slack. Exposed on the prototype to allow for testing.
+ * Slack. Exposed on the prototype to allow for testing. It the responsibility
+ * of the application to remove entries which are no longer valid.
  * @private
  * @param  {Object} e            Always null.
  * @param  {String} accessToken  String for an access token.
  * @param  {String} refreshToken String for a refresh token.
  * @param  {Object} results      Object that is returned by Slack.
  */
-SlackOAuth.prototype._processGetAuthAccessRequest =
+SlackOAuth.prototype.processGetAuthAccessRequest =
   function(e, accessToken, refreshToken, results){
     var self = this;
     logger.debug(results);
 
     try {
       if (results && results.ok === true) {
-        SlackTeam.findOrCreate({
+        sequelize.models.SlackTeam.findOrCreate({
           where: {
             slackId: results.team_id,
             slackName: results.team_name
@@ -89,32 +94,23 @@ SlackOAuth.prototype._processGetAuthAccessRequest =
             disabledAt: null
           };
 
-          sequelize.transaction(function(t) {
-            return SlackPermission.findOne({
-                attributes: ['id'],
-                where: {
-                  slack_team_id: slackTeam.id,
-                  slack_application_id : self.slackApplication.id
-                }
-              }, {transaction: t})
-              .then(function(slackPermission) {
-                if (_.isNull(slackPermission)) {
-                  return SlackPermission.create(attributes, {transaction: t});
-                } else {
-                  return slackPermission.update(attributes, {transaction: t});
-                }
-              });
-            }).then(function(slackPermission){
-              logger.info('SlackPermission created/updated.');
+          sequelize.models.SlackPermission
+            .create(attributes)
+            .then(function(slackPermission){
+              logger.info('slack-permission created.');
               self.resolve(slackPermission);
             }).catch(function(err){
               self.reject(new Error(err));
             });
+        }).catch(function(err) {
+          self.reject(new Error(err));
         });
       } else {
-        self.reject(new Error(results.error));
+        self.reject(
+          new Error(_.isUndefined(results) ? 'no response' : results.error)
+          );
       }
-    } catch(err) {
+    } catch (err) {
       self.reject(err);
     }
   };

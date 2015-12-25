@@ -26,6 +26,11 @@ to resolve.
 Then use `eb deploy` to push to AWS. Be careful as eb will pick up
 local changes. A deployment pipeline should be built out in the near future.
 
+## Development
+
+Outside of node, you'll need a bunch of extra tools to simulate the production
+environment.
+
 ### Postgres
 You'll need to install postgres version 9.4.x, if you're using OS X:
 
@@ -37,3 +42,23 @@ following:
 
 `CREATE ROLE thebraintrust WITH PASSWORD 'pwd' CREATEDB CREATEROLE LOGIN;`
 `CREATE DATABASE thebraintrust_development;`
+
+### Fake OAuth Server
+This lightweight server simulates what Slack's OAuth server would receive and
+return.
+
+`node ./test/lib/fake-oauth.js`
+
+### Fake SQS Server
+
+This lightweight server
+
+```
+bundle install
+fake_sqs
+```
+
+You can see more details in [github](https://github.com/iain/fake_sqs).
+
+Note that you'll have the manually create the queues every time.
+

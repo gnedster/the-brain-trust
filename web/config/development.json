@@ -1,10 +1,10 @@
 {
   "rds": {
-    "database" : "thebraintrust_development",
-    "username" : "thebraintrust",
-    "password" : "pwd",
-    "options" : {
-      "host" : "localhost"
+    "database": "thebraintrust_development",
+    "username": "thebraintrust",
+    "password": "pwd",
+    "options": {
+      "host": "localhost"
     }
   },
   "sqs" : {

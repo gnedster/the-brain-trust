@@ -1,4 +1,9 @@
 {
+  "outh": {
+    "slack": {
+      "baseSite": "https://slack.com/"
+    }
+  },
   "rds": {
     "database": "thebraintrust_production",
     "options" : {

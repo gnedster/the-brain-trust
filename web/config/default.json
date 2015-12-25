@@ -1,6 +1,15 @@
 {
+  "error" : {
+    "404" : "this is not the page you are looking for",
+    "500" : "something went horribly wrong"
+  },
   "oauth" : {
-    "state": "B3us.UN!VdC6gwdMykmygs"
+    "state": "B3us.UN!VdC6gwdMykmygs",
+    "slack": {
+      "baseSite": "http://localhost:3001/",
+      "authorizePath": "oauth/authorize",
+      "accessTokenPath": "api/oauth.access"
+    }
   },
   "rds" : {
     "options" : {
@@ -11,11 +20,16 @@
         "max": 5,
         "min": 0,
         "idle": 10000
+      },
+      "define": {
+        "underscored": true,
+        "underscoredAll": true,
+        "paranoid": true,
+        "timestamps": true
       }
     }
   },
-  "error" : {
-    "404" : "this is not the page you are looking for",
-    "500" : "something went horribly wrong"
+  "sqs" : {
+    "apiVersion" : "2012-11-05"
   }
 }

@@ -8,32 +8,24 @@ var sequelize = require('../lib/sequelize');
 var SlackApplication = sequelize.define('SlackApplication', {
   name: {
     type: Sequelize.STRING,
-    field: 'name',
-    allowNull : false
+    allowNull : false,
+    unique: true
   },
   authors: {
     type: Sequelize.STRING,
-    field: 'authors'
   },
   consumerKey: {
     type: Sequelize.STRING,
-    field: 'consumer_key',
     allowNull : false,
-    unique: true
+    unique: true,
+    field: 'consumer_key'
   },
   consumerSecret: {
     type: Sequelize.STRING,
-    field: 'consumer_secret',
     allowNull : false,
-    unique: true
-  },
-  disabled: {
-    type: Sequelize.BOOLEAN,
-    field: 'disabled',
-    defaultValue: false
+    unique: true,
+    field: 'consumer_secret'
   }
-}, {
-  freezeTableName: true
 });
 
 module.exports = SlackApplication;
