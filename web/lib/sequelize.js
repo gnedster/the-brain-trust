@@ -9,13 +9,9 @@ var rdsConfig = config.get('rds');
 var Sequelize = require('sequelize');
 var util = require('./util');
 
-if (util.isProduction() === true) {
+if (util.isProduction() === true || util.isTest() === true) {
   rdsConfig.username = process.env.RDS_USERNAME;
   rdsConfig.password = process.env.RDS_PASSWORD;
-} else if (util.isTest() === true) {
-  // https://codeship.com/documentation/databases/postgresql/
-  rdsConfig.username = process.env.PG_USER;
-  rdsConfig.password = process.env.PG_PASSWORD;
 }
 
 logger.debug('starting rds connection with config:\n' +
