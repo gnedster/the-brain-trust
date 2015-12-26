@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "aws-sdk": "^2.2.26",
@@ -23,8 +24,11 @@
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {
+    "chai-as-promised": "^5.2.0",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.3",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "^0.6.1",
+    "mocha": "^2.3.4",
+    "superagent": "^1.6.1"
   }
 }
