@@ -26,7 +26,7 @@ describe('GET /buttonwood/authorize', function(){
       .expect(404, /not found/, done);
   });
 
-  it('responds with 200, unauthorized on access_denied', function(done){
+  xit('responds with 200, unauthorized on access_denied', function(done){
     request(app)
       .get('/buttonwood/authorize?error=access_denied&state=' +
         config.get('oauth.state'))
@@ -34,7 +34,7 @@ describe('GET /buttonwood/authorize', function(){
       .expect(200, /whoa/, done);
   });
 
-  it('responds with 200, error on any other error', function(done){
+  xit('responds with 200, error on any other error', function(done){
     request(app)
       .get('/buttonwood/authorize?error=some_error&state=' +
         config.get('oauth.state'))
@@ -45,7 +45,7 @@ describe('GET /buttonwood/authorize', function(){
   /**
    * Fake OAuth server needs to be up.
    */
-  it('responds with 200 with valid code and state', function(done){
+  xit('responds with 200 with valid code and state', function(done){
     request(app)
       .get('/buttonwood/authorize?code=1&state=' + config.get('oauth.state'))
       .set('Accept', 'application/html')
