@@ -23,7 +23,7 @@ describe('GET /buttonwood/authorize', function(){
     request(app)
       .get('/buttonwood/authorize')
       .set('Accept', 'application/html')
-      .expect(404, /not found/, done);
+      .expect(404, /this is not the page you are looking for/, done);
   });
 
   xit('responds with 200, unauthorized on access_denied', function(done){
