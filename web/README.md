@@ -62,3 +62,14 @@ You can see more details in [github](https://github.com/iain/fake_sqs).
 
 Note that you'll have the manually create the queues every time.
 
+## Testing
+
+We use mocha, supertest, and chai-as-promised for async assertions.
+
+`npm install -g mocha`.
+
+Make sure that the mock SQS and mock OAuth servers are up.
+
+`fake_sqs`
+`node ./test/lib/fake-oauth.js
+
