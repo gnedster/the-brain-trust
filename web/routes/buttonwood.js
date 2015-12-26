@@ -1,13 +1,24 @@
+var _ = require('lodash');
 var config = require('config');
 var express = require('express');
 var logger = require('../lib/logger');
 var router = express.Router();
 var SlackOAuth = require('../lib/slack-oauth');
 var sequelize = require('../lib/sequelize');
+var sessionStore = require('../lib/session-store');
+
+const buttonwoodClientId = '16573442774.17151776516';
+const buttonwoodClientSecret = '0a94fc830fb4db0c37144103b9587cc1';
 
 /* GET buttonwood. */
 router.get('/', function(req, res, next) {
-  res.render('buttonwood/index', {state: config.get('oauth.state')});
+  SlackOAuth.getState()
+    .then(function(oAuthState) {
+      req.session = _.merge(req.session, oAuthState);
+      res.render('buttonwood/index', oAuthState);
+    }).catch(function(err) {
+      next(err);
+    });
 });
 
 /*
@@ -15,15 +26,14 @@ router.get('/', function(req, res, next) {
  * Should be the OAuth redirect uri and must contain a code and state
  */
 router.get('/authorize', function(req, res, next) {
-  // TODO: Get rid of hardcoded state
-  if ('state' in req.query && req.query.state === config.get('oauth.state')) {
+  if ('state' in req.query && 'code' in req.query) {
     sequelize.models.SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
         authors: 'the brain trust',
-        // TODO: Find a better way to store these secrets
-        consumerKey: '16573442774.17151776516',
-        consumerSecret: '0a94fc830fb4db0c37144103b9587cc1'
+        // TODO: Seed these values instead
+        consumerKey: buttonwoodClientId,
+        consumerSecret: buttonwoodClientSecret
       }
     }).then(function(task) {
       var slackApplication = task[0];

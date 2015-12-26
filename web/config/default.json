@@ -4,12 +4,14 @@
     "500" : "something went horribly wrong"
   },
   "oauth" : {
-    "state": "B3us.UN!VdC6gwdMykmygs",
     "slack": {
       "baseSite": "http://localhost:3001/",
       "authorizePath": "oauth/authorize",
       "accessTokenPath": "api/oauth.access"
     }
+  },
+  "express-session" : {
+    "secret": "uPs^gCsNUC3MabihEUg-e8"
   },
   "rds" : {
     "options" : {

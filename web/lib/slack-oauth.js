@@ -1,8 +1,10 @@
 var _ = require('lodash');
 var config = require('config');
+var crypto = require('crypto');
 var logger = require('./logger');
 var OAuth = require('oauth');
 var sequelize = require('./sequelize');
+var sessionStore = require('../lib/session-store');
 var sqs = require('../lib/sqs');
 
 /**
@@ -30,6 +32,39 @@ function SlackOAuth(slackApplication) {
 }
 
 /**
+ * Get an object containing a random state for the OAuth process
+ * @return {Promise} Get a promise containing an object with state or an error
+ */
+SlackOAuth.getState = function() {
+  var promise = new Promise(function(resolve, reject) {
+    crypto.randomBytes(12, function(err, buf) {
+      var state;
+      if (err) {
+        reject(err);
+      } else {
+        state = buf.toString('hex');
+        resolve({ oAuthState: state });
+      }
+    });
+  });
+
+  return promise;
+};
+
+/**
+ * Check whether the state provided is valid
+ * @param  {Request}  req   Object representing the incoming request
+ * @return {Boolean}        Represents whether the state provided is valid
+ */
+SlackOAuth.prototype.isValidState = function(req) {
+  if ('session' in req && req.query && 'state' in req.query) {
+    return req.session.oAuthState === req.query.state;
+  }
+
+  return false;
+};
+
+/**
  * Abstraction for getting the OAuth access token.
  * @param  {Request} redirectUri The uri that was passed back by Slack.
  * @return {Promise} A promise.
@@ -41,15 +76,19 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
   var promise = new Promise(function(resolve, reject) {
     if ('code' in query && 'state' in query) {
-      self.client.getOAuthAccessToken(
-        query.code,
-        null,
-        _.bind(self.processGetAuthAccessRequest, {
-          slackApplication: self.slackApplication,
-          resolve: resolve,
-          reject: reject,
-        })
-      );
+      if (self.isValidState(req)) {
+        self.client.getOAuthAccessToken(
+          query.code,
+          null,
+          _.bind(self.processGetAuthAccessRequest, {
+            slackApplication: self.slackApplication,
+            resolve: resolve,
+            reject: reject,
+          })
+        );
+      } else {
+        reject(new Error('invalid state'));
+      }
     } else {
       logger.error('an error was returned by Slack: ' + query.error);
       reject(new Error(query.error));

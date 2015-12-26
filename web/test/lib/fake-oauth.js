@@ -29,7 +29,8 @@ function handleRequest(request, response){
   switch(url) {
     case "/api/oauth.access":
       response.writeHead(200, {"Content-Type": "application/json"});
-      response.end(JSON.stringify({
+
+      responseBody = {
         ok: true,
         access_token: 'xoxp-' + Math.floor(Math.random() * 100),
         scope: 'identify,incoming-webhook,bot',
@@ -44,7 +45,11 @@ function handleRequest(request, response){
           bot_user_id: '123',
           bot_access_token: 'xoxb-' + Math.floor(Math.random() * 100),
         }
-      }));
+      };
+
+      logger.info('responding with:' + JSON.stringify(responseBody, null, 2));
+
+      response.end(JSON.stringify(responseBody));
       break;
     default:
       response.status(404)
