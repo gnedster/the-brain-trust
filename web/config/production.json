@@ -8,9 +8,6 @@
     "database": "thebraintrust_production",
     "options" : {
       "host": "thebraintrust.c1bsfzss4fcj.us-west-2.rds.amazonaws.com"
-    },
-    "sqs" : {
-      "endpoint": "http://localhost:4568"
     }
   }
 }
