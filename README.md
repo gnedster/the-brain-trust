@@ -30,4 +30,4 @@ are highly dependent on the node version.
 
 ## Contact
 
-You can contact <edward@the-brain-trust.com> if you need help.
+Join our Slack team <https://opnd.slack.com>.
