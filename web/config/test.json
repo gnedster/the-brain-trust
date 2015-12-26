@@ -1,5 +1,6 @@
 {
   "rds": {
+    "database": "test",
     "options": {
       "host": "localhost",
       "port": 5434

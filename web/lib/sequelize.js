@@ -16,7 +16,6 @@ if (util.isProduction() === true) {
   // https://codeship.com/documentation/databases/postgresql/
   rdsConfig.username = process.env.PG_USER;
   rdsConfig.password = process.env.PG_PASSWORD;
-  rdsConfig.database = 'test' + process.env.TEST_ENV_NUMBER;
 }
 
 logger.debug('starting rds connection with config:\n' +
