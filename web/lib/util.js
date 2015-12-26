@@ -12,6 +12,14 @@ function isDevelopment() {
 }
 
 /**
+ * Check whether or not the process is running in test (on Codeship)
+ * @return {Boolean}
+ */
+function isTest() {
+  return process.env.NODE_ENV === 'test';
+}
+
+/**
  * Check whether or not the process is running in production (staging is
  * production-like).
  * @return {Boolean}
@@ -23,5 +31,6 @@ function isProduction() {
 
 module.exports = {
   isDevelopment: isDevelopment,
+  isTest: isTest,
   isProduction: isProduction
 };
