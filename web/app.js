@@ -1,7 +1,6 @@
 var bodyParser = require('body-parser');
 var config = require('config');
 var db = require('./db/db');
-var cookieParser = require('cookie-parser');
 var express = require('express');
 var favicon = require('serve-favicon');
 var logger = require('./lib/logger');
@@ -26,7 +25,6 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan("combined", { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(session({
   resave: false,
   secret: util.isProduction() ? process.env.EXPRESS_SESSION_SECRET :

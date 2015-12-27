@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
   SlackOAuth.getState()
     .then(function(oAuthState) {
       req.session = _.merge(req.session, oAuthState);
-      res.render('buttonwood/index', oAuthState);
+      res.render('buttonwood/index', _.merge(config.get('oauth.slack'), oAuthState));
     }).catch(function(err) {
       next(err);
     });
@@ -56,9 +56,10 @@ router.get('/authorize', function(req, res, next) {
               page = 'error';
               break;
           }
-          res.render('buttonwood/' + page, {
-            slackApplication: slackApplication
-          });
+          res.status(500)
+            .render('buttonwood/' + page, {
+              slackApplication: slackApplication
+            });
         });
     }).catch(function(error) {
       logger.error(error);

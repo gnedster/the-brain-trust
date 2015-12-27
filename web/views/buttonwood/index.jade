@@ -5,7 +5,7 @@ block content
     .col-xs-8
       h2 buttonwood
     .col-xs-4.add-to-slack
-      a.pull-right(href='https://slack.com/oauth/authorize?scope=incoming-webhook,bot&client_id=16573442774.17151776516&state=#{oAuthState}')
+      a.pull-right(href='#{baseSite}oauth/authorize?scope=incoming-webhook,bot&client_id=16573442774.17151776516&state=#{oAuthState}')
         img(alt='Add to Slack', height='40', width='139', src='https://platform.slack-edge.com/img/add_to_slack.png', srcset='https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x')
 
   strong What is buttonwood?
