@@ -76,7 +76,10 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
   var promise = new Promise(function(resolve, reject) {
     if ('code' in query && 'state' in query) {
-      if (self.isValidState(req)) {
+      var isValidState = self.isValidState(req);
+
+      req.session.oAuthState = null; // Delete the oAuthState to prevent reuse
+      if (isValidState) {
         self.client.getOAuthAccessToken(
           query.code,
           null,
@@ -84,6 +87,7 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
             slackApplication: self.slackApplication,
             resolve: resolve,
             reject: reject,
+            req: req
           })
         );
       } else {

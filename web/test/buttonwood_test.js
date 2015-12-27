@@ -64,7 +64,15 @@ describe('GET /buttonwood/authorize', function(){
         testSession
           .get('/buttonwood/authorize?code=1&state=' + state)
           .set('Accept', 'application/html')
-          .expect(200, done);
+          .end(function(err, res) {
+            assert.equal(res.status, 200);
+
+            // oAuthState should not be reused
+            testSession
+              .get('/buttonwood/authorize?code=1&state=' + state)
+              .set('Accept', 'application/html')
+              .expect(500, done);
+          });
       });
   });
 });
