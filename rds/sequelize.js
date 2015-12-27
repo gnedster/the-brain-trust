@@ -2,12 +2,15 @@
  * Provide a SQL client using sequalize. Since the object is constructed when assigned to
  * module exports, there should be only one instance of this sqlClient.
  */
+var path = require('path');
 
-var config = require('config');
-var logger = require('./logger');
-var rdsConfig = config.get('rds');
+var config = require('config.json')
+  (path.join(__dirname, 'config', 'development.json'));
+var logger = require('@the-brain-trust/logger');
 var Sequelize = require('sequelize');
-var util = require('./util');
+var util = require('@the-brain-trust/utility');
+
+var rdsConfig = config.rds;
 
 if (util.isProduction() === true || util.isTest() === true) {
   rdsConfig.username = process.env.RDS_USERNAME;

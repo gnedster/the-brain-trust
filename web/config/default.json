@@ -13,24 +13,6 @@
   "express-session" : {
     "secret": "uPs^gCsNUC3MabihEUg-e8"
   },
-  "rds" : {
-    "options" : {
-      "dialect" : "postgres",
-      "port": 5432,
-      "charset": "utf8",
-      "pool": {
-        "max": 5,
-        "min": 0,
-        "idle": 10000
-      },
-      "define": {
-        "underscored": true,
-        "underscoredAll": true,
-        "paranoid": true,
-        "timestamps": true
-      }
-    }
-  },
   "sqs" : {
     "apiVersion" : "2012-11-05"
   }

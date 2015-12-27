@@ -1,0 +1,21 @@
+{
+  "name": "@the-brain-trust/utility",
+  "version": "0.0.1",
+  "description": "provides a suite of common utility functions and helpers",
+  "main": "utility.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "@the-brain-trust/rds",
+  "version": "0.0.4",
+  "description": "orm to access the primary rds",
+  "engines": {
+    "node": "4.1.1",
+    "npm": "2.14.4"
+  },
+  "main": "rds.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
+    "@the-brain-trust/utility": "0.0.1",
+    "config.json": "0.0.4",
+    "lodash": "^3.10.1",
+    "pg": "^4.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.15.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
+}

@@ -6,7 +6,7 @@
  * Check whether or not the process is running in development
  * @return {Boolean}
  */
-function isDevelopment() {
+function envIsDevelopment() {
   return typeof process.env.NODE_ENV === 'undefined' ||
     process.env.NODE_ENV === 'development';
 }
@@ -15,7 +15,7 @@ function isDevelopment() {
  * Check whether or not the process is running in test (on Codeship)
  * @return {Boolean}
  */
-function isTest() {
+function envIsTest() {
   return process.env.NODE_ENV === 'test';
 }
 
@@ -24,13 +24,13 @@ function isTest() {
  * production-like).
  * @return {Boolean}
  */
-function isProduction() {
+function envIsProduction() {
   return process.env.NODE_ENV === 'production' ||
     process.env.NODE_ENV === 'staging';
 }
 
 module.exports = {
-  isDevelopment: isDevelopment,
-  isTest: isTest,
-  isProduction: isProduction
+  envIsDevelopment: envIsDevelopment,
+  envIsTest: envIsTest,
+  envIsProduction: envIsProduction
 };

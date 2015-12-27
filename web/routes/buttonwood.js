@@ -1,10 +1,10 @@
 var _ = require('lodash');
 var config = require('config');
 var express = require('express');
-var logger = require('../lib/logger');
+var logger = require('@the-brain-trust/logger');
+var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 var SlackOAuth = require('../lib/slack-oauth');
-var sequelize = require('../lib/sequelize');
 var sessionStore = require('../lib/session-store');
 
 const buttonwoodClientId = '16573442774.17151776516';
@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
  */
 router.get('/authorize', function(req, res, next) {
   if ('state' in req.query) {
-    sequelize.models.SlackApplication.findOrCreate({
+    rds.models.SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
         authors: 'the brain trust',

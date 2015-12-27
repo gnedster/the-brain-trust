@@ -28,6 +28,14 @@ For simplicity, we generally follow the
 style guide. Folks are welcome to make use ES6, be aware that available features
 are highly dependent on the node version.
 
+## Documentation
+
+Part of the culture is to document many of the things; the folks
+before you have taken the time to write out their thoughts in the effort that
+those reading them are able to contextualize the codebase quickly. If you see
+documentation in need of updating or has an error, or even an typo, pay it
+forward and help your fellow teammates.
+
 ## Contact
 
 Join our Slack team <https://opnd.slack.com>.

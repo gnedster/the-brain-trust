@@ -1,5 +1,5 @@
 var Sequelize = require('sequelize');
-var sequelize = require('../lib/sequelize');
+var sequelize = require('../sequelize');
 
 /**
  * A Slack Team.

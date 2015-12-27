@@ -2,7 +2,7 @@
  * Generalized logger module
  */
 var winston = require('winston');
-var util = require('./util');
+var util = require('@the-brain-trust/utility');
 
 var logger = new (winston.Logger)({
   transports: [

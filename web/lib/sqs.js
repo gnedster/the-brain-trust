@@ -7,9 +7,9 @@
 var _ = require('lodash');
 var AWS = require('aws-sdk');
 var config = require('config');
-var logger = require('./logger');
+var logger = require('@the-brain-trust/logger');
 var sqsConfig = config.get('sqs');
-var util = require('./util');
+var util = require('@the-brain-trust/utility');
 
 var sqs = (function() {
   /**

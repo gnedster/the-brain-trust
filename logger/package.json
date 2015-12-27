@@ -1,0 +1,25 @@
+{
+  "name": "@the-brain-trust/logger",
+  "version": "0.0.1",
+  "description": "common logging module",
+  "main": "logger.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "dependencies": {
+    "winston": "^2.1.1",
+    "@the-brain-trust/utility": "^0.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
+}
