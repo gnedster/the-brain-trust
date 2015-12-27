@@ -7,6 +7,7 @@ var assert = require('assert');
 var config = require('config');
 var db = require('../db/db');
 var request = require('supertest');
+var session = require('supertest-session');
 
 describe('GET /buttonwood', function(){
   it('respond with html', function(done){
@@ -23,21 +24,19 @@ describe('GET /buttonwood/authorize', function(){
     request(app)
       .get('/buttonwood/authorize')
       .set('Accept', 'application/html')
-      .expect(404, /this is not the page you are looking for/, done);
+      .expect(404, done);
   });
 
   it('responds with 200, unauthorized on access_denied', function(done){
     request(app)
-      .get('/buttonwood/authorize?error=access_denied&state=' +
-        config.get('oauth.state'))
+      .get('/buttonwood/authorize?error=access_denied&state=')
       .set('Accept', 'application/html')
       .expect(200, /whoa/, done);
   });
 
   it('responds with 200, error on any other error', function(done){
     request(app)
-      .get('/buttonwood/authorize?error=some_error&state=' +
-        config.get('oauth.state'))
+      .get('/buttonwood/authorize?error=some_error&state=')
       .set('Accept', 'application/html')
       .expect(200, /hmm/, done);
   });
@@ -46,9 +45,20 @@ describe('GET /buttonwood/authorize', function(){
    * Fake OAuth server needs to be up.
    */
   it('responds with 200 with valid code and state', function(done){
-    request(app)
-      .get('/buttonwood/authorize?code=1&state=' + config.get('oauth.state'))
+    var testSession = session(app);
+    var reState = new RegExp('https:\/\/.*state=([\w]*)');
+    var state;
+
+    testSession
+      .get('/buttonwood')
       .set('Accept', 'application/html')
-      .expect(200, /you\'re in/, done);
+      .end(function(err, res) {
+        state = reState.exec(res.text).lastMatch;
+
+        testSession
+          .get('/buttonwood/authorize?code=1&state=' + state)
+          .set('Accept', 'application/html')
+          .expect(200, done);
+      });
   });
 });

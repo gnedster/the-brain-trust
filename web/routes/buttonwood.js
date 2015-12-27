@@ -26,7 +26,7 @@ router.get('/', function(req, res, next) {
  * Should be the OAuth redirect uri and must contain a code and state
  */
 router.get('/authorize', function(req, res, next) {
-  if ('state' in req.query && 'code' in req.query) {
+  if ('state' in req.query) {
     sequelize.models.SlackApplication.findOrCreate({
       where: {
         name: 'buttonwood',
