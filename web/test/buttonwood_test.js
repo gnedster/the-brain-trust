@@ -31,12 +31,12 @@ describe('GET /buttonwood/authorize', function(){
       .expect(404, done);
   });
 
-  it('responds with 500, unauthorized on access_denied', function(done){
+  it('responds with 403, unauthorized on access_denied', function(done){
     request(app)
       .get('/buttonwood/authorize?error=access_denied&state=')
       .set('Accept', 'text/html')
       .set('Content-Type', 'text/html; charset=utf8')
-      .expect(500, /whoa/, done);
+      .expect(403, /whoa/, done);
   });
 
   it('responds with 500, error on any other error', function(done){

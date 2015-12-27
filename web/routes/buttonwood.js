@@ -45,18 +45,20 @@ router.get('/authorize', function(req, res, next) {
           });
         })
         .catch(function(error) {
-          var page;
+          var page, status;
           logger.error(error);
 
           switch(error.message) {
             case 'access_denied':
+              status = 403;
               page = 'unauthorized';
               break;
             default:
+              status = 500;
               page = 'error';
               break;
           }
-          res.status(500)
+          res.status(status)
             .render('buttonwood/' + page, {
               slackApplication: slackApplication
             });
