@@ -3,11 +3,5 @@
     "slack": {
       "baseSite": "https://slack.com/"
     }
-  },
-  "rds": {
-    "database": "thebraintrust_production",
-    "options" : {
-      "host": "thebraintrust.c1bsfzss4fcj.us-west-2.rds.amazonaws.com"
-    }
   }
 }

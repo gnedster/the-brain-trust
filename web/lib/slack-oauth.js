@@ -1,9 +1,9 @@
 var _ = require('lodash');
 var config = require('config');
 var crypto = require('crypto');
-var logger = require('./logger');
+var logger = require('@the-brain-trust/logger');
 var OAuth = require('oauth');
-var sequelize = require('./sequelize');
+var rds = require('@the-brain-trust/rds');
 var sessionStore = require('../lib/session-store');
 var sqs = require('../lib/sqs');
 
@@ -119,7 +119,7 @@ SlackOAuth.prototype.processGetAuthAccessRequest =
 
     try {
       if (results && results.ok === true) {
-        sequelize.models.SlackTeam.findOrCreate({
+        rds.models.SlackTeam.findOrCreate({
           where: {
             slackId: results.team_id,
             slackName: results.team_name
@@ -137,7 +137,7 @@ SlackOAuth.prototype.processGetAuthAccessRequest =
             disabledAt: null
           };
 
-          sequelize.models.SlackPermission
+          rds.models.SlackPermission
             .create(attributes)
             .then(function(slackPermission){
               logger.info('slack-permission created.');

@@ -4,20 +4,7 @@
 
 var http = require('http');
 var url = require('url');
-var winston = require('winston');
-
-var logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.Console)({
-      timestamp: true,
-      level: 'debug',
-      handleExceptions: true,
-      json: false,
-      prettyPrint: true,
-      colorize: true
-    })
-  ]
-});
+var logger = require('@the-brain-trust/logger');
 
 //Lets define a port we want to listen to
 const PORT=3001;
