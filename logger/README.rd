@@ -6,7 +6,7 @@ Provides a common logging module.
 
 ## Usage
 
-Put `var logger = require ('@the-brain-trust/logger');` in the relevant files.
+`var logger = require ('@the-brain-trust/logger');`
 
 ## Publishing
 

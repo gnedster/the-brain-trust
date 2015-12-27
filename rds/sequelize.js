@@ -3,9 +3,10 @@
  * module exports, there should be only one instance of this sqlClient.
  */
 var path = require('path');
+var env = process.env.NODE_ENV || 'development';
 
 var config = require('config.json')
-  (path.join(__dirname, 'config', 'development.json'));
+  (path.join(__dirname, 'config', env + '.json'));
 var logger = require('@the-brain-trust/logger');
 var Sequelize = require('sequelize');
 var util = require('@the-brain-trust/utility');

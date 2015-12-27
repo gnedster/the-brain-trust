@@ -6,7 +6,7 @@ Provides common utility functions and helpers.
 
 ## Usage
 
-Put `var utility = require ('@the-brain-trust/utility');` in the relevant files.
+`var utility = require ('@the-brain-trust/utility');`
 
 ## Publishing
 

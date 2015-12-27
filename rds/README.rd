@@ -7,7 +7,8 @@ scripts, and associated models.
 
 ## Usage
 
-Put `var rds = require ('@the-brain-trust/rds');` in the relevant files.
+`var rds = require ('@the-brain-trust/rds');`
+
 You can access the models by accessing the `models` property on the returned
 module.
 
