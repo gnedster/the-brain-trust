@@ -10,7 +10,6 @@ var db = require('../db/db');
 var request = require('supertest');
 var session = require('supertest-session');
 var sessionStore = require('../lib/session-store');
-var signature = require('cookie-signature');
 
 describe('GET /buttonwood', function(){
   it('respond with html', function(done){
