@@ -3,6 +3,7 @@
  */
 
 var http = require('http');
+var url = require('url');
 var winston = require('winston');
 
 var logger = new (winston.Logger)({
@@ -23,13 +24,14 @@ const PORT=3001;
 
 //We need a function which handles requests and send response
 function handleRequest(request, response){
-  var url = request.url;
-  logger.info('recieved request for', url);
+  var urlObj = url.parse(request.url, true);
+  logger.info('recieved request for', JSON.stringify(urlObj, null, 2));
 
-  switch(url) {
-    case "/api/oauth.access":
-      response.writeHead(200, {"Content-Type": "application/json"});
-      response.end(JSON.stringify({
+  switch(urlObj.pathname) {
+    case '/api/oauth.access':
+      response.writeHead(200, {'Content-Type': 'application/json'});
+
+      responseBody = {
         ok: true,
         access_token: 'xoxp-' + Math.floor(Math.random() * 100),
         scope: 'identify,incoming-webhook,bot',
@@ -44,11 +46,23 @@ function handleRequest(request, response){
           bot_user_id: '123',
           bot_access_token: 'xoxb-' + Math.floor(Math.random() * 100),
         }
-      }));
+      };
+
+      logger.info('responding with:' + JSON.stringify(responseBody, null, 2));
+
+      response.end(JSON.stringify(responseBody));
+      break;
+    case '/oauth/authorize':
+      urlObj = url.parse(request.url, true);
+      response.writeHead(302, {
+        'Location': 'http://localhost:3000/buttonwood/authorize?code=1&state=' +
+          urlObj.query.state
+      });
+      response.end();
       break;
     default:
-      response.status(404)
-        .send('Not found');
+      response.writeHead(404);
+      response.end('not found');
       break;
   }
 }
@@ -56,5 +70,5 @@ function handleRequest(request, response){
 var server = http.createServer(handleRequest);
 
 server.listen(PORT, function(){
-  logger.info("Fake OAuth server listening on: http://localhost:%s", PORT);
+  logger.info('Fake OAuth server listening on: http://localhost:%s', PORT);
 });

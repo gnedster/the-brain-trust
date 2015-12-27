@@ -1,11 +1,13 @@
 var bodyParser = require('body-parser');
 var config = require('config');
-var cookieParser = require('cookie-parser');
+var db = require('./db/db');
 var express = require('express');
 var favicon = require('serve-favicon');
 var logger = require('./lib/logger');
 var morgan = require('morgan');
 var path = require('path');
+var sessionStore = require('./lib/session-store');
+var session = require('express-session');
 var util = require('./lib/util');
 
 // Routes
@@ -23,7 +25,13 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan("combined", { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(session({
+  resave: false,
+  secret: util.isProduction() ? process.env.EXPRESS_SESSION_SECRET :
+    config.get('express-session.secret'),
+  store: sessionStore,
+  saveUninitialized: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
