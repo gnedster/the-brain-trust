@@ -2,14 +2,11 @@
  * Add tests for buttonwood
  */
 
-var _ = require('lodash');
 var app = require('../app');
 var assert = require('assert');
-var config = require('config');
 var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 var session = require('supertest-session');
-var sessionStore = require('../lib/session-store');
 
 rds.sync();
 

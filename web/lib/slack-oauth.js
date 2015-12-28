@@ -4,8 +4,6 @@ var crypto = require('crypto');
 var logger = require('@the-brain-trust/logger');
 var OAuth = require('oauth');
 var rds = require('@the-brain-trust/rds');
-var sessionStore = require('../lib/session-store');
-var sqs = require('../lib/sqs');
 
 /**
  * Create a OAuth2 client for Slack OAuth. Should adhere to
@@ -17,7 +15,7 @@ var sqs = require('../lib/sqs');
 function SlackOAuth(slackApplication) {
   var oAuthConfig = config.get('oauth.slack');
 
-  logger.info("starting connection with oauth:\n" +
+  logger.info('starting connection with oauth:\n' +
     JSON.stringify(oAuthConfig));
 
   this.slackApplication = slackApplication;

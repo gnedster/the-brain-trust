@@ -5,7 +5,6 @@ var favicon = require('serve-favicon');
 var logger = require('@the-brain-trust/logger');
 var morgan = require('morgan');
 var path = require('path');
-var rds = require('@the-brain-trust/rds');
 var sessionStore = require('./lib/session-store');
 var session = require('express-session');
 var util = require('@the-brain-trust/utility');
@@ -22,7 +21,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(morgan("combined", { stream: logger.stream }));
+app.use(morgan('combined', { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({

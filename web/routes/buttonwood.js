@@ -5,7 +5,6 @@ var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 var SlackOAuth = require('../lib/slack-oauth');
-var sessionStore = require('../lib/session-store');
 
 const buttonwoodClientId = '16573442774.17151776516';
 const buttonwoodClientSecret = '0a94fc830fb4db0c37144103b9587cc1';

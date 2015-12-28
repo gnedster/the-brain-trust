@@ -18,7 +18,7 @@ function handleRequest(request, response){
     case '/api/oauth.access':
       response.writeHead(200, {'Content-Type': 'application/json'});
 
-      responseBody = {
+      var responseBody = {
         ok: true,
         access_token: 'xoxp-' + Math.floor(Math.random() * 100),
         scope: 'identify,incoming-webhook,bot',
@@ -31,7 +31,7 @@ function handleRequest(request, response){
         },
         bot: {
           bot_user_id: '123',
-          bot_access_token: 'xoxb-' + Math.floor(Math.random() * 100),
+          bot_access_token: 'xoxb-' + Math.floor(Math.random() * 100)
         }
       };
 
