@@ -1,45 +1,51 @@
 extends ../layout
 
 block content
-  .row.slack-app-title
+  .row.application-header
     .col-xs-8
       h2 buttonwood
-    .col-xs-4.add-to-slack
+    .col-xs-4.application-addToSlackBtn
       a.pull-right(href='#{baseSite}oauth/authorize?scope=incoming-webhook,bot&client_id=16573442774.17151776516&state=#{oAuthState}')
         img(alt='Add to Slack', height='40', width='139', src='https://platform.slack-edge.com/img/add_to_slack.png', srcset='https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x')
 
-  strong What is buttonwood?
+  .row.application-content
+    .col-sm-3
+      embed.application-icon(src='/images/applications/buttonwood/icon.svg')
+    .col-sm-9
+      strong What is buttonwood?
 
-  p.
-    buttonwood is a #[a(href="https://slack.com") Slack] app that provides
-    pricing information about stocks whenever a cash tag (like $AAPL)
-    is mentioned in a channel that @buttonwood is in, or when mentioning or
-    directly talking to @buttonwood.
+      p.
+        buttonwood is a #[a(href="https://slack.com") Slack] app that provides
+        pricing information about stocks whenever a cash tag (like $AAPL)
+        is mentioned in a channel that @buttonwood is in, or when mentioning or
+        directly talking to @buttonwood.
 
-  strong What else?
+      strong What else?
 
-  p.
-    In the future, we'd like to add personalized alerts to help monitor large
-    movements in stock prices, macroeconomic events, and company news. If you'd
-    like to see additional features, e-mail us at
-    #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].
+      p.
+        In the future, we'd like to add personalized alerts to help monitor large
+        movements in stock prices, macroeconomic events, and company news.
 
-  strong It doesn't work
+      p.
+        If you'd like to see additional features, e-mail us at
+        #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].
 
-  p E-mail us at #[a(href="mailto:support@the-brain-trust.com") support@the-brain-trust.com].
+      strong It doesn't work
 
-  strong Why the name?
+      p E-mail us at #[a(href="mailto:support@the-brain-trust.com") support@the-brain-trust.com].
 
-  p.
-    buttonwood is named after
-    #[a(href="https://en.wikipedia.org/wiki/Buttonwood_Agreement") The Buttonwood Agreement]
-    which established the New York Stock & Exchange Board, or in its modern
-    nomenclature, the New York Stock Exchange.
+      strong Why the name?
 
-  h3 Changelog
+      p.
+        buttonwood is named after
+        #[a(href="https://en.wikipedia.org/wiki/Buttonwood_Agreement") The Buttonwood Agreement]
+        which established the New York Stock &amp; Exchange Board, or in its modern
+        nomenclature, the New York Stock Exchange.
 
-  p
-    em December 21, 2015
+      h3 Changelog
 
-  p Initial release.
+      p
+        em December 21, 2015
+
+      p Initial release.
 
