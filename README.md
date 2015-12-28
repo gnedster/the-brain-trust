@@ -21,6 +21,15 @@ If you're using [Sublime](<http://www.sublimetext.com/>), you can use the
 sublime-settings file found in this repository to be consistent with the rest of
 the team.
 
+## Development
+
+Run `npm install`.
+
+We use [mocha](https://mochajs.org/) and [eslint](http://eslint.org/)
+for testing and linting respectively, so make sure they exist.
+
+`npm install -g mocha eslint`
+
 ## Style Guide
 
 For Javascript, we generally follow the
