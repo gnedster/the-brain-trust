@@ -3,7 +3,6 @@
  */
 
 var app = require('../app');
-var assert = require('assert');
 var request = require('supertest');
 
 describe('GET /', function(){

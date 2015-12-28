@@ -1,0 +1,22 @@
+{
+  "name": "the-brain-trust",
+  "version": "0.0.1",
+  "description": "all projects for the brain trust",
+  "dependencies": {},
+  "devDependencies": {
+    "pre-commit": "^1.1.2"
+  },
+  "scripts": {
+    "lint" : "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "pre-commit": ["lint"]
+}

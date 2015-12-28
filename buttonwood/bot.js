@@ -6,7 +6,7 @@ var controller = Botkit.slackbot({
   debug: false
 });
 
-var bot = controller.spawn(
+controller.spawn(
   {
     token:process.env.token
   }
@@ -18,8 +18,8 @@ var priceTpl = _.template(
   ].join('\n')
 );
 var notFoundTpl = _.template('*<%= symbol %>* doesn\'t look like a valid symbol.');
-var introduction = ["I'm buttonwood, it's nice to meet you!",
-    "Type out a stock symbol like *$AAPL*, and I'll get the latest price for you."].join("\n");
+var introduction = ['I\'m buttonwood, it\'s nice to meet you!',
+    'Type out a stock symbol like *$AAPL*, and I\'ll get the latest price for you.'].join('\n');
 
 /**
  * Return usage information.
@@ -30,7 +30,7 @@ controller.hears(['hello', 'hi'],'direct_message,direct_mention,mention',functio
 
   controller.storage.users.get(message.user,function(err,user) {
     if (user && user.name) {
-      bot.reply(message, "Hello " + user.name + "!" + introduction);
+      bot.reply(message, 'Hello ' + user.name + '!' + introduction);
     } else {
       bot.reply(message, introduction);
     }
@@ -54,11 +54,10 @@ controller.hears(['(\$[A-z]*)'],'direct_message,direct_mention,mention,ambient',
 
   yahooFinance.snapshot({
     symbols: symbols,
-    fields: ['s', 'n', 'l1'],
+    fields: ['s', 'n', 'l1']
   }, function (err, snapshot) {
     if (err) {
-      console.log(err);
-      bot.reply(message,"Sorry, something went terribly wrong.");
+      bot.reply(message,'Sorry, something went terribly wrong.');
     } else {
       var messages = _.map(snapshot, function(data) {
         if (_.isEmpty(data.name)) {
@@ -68,7 +67,7 @@ controller.hears(['(\$[A-z]*)'],'direct_message,direct_mention,mention,ambient',
         }
       });
 
-      bot.reply(message, messages.join("\n"));
+      bot.reply(message, messages.join('\n'));
     }
   });
 });

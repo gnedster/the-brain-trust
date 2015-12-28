@@ -12,7 +12,7 @@ var SlackApplication = sequelize.define('SlackApplication', {
     unique: true
   },
   authors: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING
   },
   consumerKey: {
     type: Sequelize.STRING,
