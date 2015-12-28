@@ -7,11 +7,18 @@
   },
   "version": "0.0.1",
   "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gnedster/the-brain-trust"
   },
   "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
+    "@the-brain-trust/rds": "0.3.1",
+    "@the-brain-trust/utility": "0.0.1",
     "botkit": "^0.0.4",
     "lodash": "^3.10.1",
     "yahoo-finance": "^0.2.12"
