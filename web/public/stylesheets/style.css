@@ -6,15 +6,20 @@ a {
   color: #00B7FF;
 }
 
-.company-title {
-  color: black;
+.header-title {
+  color: rgb(0, 0, 0);
 }
 
-.slack-app-title {
+.application-header {
   margin-top: -10px;
 }
-
-.slack-app-title > .add-to-slack {
+.application-header .application-addToSlackBtn {
   position: relative;
   top: 15px;
+}
+.application-icon {
+  display: block;
+  margin: auto;
+  max-width: 200px;
+  width: 100%;
 }
