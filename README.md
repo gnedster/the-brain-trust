@@ -25,10 +25,12 @@ the team.
 
 Run `npm install`.
 
-We use [mocha](https://mochajs.org/) and [eslint](http://eslint.org/)
-for testing and linting respectively, so make sure they exist.
+We use [mocha](https://mochajs.org/), [eslint](http://eslint.org/),
+[csslint](http://csslint.net/) for testing and linting respectively,
+so make sure they exist. We also use [grunt](http://gruntjs.com/) for task
+running.
 
-`npm install -g mocha eslint`
+`npm install -g mocha eslint grunt`
 
 ## Style Guide
 
