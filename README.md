@@ -32,6 +32,9 @@ running.
 
 `npm install -g mocha eslint grunt`
 
+Also we use [reflow](https://github.com/reenhanced/gitreflow) for creating and
+merging branches.
+
 ## Style Guide
 
 For Javascript, we generally follow the

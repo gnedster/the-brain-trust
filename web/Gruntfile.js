@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     forever: {
-      oauthServer: {
+      oauth_server: {
         options: {
           index: './test/lib/fake-oauth.js'
         }
@@ -15,9 +15,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-forever');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.registerTask('test',[
-    'forever:oauthServer:start',
+    'forever:oauth_server:start',
     'mochaTest',
-    'forever:oauthServer:stop'
+    'forever:oauth_server:stop'
     ]
   );
 };

@@ -4,12 +4,13 @@ module.exports = function(grunt) {
       src: ['.']
     },
     csslint: {
-      src: ['**/public/**/*.css']
+      src: ['web/public/**/*.css']
     }
   });
 
-  grunt.loadNpmTasks('gruntify-eslint');
   grunt.loadNpmTasks('grunt-contrib-csslint');
+  grunt.loadNpmTasks('gruntify-eslint');
+
   grunt.registerTask('lint', ['eslint', 'csslint']);
 };
 
