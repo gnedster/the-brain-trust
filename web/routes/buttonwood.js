@@ -20,6 +20,10 @@ router.get('/', function(req, res, next) {
     });
 });
 
+router.get('/changelog', function(req, res, next) {
+  res.render('buttonwood/changelog');
+});
+
 /*
  * GET buttonwood/authorize.
  * Should be the OAuth redirect uri and must contain a code and state

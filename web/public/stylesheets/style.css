@@ -13,6 +13,12 @@ a {
 .application-header {
   margin-top: -10px;
 }
+
+.application-header a {
+  color: rgb(0, 0, 0);
+}
+
+
 .application-header .application-addToSlackBtn {
   position: relative;
   top: 15px;
