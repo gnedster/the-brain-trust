@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Run npm install for all Node.js packages under a given directory.
+# Run npm <cmd> for all Node.js packages under the immediate directory.
 #
 # Adapted from:
 # https://www.exratione.com/2015/01/run-npm-install-on-all-subdirectories-containing-packages/
@@ -62,6 +62,6 @@ CMD="$2"
 #       # Run the quoted bash command.
 #       bash -c "${SCRIPT_DIR}/npm-install-called-by-xargs.sh %"
 #
-find "${DIR}" -maxdepth 2 -name "package.json" -print0 |
+find "${DIR}" -mindepth 1 -maxdepth 2 -name "package.json" -print0 |
   sed s,/package.json,,g |
   xargs -0 -I % bash -c "${SCRIPT_DIR}/npm-called-by-xargs.sh % $2"
