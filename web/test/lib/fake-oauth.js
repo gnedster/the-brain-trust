@@ -7,7 +7,7 @@ var url = require('url');
 var logger = require('@the-brain-trust/logger');
 
 //Lets define a port we want to listen to
-const PORT=3001;
+const PORT=4000;
 
 //We need a function which handles requests and send response
 function handleRequest(request, response){
