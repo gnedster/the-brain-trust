@@ -2,7 +2,7 @@ var bodyParser = require('body-parser');
 var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
-//var forceSSL = require('express-force-ssl');
+var httpsRedirect = require('./lib/https-redirect');
 var logger = require('@the-brain-trust/logger');
 var morgan = require('morgan');
 var path = require('path');
@@ -18,21 +18,7 @@ var app = express();
 
 
 if (util.isProduction() === true) {
-  app.use(function(req, res, next) {
-    if (req.headers['x-forwarded-proto'] &&
-      req.headers['x-forwarded-proto'].toLowerCase() === 'http') {
-     return res.redirect('https://' + req.headers.host + req.url);
-    }
-    next();
-  });
-  // app.set('forceSSLOptions', {
-  //   enable301Redirects: true,
-  //   trustXFPHeader: true, // Assuming it is behind ELB
-  //   httpsPort: 443,
-  //   sslRequiredMessage: 'ssl required'
-  // });
-
-  // app.use(forceSSL);
+  app.use(httpsRedirect);
 }
 
 // view engine setup
