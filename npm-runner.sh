@@ -2,6 +2,12 @@
 #
 # Run npm install for all Node.js packages under a given directory.
 #
+# Adapted from:
+# https://www.exratione.com/2015/01/run-npm-install-on-all-subdirectories-containing-packages/
+#
+# Why this is a bash script:
+# https://github.com/npm/npm#using-npm-programmatically
+#
 # Usage: $0 <directory>
 #
 
