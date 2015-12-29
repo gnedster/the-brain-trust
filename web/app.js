@@ -2,6 +2,7 @@ var bodyParser = require('body-parser');
 var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
+var forceSSL = require('express-force-ssl');
 var logger = require('@the-brain-trust/logger');
 var morgan = require('morgan');
 var path = require('path');
@@ -14,6 +15,17 @@ var buttonwood = require('./routes/buttonwood');
 var web = require('./routes/index');
 
 var app = express();
+
+if (util.isDevelopment() === false) {
+  app.use(forceSSL);
+
+  app.set('forceSSLOptions', {
+    enable301Redirects: true,
+    trustXFPHeader: true, // Assuming it is behind ELB
+    httpsPort: 443,
+    sslRequiredMessage: 'ssl required'
+  });
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
