@@ -3,6 +3,7 @@ var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
 var httpsRedirect = require('./lib/https-redirect');
+var helmet = require('helmet');
 var logger = require('@the-brain-trust/logger');
 var morgan = require('morgan');
 var path = require('path');
@@ -15,7 +16,7 @@ var buttonwood = require('./routes/buttonwood');
 var web = require('./routes/index');
 
 var app = express();
-
+app.use(helmet())
 
 if (util.isProduction() === true) {
   app.use(httpsRedirect);
