@@ -56,7 +56,7 @@ cd "${PACKAGE_DIR}"
 # rm -Rf "${PACKAGE_DIR}/node_modules"
 
 # Finally we get to the installation.
-npm $CMD --loglevel=info
+npm $CMD
 
 # We need to ensure that cache directories are cleaned to keep disk
 # utilization low, e.g. on a build server where this might run scores of times.
