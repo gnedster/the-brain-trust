@@ -16,7 +16,7 @@ var web = require('./routes/index');
 
 var app = express();
 
-if (util.isDevelopment() === false) {
+if (util.isProduction() === true) {
   app.use(forceSSL);
 
   app.set('forceSSLOptions', {
