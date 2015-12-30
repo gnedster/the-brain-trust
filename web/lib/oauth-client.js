@@ -119,7 +119,6 @@ OAuthClient.prototype.processGetAuthAccessRequest =
 
     try {
       if (results && results.ok === true) {
-        logger.debug(self.platform);
         var attributes = {
           platformId: self.platform.id,
           applicationId: self.application.id,

@@ -13,8 +13,7 @@ block content
   .row.application-content
     .col-sm-3
       embed.application-icon(src='/images/applications/#{application.name}/icon.svg')
-      p
-        #[a(href="/applications/#{application.name}/changelog") changelog]
+      p #[a(href="/applications/#{application.name}/changelog") changelog]
     .col-sm-9
       strong What is #{application.name}?
 
