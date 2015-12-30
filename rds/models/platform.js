@@ -9,7 +9,8 @@ var sequelize = require('../sequelize');
 var Platform = sequelize.define('Platform', {
   name: {
     type: Sequelize.STRING,
-    allowNull : false
+    allowNull : false,
+    unique: true
   },
   description: {
     type: Sequelize.STRING
