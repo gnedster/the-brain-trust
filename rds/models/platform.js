@@ -8,7 +8,7 @@ var sequelize = require('../sequelize');
  */
 var Platform = sequelize.define('Platform', {
   name: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     allowNull : false
   },
   description: {
