@@ -1,30 +1,29 @@
 var _ = require('lodash');
-var config = require('config');
 var crypto = require('crypto');
 var logger = require('@the-brain-trust/logger');
 var OAuth = require('oauth');
 var rds = require('@the-brain-trust/rds');
 
 /**
- * Create a OAuth2 client for Slack OAuth. Should adhere to
- * https://api.slack.com/docs/oauth. Note that we don't have the authorize
- * clause abstracted since that's largely handled by the Slack button.
- * @param {Object} slackApplication Instance of a SlackApplication to make
- *                                  OAuth requests for.
+ * Create a OAuth2 client for OAuth. Should adhere to something like
+ * https://api.slack.com/docs/oauth.
+ *
+ * @param {Object} application Instance of an Aplication to make
+ *                             OAuth requests for.
  */
-function SlackOAuth(slackApplication) {
-  var oAuthConfig = config.get('oauth.slack');
+function OAuthClient(application, platform) {
+  logger.debug('starting connection with platform:', JSON.stringify(platform, null, 2));
+  logger.debug('for application:\n', JSON.stringify(application, null, 2));
 
-  logger.info('starting connection with oauth:\n' +
-    JSON.stringify(oAuthConfig));
+  this.application = application;
+  this.platform = platform;
 
-  this.slackApplication = slackApplication;
   this.client = new OAuth.OAuth2(
-    slackApplication.consumerKey,
-    slackApplication.consumerSecret,
-    oAuthConfig.baseSite,
-    oAuthConfig.authorizePath,
-    oAuthConfig.accessTokenPath,
+    application.consumerKey,
+    application.consumerSecret,
+    platform.baseSite,
+    platform.authorizePath,
+    platform.accessTokenPath,
     null
   );
 }
@@ -33,7 +32,7 @@ function SlackOAuth(slackApplication) {
  * Get an object containing a random state for the OAuth process
  * @return {Promise} Get a promise containing an object with state or an error
  */
-SlackOAuth.getState = function() {
+OAuthClient.getState = function() {
   var promise = new Promise(function(resolve, reject) {
     crypto.randomBytes(12, function(err, buf) {
       var state;
@@ -54,7 +53,7 @@ SlackOAuth.getState = function() {
  * @param  {Request}  req   Object representing the incoming request
  * @return {Boolean}        Represents whether the state provided is valid
  */
-SlackOAuth.prototype.isValidState = function(req) {
+OAuthClient.prototype.isValidState = function(req) {
   if ('session' in req && req.query && 'state' in req.query) {
     return req.session.oAuthState === req.query.state;
   }
@@ -67,7 +66,7 @@ SlackOAuth.prototype.isValidState = function(req) {
  * @param  {Request} redirectUri The uri that was passed back by Slack.
  * @return {Promise} A promise.
  */
-SlackOAuth.prototype.getOAuthAccessToken = function(req) {
+OAuthClient.prototype.getOAuthAccessToken = function(req) {
   logger.info('processing OAuth2 authorize response for: ' + req.originalUrl);
   var self = this;
   var query = req.query;
@@ -82,7 +81,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
           query.code,
           null,
           _.bind(self.processGetAuthAccessRequest, {
-            slackApplication: self.slackApplication,
+            application: self.application,
+            platform: self.platform,
             resolve: resolve,
             reject: reject,
             req: req
@@ -92,7 +92,8 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
         reject(new Error('invalid state'));
       }
     } else {
-      logger.error('an error was returned by Slack: ' + query.error);
+      logger.error('an error was returned by : ',
+        self.platform.name, query.error);
       reject(new Error(query.error));
     }
   });
@@ -101,51 +102,39 @@ SlackOAuth.prototype.getOAuthAccessToken = function(req) {
 
 
 /**
- * Process the return value of hitting the api/oauth.access endpoint of
- * Slack. Exposed on the prototype to allow for testing. It the responsibility
- * of the application to remove entries which are no longer valid.
+ * Process the return value of hitting the access request endpoint of
+ * platform. Exposed on the prototype to allow for testing. It the
+ * responsibility of the application to remove entries which are no
+ * longer valid.
  * @private
  * @param  {Object} e            Always null.
  * @param  {String} accessToken  String for an access token.
  * @param  {String} refreshToken String for a refresh token.
- * @param  {Object} results      Object that is returned by Slack.
+ * @param  {Object} results      Object that is returned by authorizer.
  */
-SlackOAuth.prototype.processGetAuthAccessRequest =
+OAuthClient.prototype.processGetAuthAccessRequest =
   function(e, accessToken, refreshToken, results){
     var self = this;
     logger.debug(results);
 
     try {
       if (results && results.ok === true) {
-        rds.models.SlackTeam.findOrCreate({
-          where: {
-            slackId: results.team_id,
-            slackName: results.team_name
-          }
-        }).then(function(task) {
-          var slackTeam = task[0];
-          var attributes = {
-            slackTeamId: slackTeam.id,
-            slackApplicationId: self.slackApplication.id,
-            accessToken: results.access_token,
-            scope: results.scope,
-            incomingWebhook: results.incoming_webhook,
-            bot: results.incoming_webhook,
-            disabled: false,
-            disabledAt: null
-          };
+        logger.debug(self.platform);
+        var attributes = {
+          platformId: self.platform.id,
+          applicationId: self.application.id,
+          credentials: results
+        }
 
-          rds.models.SlackPermission
-            .create(attributes)
-            .then(function(slackPermission){
-              logger.info('slack-permission created.');
-              self.resolve(slackPermission);
-            }).catch(function(err){
-              self.reject(new Error(err));
-            });
-        }).catch(function(err) {
-          self.reject(new Error(err));
-        });
+        rds.models.PlatformPermission
+          .create(attributes)
+          .then(function(platformPermission){
+            logger.info('platform-permission created.');
+            self.resolve(platformPermission);
+          }).catch(function(err){
+            self.reject(new Error(err));
+          });
+
       } else {
         self.reject(
           new Error(_.isUndefined(results) ? 'no response' : results.error)
@@ -156,4 +145,4 @@ SlackOAuth.prototype.processGetAuthAccessRequest =
     }
   };
 
-module.exports = SlackOAuth;
+module.exports = OAuthClient;
