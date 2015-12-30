@@ -32,7 +32,7 @@ router.get('/:name', function(req, res, next) {
   OAuthClient.getState()
     .then(function(state) {
       // Save oAuthState to cookie session
-      req.session.oAuthState = state.oAuthState
+      req.session.oAuthState = state.oAuthState;
 
       rds.models.Platform.findAll()
         .then(function(promise) {
@@ -40,7 +40,7 @@ router.get('/:name', function(req, res, next) {
             application: req.application,
             oAuthState: state.oAuthState,
             platforms: _.indexBy(promise[0], 'name')
-          }
+          };
 
           res.render('applications/index', params);
         })
@@ -109,11 +109,11 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
               });
           });
         } catch (error) {
-          logger.error(error)
+          logger.error(error);
           error.status = 500;
           next(error);
         }
-      })
+      });
   } else {
     var err = new Error('not found');
     err.status = 404;

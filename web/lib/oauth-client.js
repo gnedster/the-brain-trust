@@ -124,7 +124,7 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           platformId: self.platform.id,
           applicationId: self.application.id,
           credentials: results
-        }
+        };
 
         rds.models.PlatformPermission
           .create(attributes)
