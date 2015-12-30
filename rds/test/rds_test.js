@@ -9,6 +9,6 @@ describe('rds', function(){
   it('should initialize', function(done){
     assert(rds instanceof Sequelize);
     assert(rds.models.Application instanceof Sequelize.Model);
-    done()
+    done();
   });
 });
