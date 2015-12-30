@@ -12,7 +12,7 @@ var session = require('supertest-session');
 
 describe('/applications', function() {
   before(function(done) {
-    rds.sync()
+    rds.sync({logging: logger.stream.write})
       .then(factory.create('application'))
       .then(factory.create('platform'))
       .then(function() {done();})
