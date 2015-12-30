@@ -73,38 +73,46 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
         name: req.params.platform_name
       })
       .then(function(platform) {
+        var err;
         if (_.isUndefined(platform)) {
-          var err = new Error('not found');
+          err = new Error('not found');
           err.status = 404;
           next(err);
         }
-        var oAuthClient = new OAuthClient(application, platform);
 
-        oAuthClient.getOAuthAccessToken(req)
-          .then(function() {
-            res.render('applications/authorized', {
-              application: application
-            });
-          })
-        .catch(function(error) {
-          var page, status;
-          logger.error(error);
+        try {
+          var oAuthClient = new OAuthClient(application, platform);
 
-          switch(error.message) {
-            case 'access_denied':
-              status = 403;
-              page = 'unauthorized';
-              break;
-            default:
-              status = 500;
-              page = 'error';
-              break;
-          }
-          res.status(status)
-            .render('applications/' + page, {
-              application: application
-            });
-        });
+          oAuthClient.getOAuthAccessToken(req)
+            .then(function() {
+              res.render('applications/authorized', {
+                application: application
+              });
+            })
+          .catch(function(error) {
+            var page, status;
+            logger.error(error);
+
+            switch(error.message) {
+              case 'access_denied':
+                status = 403;
+                page = 'unauthorized';
+                break;
+              default:
+                status = 500;
+                page = 'error';
+                break;
+            }
+            res.status(status)
+              .render('applications/' + page, {
+                application: application
+              });
+          });
+        } catch (error) {
+          logger.error(error)
+          err.status = 500;
+          next(error);
+        }
       })
   } else {
     var err = new Error('not found');
