@@ -15,7 +15,7 @@ describe('/applications', function() {
     rds.sync()
       .then(factory.create('application'))
       .then(factory.create('platform'))
-      .then(done())
+      .then(function() {done()})
       .catch(function (err) {
         logger.error(err);
         done();
