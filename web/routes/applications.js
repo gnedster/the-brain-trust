@@ -110,7 +110,7 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
           });
         } catch (error) {
           logger.error(error)
-          err.status = 500;
+          error.status = 500;
           next(error);
         }
       })
