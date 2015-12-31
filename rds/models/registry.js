@@ -8,7 +8,7 @@ Application.hasMany(ApplicationPlatform, {
 });
 
 Platform.hasMany(ApplicationPlatform, {
-  foreignKey: 'application_id'
+  foreignKey: 'platform_id'
 });
 
 Application.hasMany(ApplicationPlatformEntity, {
