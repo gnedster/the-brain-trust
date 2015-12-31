@@ -120,8 +120,8 @@ OAuthClient.prototype.processGetAuthAccessRequest =
     try {
       if (results && results.ok === true) {
         var attributes = {
-          platformId: self.platform.id,
-          applicationId: self.application.id,
+          platform_id: self.platform.id,
+          application_id: self.application.id,
           credentials: results
         };
 
