@@ -8,7 +8,8 @@
   "extends": "eslint:recommended",
   "root": true,
   "rules": {
+    "no-unused-vars": [2, {"vars": "all", "args": "none"}],
     "quotes": [2, "single"],
-    "no-unused-vars": [2, {"vars": "all", "args": "none"}]
+    "semi": 1
   }
 }

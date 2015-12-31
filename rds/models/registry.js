@@ -1,17 +1,17 @@
-var SlackApplication = require('./slack-application');
-var SlackTeam = require('./slack-team');
-var SlackPermission = require('./slack-permission');
+var Application = require('./application');
+var Platform = require('./platform');
+var PlatformPermission = require('./platform-permission');
 
-SlackTeam.hasMany(SlackPermission, {
-  foreignKey: 'slack_team_id'
+Application.hasMany(PlatformPermission, {
+  foreignKey: 'application_id'
 });
 
-SlackApplication.hasMany(SlackPermission, {
-  foreignKey: 'slack_application_id'
+Platform.hasMany(PlatformPermission, {
+  foreignKey: 'platform_id'
 });
 
 module.exports = {
-  SlackApplication: SlackApplication,
-  SlackTeam: SlackTeam,
-  SlackPermission: SlackPermission
+  Application: Application,
+  Platform: Platform,
+  PlatformPermission: PlatformPermission
 };

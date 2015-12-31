@@ -12,4 +12,4 @@ module.exports = function(req, res, next) {
    return res.redirect('https://' + req.headers.host + req.url);
   }
   next();
-}
+};

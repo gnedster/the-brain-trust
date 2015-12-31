@@ -12,8 +12,8 @@ var session = require('express-session');
 var util = require('@the-brain-trust/utility');
 
 // Routes
-var buttonwood = require('./routes/buttonwood');
-var web = require('./routes/index');
+var index = require('./routes/index');
+var applications = require('./routes/applications');
 
 var app = express();
 
@@ -43,8 +43,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
 
-app.use('/', web);
-app.use('/buttonwood', buttonwood);
+app.use('/', index);
+app.use('/applications', applications);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

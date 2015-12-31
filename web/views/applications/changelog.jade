@@ -1,0 +1,15 @@
+extends ../layout
+
+block content
+  .row
+    .col-sm-12.application-header
+      h2
+        #[a(href="/applications/#{application.name}") #{application.name}]
+        &nbsp;&gt;&nbsp;
+        #[a(href="/applications/#{application.name}/changelog") changelog]
+
+  p
+    strong December 21, 2015
+
+    p Initial release.
+

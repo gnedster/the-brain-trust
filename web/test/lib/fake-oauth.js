@@ -42,7 +42,8 @@ function handleRequest(request, response){
     case '/oauth/authorize':
       urlObj = url.parse(request.url, true);
       response.writeHead(302, {
-        'Location': 'http://localhost:3000/buttonwood/authorize?code=1&state=' +
+        'Location': 'http://localhost:3000/applications/buttonwood/slack/authorize?' +
+          'code=1&state=' +
           urlObj.query.state
       });
       response.end();
