@@ -2,8 +2,8 @@
  * Any further updated to sequelize models not provided by the rds module
  * should be collected here.
  */
-var PlatformPermission = require('./platform-permission');
+var ApplicationPlatformEntity = require('./application-platform-entity');
 
 module.exports = {
-  PlatformPermission: PlatformPermission
+  ApplicationPlatformEntity: ApplicationPlatformEntity
 };
