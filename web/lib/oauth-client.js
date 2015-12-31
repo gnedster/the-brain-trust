@@ -125,15 +125,12 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           credentials: results
         };
 
-        rds.models.PlatformPermission
+        rds.models.ApplicationPlatformEntity
           .create(attributes)
-          .then(function(platformPermission){
-            logger.info('platform-permission created.');
-            self.resolve(platformPermission);
-          }).catch(function(err){
+          .then(self.resolve)
+          .catch(function(err){
             self.reject(new Error(err));
           });
-
       } else {
         self.reject(
           new Error(_.isUndefined(results) ? 'no response' : results.error)

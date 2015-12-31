@@ -1,17 +1,27 @@
 var Application = require('./application');
+var ApplicationPlatform = require('./application-platform');
+var ApplicationPlatformEntity = require('./application-platform-entity');
 var Platform = require('./platform');
-var PlatformPermission = require('./platform-permission');
 
-Application.hasMany(PlatformPermission, {
+Application.hasMany(ApplicationPlatform, {
   foreignKey: 'application_id'
 });
 
-Platform.hasMany(PlatformPermission, {
+Platform.hasMany(ApplicationPlatform, {
+  foreignKey: 'platform_id'
+});
+
+Application.hasMany(ApplicationPlatformEntity, {
+  foreignKey: 'application_id'
+});
+
+Platform.hasMany(ApplicationPlatformEntity, {
   foreignKey: 'platform_id'
 });
 
 module.exports = {
   Application: Application,
-  Platform: Platform,
-  PlatformPermission: PlatformPermission
+  ApplicationPlatform: ApplicationPlatform,
+  ApplicationPlatformEntity: ApplicationPlatformEntity,
+  Platform: Platform
 };
