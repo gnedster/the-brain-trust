@@ -30,6 +30,7 @@ var Application = sequelize.define('Application', {
   lastPublishedAt: {
     type: Sequelize.DATE,
     field: 'last_published_at',
+    allowNull: false,
     defaultValue: Sequelize.NOW
   },
   integrations: {
