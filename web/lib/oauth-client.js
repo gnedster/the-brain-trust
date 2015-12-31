@@ -12,20 +12,13 @@ var rds = require('@the-brain-trust/rds');
  *                             OAuth requests for.
  */
 function OAuthClient(application, platform) {
-  logger.debug('starting connection with platform:', JSON.stringify(platform, null, 2));
-  logger.debug('for application:\n', JSON.stringify(application, null, 2));
+  logger.debug('starting connection with platform:',
+    JSON.stringify(platform, null, 2));
+  logger.debug('for application:\n',
+    JSON.stringify(application, null, 2));
 
   this.application = application;
   this.platform = platform;
-
-  this.client = new OAuth.OAuth2(
-    application.consumerKey,
-    application.consumerSecret,
-    platform.baseSite,
-    platform.authorizePath,
-    platform.accessTokenPath,
-    null
-  );
 }
 
 /**
@@ -45,6 +38,45 @@ OAuthClient.getState = function() {
     });
   });
 
+  return promise;
+};
+
+/**
+ * Return oauth client based off of current credentials
+ * @return {Promise} Return Promise which might contain
+ *                          an instance of OAuth.OAuth2
+ */
+OAuthClient.prototype.getClient = function(){
+  var self = this;
+  var promise = new Promise(function(resolve, reject) {
+    if (self.client instanceof OAuth.OAuth2) {
+      resolve(self.client);
+    } else {
+      // Sequelize's APIs don't work too nice here, so we
+      // manually search directly on the foreign keys
+      rds.models.ApplicationPlatform.findOne({
+        application_id: self.application.id,
+        platform_id: self.platform_id
+      }).then(function(instance) {
+        if (instance instanceof rds.models.ApplicationPlatform.Instance) {
+          logger.debug(instance.credentials.clientId);
+          self.client = new OAuth.OAuth2(
+            instance.credentials.clientId,
+            instance.credentials.clientToken,
+            self.platform.baseSite,
+            self.platform.authorizePath,
+            self.platform.accessTokenPath,
+            null
+          );
+          resolve(self.client);
+        } else {
+          reject(new Error('application-platform not found.'));
+        }
+      }).catch(function(err){
+        reject(new Error(err));
+      });
+    }
+  });
   return promise;
 };
 
@@ -77,17 +109,22 @@ OAuthClient.prototype.getOAuthAccessToken = function(req) {
 
       req.session.oAuthState = null; // Delete the oAuthState to prevent reuse
       if (isValidState) {
-        self.client.getOAuthAccessToken(
-          query.code,
-          null,
-          _.bind(self.processGetAuthAccessRequest, {
-            application: self.application,
-            platform: self.platform,
-            resolve: resolve,
-            reject: reject,
-            req: req
-          })
-        );
+        self.getClient().then(function(client){
+          client.getOAuthAccessToken(
+            query.code,
+            null,
+            // Would be nice to find a better way to access this.
+            _.bind(self.processGetAuthAccessRequest, {
+              application: self.application,
+              platform: self.platform,
+              resolve: resolve,
+              reject: reject,
+              req: req
+            })
+          );
+        }).catch(function(err) {
+          reject(err);
+        });
       } else {
         reject(new Error('invalid state'));
       }
@@ -115,7 +152,7 @@ OAuthClient.prototype.getOAuthAccessToken = function(req) {
 OAuthClient.prototype.processGetAuthAccessRequest =
   function(e, accessToken, refreshToken, results){
     var self = this;
-    logger.debug(results);
+    logger.debug('get auth results', results);
 
     try {
       if (results && results.ok === true) {
@@ -133,7 +170,7 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           });
       } else {
         self.reject(
-          new Error(_.isUndefined(results) ? 'no response' : results.error)
+          new Error(_.isUndefined(results.error) ? 'no response' : results.error)
           );
       }
     } catch (err) {

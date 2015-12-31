@@ -20,6 +20,8 @@ factory.define('application', rds.models.Application, {
 });
 
 factory.define('application-permission', rds.models.ApplicationPlatform, {
+  application_id: factory.assoc('application', 'id'),
+  platform_id: factory.assoc('platform', 'id'),
   credentials: {
     clientId: faker.random.uuid(),
     clientToken: faker.random.uuid()
