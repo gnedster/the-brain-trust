@@ -30,7 +30,7 @@ We use [mocha](https://mochajs.org/), [eslint](http://eslint.org/),
 so make sure they exist. We also use [grunt](http://gruntjs.com/) for task
 running.
 
-`npm install -g mocha eslint grunt`
+`npm install -g mocha eslint grunt-cli`
 
 Also we use [reflow](https://github.com/reenhanced/gitreflow) for creating and
 merging branches.
