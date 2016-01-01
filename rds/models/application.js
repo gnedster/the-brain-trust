@@ -25,7 +25,8 @@ var Application = sequelize.define('Application', {
   },
   contact: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    isEmail: true
   },
   lastPublishedAt: {
     type: Sequelize.DATE,

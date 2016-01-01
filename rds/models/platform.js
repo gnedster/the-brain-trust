@@ -18,7 +18,8 @@ var Platform = sequelize.define('Platform', {
   baseSite: {
     type: Sequelize.STRING,
     allowNull : false,
-    field: 'base_site'
+    field: 'base_site',
+    isUrl: true
   },
   authorizePath: {
     type: Sequelize.STRING,

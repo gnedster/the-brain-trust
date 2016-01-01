@@ -1,9 +1,8 @@
-var passportLocalSequelize = require('passport-local-sequelize');
 var Sequelize = require('sequelize');
 var sequelize = require('../sequelize');
 
 /**
- * Models uers
+ * Models users
  * @type {Model}
  */
 var User = sequelize.define('User', {
@@ -20,7 +19,9 @@ var User = sequelize.define('User', {
   },
   email: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    unique: true,
+    isEmail: true
   },
   locked: {
     type: Sequelize.BOOLEAN,
@@ -37,17 +38,21 @@ var User = sequelize.define('User', {
     defaultValue: 0
   },
   hash: {
-    type: Sequelize.STRING
+    type: Sequelize.TEXT
   },
   salt: {
     type: Sequelize.STRING
+  },
+  activationKey: {
+    type: Sequelize.STRING,
+    allowNull: true,
+    field: 'activation_key'
+  },
+  resetPasswordKey: {
+    type: Sequelize.STRING,
+    allowNull: true,
+    field: 'reset_password_key'
   }
-});
-
-passportLocalSequelize.attachToUser(User, {
-  usernameField: 'username',
-  hashField: 'hash',
-  saltField: 'salt'
 });
 
 module.exports = User;
