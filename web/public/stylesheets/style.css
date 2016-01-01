@@ -28,3 +28,6 @@ a {
 .application-menu {
   line-height: 0.8em;
 }
+.login {
+  max-width: 400px;
+}

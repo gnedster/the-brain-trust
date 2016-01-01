@@ -3,7 +3,9 @@
  * should be collected here.
  */
 var ApplicationPlatformEntity = require('./application-platform-entity');
+var User = require('./user');
 
 module.exports = {
-  ApplicationPlatformEntity: ApplicationPlatformEntity
+  ApplicationPlatformEntity: ApplicationPlatformEntity,
+  User: User
 };

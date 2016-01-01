@@ -2,11 +2,13 @@ var bodyParser = require('body-parser');
 var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
+var flash = require('connect-flash');
 var httpsRedirect = require('./lib/https-redirect');
 var helmet = require('helmet');
 var logger = require('@the-brain-trust/logger');
 var morgan = require('morgan');
 var path = require('path');
+var passport = require('passport');
 var sessionStore = require('./lib/session-store');
 var session = require('express-session');
 var util = require('@the-brain-trust/utility');
@@ -14,6 +16,7 @@ var util = require('@the-brain-trust/utility');
 // Routes
 var index = require('./routes/index');
 var applications = require('./routes/applications');
+var admin = require('./routes/admin');
 
 var app = express();
 
@@ -39,12 +42,17 @@ app.use(session({
   store: sessionStore,
   saveUninitialized: true
 }));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
 
 app.use('/', index);
 app.use('/applications', applications);
+app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
