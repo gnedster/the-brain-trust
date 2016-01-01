@@ -58,11 +58,11 @@ OAuthClient.prototype.getClient = function(){
         application_id: self.application.id,
         platform_id: self.platform_id
       }).then(function(instance) {
-        if (instance instanceof rds.models.ApplicationPlatform.Instance) {
-          logger.debug(instance.credentials.clientId);
+        if (instance instanceof rds.models.ApplicationPlatform.Instance &&
+            instance.clientId && instance.token) {
           self.client = new OAuth.OAuth2(
-            instance.credentials.clientId,
-            instance.credentials.clientToken,
+            instance.clientId,
+            instance.token,
             self.platform.baseSite,
             self.platform.authorizePath,
             self.platform.accessTokenPath,
