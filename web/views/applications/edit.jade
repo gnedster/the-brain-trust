@@ -1,0 +1,37 @@
+extends ../layout
+
+block content
+  .row
+    .col-sm-12.application-header
+      h2.
+        #[a(href="/applications/#{application.name}") #{application.name}]
+        &nbsp;&gt;&nbsp;
+        edit
+
+  form(name='exit', action='edit', method='post', accept-charset='utf-8')
+    .form-group
+      label(for='name') name
+      input.form-control(type='text', name='name', value=application.name, required='')
+    .form-group
+      label(for='author') author
+      input.form-control(type='text', name='author', value=application.author, required='')
+    .form-group
+      label(for='contact') contact
+      input.form-control(type='email', name='contact', value=application.contact, required='')
+    .form-group
+      label(for='lastPublishedAt') last published
+      input.form-control(type='datetime-local', name='lastPublishedAt', value=application.lastPublishedAt.toISOString().slice(0,-1), required='')
+    .form-group
+      label(for='description') description
+      textarea.form-control(type='text',name='description', rows=20, required='').
+        #{application.description}
+    .form-group
+      label(for='changelog') changelog
+      textarea.form-control(type='text', name='changelog', rows=20, required='').
+        #{application.changelog}
+    .form-group.pull-right
+      button(type='reset' class='btn btn-default') reset
+      &nbsp;
+      button(type='submit' class='btn btn-primary') save
+
+

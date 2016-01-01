@@ -10,8 +10,7 @@ block content
         th edit
         th author
         th contact
-        th description
-        th changelog
+        th last published
         th page views
         th permissions granted
         th messages sent
@@ -23,8 +22,7 @@ block content
           td #[a(href="/applications/#{application.name}/edit") edit]
           td= application.author
           td= application.contact
-          td= application.description
-          td= application.changelog
+          td= application.lastPublishedAt
           td= application.pageViews
           td n/a
           td n/a

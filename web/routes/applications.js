@@ -18,7 +18,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* Attempt to discover the application. */
-router.get('/:name*', function(req, res, next) {
+router.all('/:name*', function(req, res, next) {
   if (req.params.name) {
     rds.models.Application.findOne({
         name: req.params.name
@@ -27,11 +27,7 @@ router.get('/:name*', function(req, res, next) {
         req.application = application;
         next();
       })
-      .catch(function(){
-        var err = new Error('internal error');
-        err.status = 500;
-        next(err);
-      });
+      .catch(next);
   } else {
     var err = new Error('not found');
     err.status = 404;
@@ -51,21 +47,48 @@ router.get('/:name', function(req, res, next) {
           var params = {
             application: req.application,
             oAuthState: state.oAuthState,
-            platforms: _.indexBy(promise[0], 'name')
+            platforms: _.indexBy(promise[0], 'name'),
+            isAuthenticated: req.isAuthenticated()
           };
 
           res.render('applications/show', params);
         })
-        .catch(function(err) {
-          next(err);
-        });
-    }).catch(function(err) {
-      next(err);
-    });
+        .catch(next);
+    }).catch(next);
 });
 
 /**
- * Show the changelog
+ * GET applications/:name/edit
+ */
+router.get('/:name/edit', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.render('applications/edit', {
+      application: req.application
+    });
+  } else {
+    res.redirect('/login');
+  }
+});
+
+/**
+ * POST applications/:name/edit
+ */
+router.post('/:name/edit', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    req.application.update(req.body)
+      .then(function(promise){
+        res.render('applications/edit', {
+          application: this
+        });
+      })
+      .catch(next);
+  } else {
+    res.redirect('/login');
+  }
+});
+
+/**
+ * GET applications/:name/changelog
  */
 router.get('/:name/changelog', function(req, res, next) {
   res.render('applications/changelog', {

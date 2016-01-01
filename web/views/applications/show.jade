@@ -17,6 +17,8 @@ block content
         ul.list-unstyled
           li #[a(href="/applications/#{application.name}/changelog") changelog]
           li #[a(href="mailto:#{application.contact}") contact]
+          if isAuthenticated
+            li #[a(href="/applications/#{application.name}/edit") edit]
     .col-sm-9
       strong What is #{application.name}?
 
