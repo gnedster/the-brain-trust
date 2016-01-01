@@ -28,6 +28,10 @@ a {
 .application-menu {
   line-height: 0.8em;
 }
+.flash {
+  display: block;
+  padding: 7px 10px;
+}
 .login {
   max-width: 400px;
 }

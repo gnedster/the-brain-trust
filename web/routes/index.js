@@ -19,14 +19,16 @@ router.get('/privacy-policy', function(req, res, next) {
 
 /* GET login. */
 router.get('/login', function(req, res, next) {
-  res.render('login');
+  res.render('login', {
+    error: req.flash('error')
+  });
 });
 
 /* POST login. */
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/admin',
   failureRedirect: '/login',
-  failureFlash: true
+  failureFlash: 'invalid username or password'
 }));
 
 module.exports = router;

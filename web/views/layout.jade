@@ -14,6 +14,10 @@ html
 
   body
     google-analytics(code='UA-71658652-1')
+    if error && error.length > 0
+      .flash.alert-danger(role='alert')
+        span.glyphicon.glyphicon-exclamation-sign(aria-hidden="true") &nbsp;
+        span #{error}
     .container
       .header
         h1 #[a.header-title(href='/') the brain trust]
