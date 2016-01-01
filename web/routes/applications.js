@@ -5,6 +5,18 @@ var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 var OAuthClient = require('../lib/oauth-client');
 
+/* Get all applications */
+router.get('/', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.Application.findAll()
+      .then(function(applications){
+        res.render('applications/index', {applications: applications});
+      });
+  } else {
+    res.redirect('/login');
+  }
+});
+
 /* Attempt to discover the application. */
 router.get('/:name*', function(req, res, next) {
   if (req.params.name) {
@@ -42,7 +54,7 @@ router.get('/:name', function(req, res, next) {
             platforms: _.indexBy(promise[0], 'name')
           };
 
-          res.render('applications/index', params);
+          res.render('applications/show', params);
         })
         .catch(function(err) {
           next(err);
