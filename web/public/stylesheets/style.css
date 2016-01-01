@@ -9,16 +9,12 @@ a {
 .header-title {
   color: rgb(0, 0, 0);
 }
-
 .application-header {
   margin-top: -10px;
 }
-
 .application-header a {
   color: rgb(0, 0, 0);
 }
-
-
 .application-header .application-addToSlackBtn {
   position: relative;
   top: 15px;
@@ -28,4 +24,7 @@ a {
   margin: auto;
   max-width: 200px;
   width: 100%;
+}
+.application-menu {
+  line-height: 0.8em;
 }

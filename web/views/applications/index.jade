@@ -13,7 +13,9 @@ block content
   .row.application-content
     .col-sm-3
       embed.application-icon(src='/images/applications/#{application.name}/icon.svg')
-      p #[a(href="/applications/#{application.name}/changelog") changelog]
+      div.application-menu
+        p #[a(href="/applications/#{application.name}/changelog") changelog]
+        p #[a(href="mailto:#{application.contact}") contact]
     .col-sm-9
       strong What is #{application.name}?
 
@@ -28,10 +30,6 @@ block content
       p.
         In the future, we'd like to add personalized alerts to help monitor large
         movements in stock prices, macroeconomic events, and company news.
-
-      p.
-        If you'd like to see additional features, e-mail us at
-        #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].
 
       strong Why the name?
 
