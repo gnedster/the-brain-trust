@@ -4,6 +4,9 @@
 .header-title {
   color: rgb(0, 0, 0);
 }
+.header-links {
+  margin-top: 20px;
+}
 .application-header {
   margin-top: -10px;
 }

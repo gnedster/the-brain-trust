@@ -24,6 +24,12 @@ router.get('/login', function(req, res, next) {
   });
 });
 
+/* GET logout. */
+router.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 /* POST login. */
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/admin',

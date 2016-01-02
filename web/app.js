@@ -50,6 +50,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components',
   express.static(path.join(__dirname,'/bower_components')));
 
+// add isAuthenticated to every view
+app.use('*', function(req, res, next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.user = req.user;
+  next();
+});
 app.use('/', index);
 app.use('/applications', applications);
 app.use('/admin', admin);

@@ -55,8 +55,7 @@ router.get('/:name', function(req, res, next) {
           var params = {
             application: req.application,
             oAuthState: state.oAuthState,
-            platforms: _.indexBy(promise[0], 'name'),
-            isAuthenticated: req.isAuthenticated()
+            platforms: _.indexBy(promise[0], 'name')
           };
 
           res.render('applications/show', params);
