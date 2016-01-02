@@ -13,6 +13,8 @@ var session = require('supertest-session');
 
 describe('/applications', function() {
   before(function(done) {
+    this.timeout(3000);
+
     rds.sync({logging: logger.stream.write})
       .then(function() {require('../models/registry');})
       .then(function() {factory.create('application-permission');})
