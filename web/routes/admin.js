@@ -2,7 +2,7 @@ var express = require('express');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 
-router.get('*', function(req, res, next) {
+router.all('*', function(req, res, next) {
   if (req.isAuthenticated()) {
     next();
   } else {
