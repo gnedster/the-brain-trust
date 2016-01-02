@@ -2,6 +2,7 @@ var Application = require('./application');
 var ApplicationPlatform = require('./application-platform');
 var ApplicationPlatformEntity = require('./application-platform-entity');
 var Platform = require('./platform');
+var User = require('./user');
 
 Application.hasMany(ApplicationPlatform, {
   foreignKey: 'application_id'
@@ -23,5 +24,6 @@ module.exports = {
   Application: Application,
   ApplicationPlatform: ApplicationPlatform,
   ApplicationPlatformEntity: ApplicationPlatformEntity,
-  Platform: Platform
+  Platform: Platform,
+  User: User
 };

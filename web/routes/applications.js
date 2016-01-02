@@ -5,21 +5,37 @@ var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 var OAuthClient = require('../lib/oauth-client');
 
+/* Get all applications */
+router.get('/', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.Application.findAll()
+      .then(function(applications){
+        res.render('applications/index', {applications: applications});
+      });
+  } else {
+    res.redirect('/login');
+  }
+});
+
 /* Attempt to discover the application. */
-router.get('/:name*', function(req, res, next) {
+router.all('/:name*', function(req, res, next) {
   if (req.params.name) {
     rds.models.Application.findOne({
-        name: req.params.name
+        where: {
+          name: req.params.name
+        }
       })
       .then(function(application){
-        req.application = application;
-        next();
+        if (application instanceof rds.models.Application.Instance) {
+          req.application = application;
+          next();
+        } else {
+          var err = new Error('not found');
+          err.status = 404;
+          next(err);
+        }
       })
-      .catch(function(){
-        var err = new Error('internal error');
-        err.status = 500;
-        next(err);
-      });
+      .catch(next);
   } else {
     var err = new Error('not found');
     err.status = 404;
@@ -42,18 +58,44 @@ router.get('/:name', function(req, res, next) {
             platforms: _.indexBy(promise[0], 'name')
           };
 
-          res.render('applications/index', params);
+          res.render('applications/show', params);
         })
-        .catch(function(err) {
-          next(err);
-        });
-    }).catch(function(err) {
-      next(err);
-    });
+        .catch(next);
+    }).catch(next);
 });
 
 /**
- * Show the changelog
+ * GET applications/:name/edit
+ */
+router.get('/:name/edit', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.render('applications/edit', {
+      application: req.application
+    });
+  } else {
+    res.redirect('/login');
+  }
+});
+
+/**
+ * POST applications/:name/edit
+ */
+router.post('/:name/edit', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    req.application.update(req.body)
+      .then(function(promise){
+        res.render('applications/edit', {
+          application: this
+        });
+      })
+      .catch(next);
+  } else {
+    res.redirect('/login');
+  }
+});
+
+/**
+ * GET applications/:name/changelog
  */
 router.get('/:name/changelog', function(req, res, next) {
   res.render('applications/changelog', {
