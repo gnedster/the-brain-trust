@@ -31,7 +31,8 @@ describe('/', function() {
         .get('/')
         .set('Accept', 'application/html')
         .expect('Content-Type', /html/)
-        .expect(200, /the brain trust/, done);
+        .expect(200, /the brain trust/)
+        .expect(200, /login/, done);
     });
   });
 
