@@ -3,10 +3,12 @@ extends ../layout
 block content
   .row.application-header
     .col-xs-8
-      h2.
-        #[a(href="/applications/") applications]
-        &nbsp;&gt;&nbsp;
-        #{application.name}
+      h2
+        if isAuthenticated
+          #[a(href="/applications/") applications]
+          &nbsp;&gt;&nbsp;
+        span.
+          #{application.name}
     .col-xs-4.application-addToSlackBtn
       a.pull-right(href='#{platforms.slack.baseSite}#{platforms.slack.authorizePath}?scope=incoming-webhook,bot&client_id=16573442774.17151776516&state=#{oAuthState}')
         img(alt='Add to Slack', height='40', width='139',
@@ -14,7 +16,7 @@ block content
           srcset='https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x')
 
   .row.application-content
-    .col-sm-3
+    .col-md-3
       embed.application-icon(src='/images/applications/#{application.name}/icon.svg')
       div.application-menu
         ul.list-unstyled
@@ -22,7 +24,7 @@ block content
           li #[a(href="mailto:#{application.contact}") contact]
           if isAuthenticated
             li #[a(href="/applications/#{application.name}/edit") edit]
-    .col-sm-9
+    .col-md-9
       strong What is #{application.name}?
 
       p.

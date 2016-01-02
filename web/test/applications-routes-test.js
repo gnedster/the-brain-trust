@@ -67,12 +67,18 @@ describe('/applications', function() {
           .expect(302)
           .expect('Location', '/admin')
           .end(function(err, res) {
-            logger.info('boooger');
             testSession
               .get('/applications/buttonwood/edit')
               .set('Accept', 'text/html')
               .set('Content-Type', 'text/html; charset=utf8')
-              .expect(200, done);
+              .expect(200, /logout/)
+              .end(function(err, res) {
+                testSession
+                  .post('/applications/buttonwood/edit')
+                  .type('form')
+                  .send({ contact: 'info@test.com' })
+                  .expect(200, /edit/, done);
+              });
           });
     });
   });

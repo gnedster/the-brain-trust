@@ -1,17 +1,14 @@
 .container {
-  max-width: 1200px;
+  max-width: 800px;
 }
 .header-title {
   color: rgb(0, 0, 0);
 }
 .header-links {
-  margin-top: 20px;
+  margin-top: 5px;
 }
 .application-header {
   margin-top: -10px;
-}
-.application-header a {
-  color: rgb(0, 0, 0);
 }
 .application-header .application-addToSlackBtn {
   position: relative;
@@ -20,7 +17,7 @@
 .application-icon {
   display: block;
   margin: auto;
-  max-width: 200px;
+  max-width: 220px;
   width: 100%;
 }
 .flash {
