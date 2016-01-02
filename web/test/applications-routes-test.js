@@ -53,8 +53,7 @@ describe('/applications', function() {
         .set('Accept', 'text/html')
         .set('Content-Type', 'text/html; charset=utf8')
         .expect('Content-Type', /html/)
-        .expect(302)
-        .expect('Location', '/login')
+        .expect(404)
         .end(done);
     });
 
