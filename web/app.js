@@ -32,6 +32,10 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components',
+  express.static(path.join(__dirname,'/bower_components')));
+
 app.use(morgan('combined', { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -45,10 +49,6 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/bower_components',
-  express.static(path.join(__dirname,'/bower_components')));
 
 // add isAuthenticated to every view
 app.use('*', function(req, res, next){
