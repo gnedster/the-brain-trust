@@ -20,12 +20,12 @@ html
         span #{error}
     .container
       .row.header
-        .col-xs-9
+        .col-xs-7
           h1 #[a.header-title(href='/') the brain trust]
-        .col-xs-3
+        .col-xs-5
           span.header-links.pull-right
             if isAuthenticated
-              span #{user.email}&nbsp;
+              span #[a(href='/admin') #{user.email}]&nbsp;
               span |
               &nbsp;#[a(href='/logout') logout]
             else
