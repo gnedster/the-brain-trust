@@ -25,25 +25,4 @@ block content
           if isAuthenticated
             li #[a(href="/applications/#{application.name}/edit") edit]
     .col-md-9
-      strong What is #{application.name}?
-
-      p.
-        buttonwood is a Slack app that provides
-        pricing information about stocks whenever a cash tag (like $AAPL)
-        is mentioned in a channel that @buttonwood is in, or when mentioning or
-        directly talking to @buttonwood.
-
-      strong What else?
-
-      p.
-        In the future, we'd like to add personalized alerts to help monitor large
-        movements in stock prices, macroeconomic events, and company news.
-
-      strong Why the name?
-
-      p.
-        buttonwood is named after
-        #[a(href="https://en.wikipedia.org/wiki/Buttonwood_Agreement") The Buttonwood Agreement]
-        which established the New York Stock &amp; Exchange Board, or in its modern
-        nomenclature, the New York Stock Exchange.
-
+      .application-description!= marked(application.description)
