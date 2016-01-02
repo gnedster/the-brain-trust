@@ -6,6 +6,7 @@ var flash = require('connect-flash');
 var httpsRedirect = require('./lib/https-redirect');
 var helmet = require('helmet');
 var logger = require('@the-brain-trust/logger');
+var marked = require('marked');
 var morgan = require('morgan');
 var path = require('path');
 var passport = require('passport');
@@ -54,6 +55,7 @@ app.use(passport.session());
 app.use('*', function(req, res, next){
   res.locals.isAuthenticated = req.isAuthenticated();
   res.locals.user = req.user;
+  res.locals.marked = marked;
   next();
 });
 app.use('/', index);

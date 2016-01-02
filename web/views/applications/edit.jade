@@ -24,11 +24,11 @@ block content
       label(for='lastPublishedAt') last published
       input.form-control(type='datetime-local', name='lastPublishedAt', value=application.lastPublishedAt.toISOString().slice(0,-1), required='')
     .form-group
-      label(for='description') description
+      label(for='description') description (use markdown syntax)
       textarea.form-control(type='text',name='description', rows=20, required='').
         #{application.description}
     .form-group
-      label(for='changelog') changelog
+      label(for='changelog') changelog (use markdown syntax)
       textarea.form-control(type='text', name='changelog', rows=20, required='').
         #{application.changelog}
     .form-group.pull-right
