@@ -21,11 +21,19 @@ router.get('/', function(req, res, next) {
 router.all('/:name*', function(req, res, next) {
   if (req.params.name) {
     rds.models.Application.findOne({
-        name: req.params.name
+        where: {
+          name: req.params.name
+        }
       })
       .then(function(application){
-        req.application = application;
-        next();
+        if (application instanceof rds.models.Application.Instance) {
+          req.application = application;
+          next();
+        } else {
+          var err = new Error('not found');
+          err.status = 404;
+          next(err);
+        }
       })
       .catch(next);
   } else {
