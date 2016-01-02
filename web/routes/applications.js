@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
         res.render('applications/index', {applications: applications});
       });
   } else {
-    res.redirect('/login');
+    next();
   }
 });
 
@@ -37,9 +37,7 @@ router.all('/:name*', function(req, res, next) {
       })
       .catch(next);
   } else {
-    var err = new Error('not found');
-    err.status = 404;
-    next(err);
+    next();
   }
 });
 
@@ -73,7 +71,7 @@ router.get('/:name/edit', function(req, res, next) {
       application: req.application
     });
   } else {
-    res.redirect('/login');
+    next();
   }
 });
 
@@ -90,7 +88,20 @@ router.post('/:name/edit', function(req, res, next) {
       })
       .catch(next);
   } else {
-    res.redirect('/login');
+    next();
+  }
+});
+
+/**
+ * GET applications/:name/permissions
+ */
+router.get('/:name/perimssions', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.render('applications/permissions', {
+      application: req.getApplicationPemirrions
+    });
+  } else {
+    next();
   }
 });
 
@@ -157,9 +168,7 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
         }
       });
   } else {
-    var err = new Error('not found');
-    err.status = 404;
-    next(err);
+    next();
   }
 });
 

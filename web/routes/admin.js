@@ -2,6 +2,16 @@ var express = require('express');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 
+router.get('*', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    var error = new Error('not found');
+    error.status = 404;
+    next(error);
+  }
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   Promise.all([
