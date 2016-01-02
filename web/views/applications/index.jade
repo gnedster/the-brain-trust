@@ -15,7 +15,7 @@ block content
         th permissions granted
         th messages sent
         th messages received
-        th status
+        th enabled
       tbody
         each application in applications
           td #[a(href="/applications/#{application.name}") #{application.name}]
@@ -25,7 +25,7 @@ block content
           td= application.lastPublishedAt
           td= application.pageViews
           td n/a
-          td n/a
-          td n/a
-          td n/a
+          td= application.messagesSent
+          td= application.messagesReceived
+          td= application.enabled
 

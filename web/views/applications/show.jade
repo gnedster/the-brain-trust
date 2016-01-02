@@ -3,7 +3,10 @@ extends ../layout
 block content
   .row.application-header
     .col-xs-8
-      h2 #[a(href="/applications/#{application.name}") #{application.name}]
+      h2.
+        #[a(href="/applications/") applications]
+        &nbsp;&gt;&nbsp;
+        #{application.name}
     .col-xs-4.application-addToSlackBtn
       a.pull-right(href='#{platforms.slack.baseSite}#{platforms.slack.authorizePath}?scope=incoming-webhook,bot&client_id=16573442774.17151776516&state=#{oAuthState}')
         img(alt='Add to Slack', height='40', width='139',

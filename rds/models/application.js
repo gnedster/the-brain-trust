@@ -34,18 +34,24 @@ var Application = sequelize.define('Application', {
     allowNull: false,
     defaultValue: Sequelize.NOW
   },
-  integrations: {
-    type: Sequelize.INTEGER,
+  messagesReceived: {
+    type: Sequelize.BIGINT,
+    field: 'messages_received',
     defaultValue: 0
   },
-  interactions: {
+  messagesSent: {
     type: Sequelize.BIGINT,
+    field: 'messages_sent',
     defaultValue: 0
   },
   pageViews: {
     type: Sequelize.INTEGER,
     field: 'page_views',
     defaultValue: 0
+  },
+  enabled: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true
   }
 });
 
