@@ -23,8 +23,8 @@ var sqs = (function() {
    */
   function getQueueUrl(name) {
     var promise = new Promise(function(resolve, reject) {
-      if (name in queueUrls) {
-        resolve(queueUrls[name]);
+      if (queueUrls.has(name)) {
+        queueUrls.get(name);
       }
 
       sqs.getQueueUrl({
@@ -37,8 +37,8 @@ var sqs = (function() {
           logger.debug(JSON.stringify(data, null, 2));
 
           if ('QueueUrl' in data) {
-            queueUrls[name] = data.QueueUrl;
-            resolve(queueUrls[name]);
+            queueUrls.set(name, data.QueueUrl);
+            resolve(queueUrls.get(name));
           }
 
           reject(new Error('Queue url could not be retrieved.'));
@@ -91,7 +91,7 @@ var sqs = (function() {
       });
   }
 
-  var queueUrls = {};
+  var queueUrls = new Map();
 
   if (util.isProduction()) {
     sqsConfig.accessKeyId = process.env.SQS_ACCESS_KEY_ID;
