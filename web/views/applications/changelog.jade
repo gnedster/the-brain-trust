@@ -9,6 +9,8 @@ block content
       #[a(href="/applications/#{application.name}") #{application.name}]
       &nbsp;&gt;&nbsp;
       changelog
-
-  p
-    .application-changelog!= marked(application.changelog)
+  .row.application-content
+    .col-md-3
+      include ./sidebar.jade
+    .col-md-9
+      .application-changelog!= marked(application.changelog)
