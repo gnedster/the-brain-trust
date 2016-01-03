@@ -129,44 +129,44 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
       })
       .then(function(platform) {
         var err;
-        if (_.isNull(platform)) {
+        if (platform instanceof rds.models.Platform.Instance) {
+          try {
+            var oAuthClient = new OAuthClient(application, platform);
+
+            oAuthClient.getOAuthAccessToken(req)
+              .then(function() {
+                res.render('applications/authorized', {
+                  application: application
+                });
+              })
+            .catch(function(error) {
+              var page, status;
+              logger.error(error);
+
+              switch(error.message) {
+                case 'access_denied':
+                  status = 403;
+                  page = 'unauthorized';
+                  break;
+                default:
+                  status = 500;
+                  page = 'error';
+                  break;
+              }
+              res.status(status)
+                .render('applications/' + page, {
+                  application: application
+                });
+            });
+          } catch (error) {
+            logger.error(error);
+            error.status = 500;
+            next(error);
+          }
+        } else {
           err = new Error('not found');
           err.status = 404;
           next(err);
-        }
-
-        try {
-          var oAuthClient = new OAuthClient(application, platform);
-
-          oAuthClient.getOAuthAccessToken(req)
-            .then(function() {
-              res.render('applications/authorized', {
-                application: application
-              });
-            })
-          .catch(function(error) {
-            var page, status;
-            logger.error(error);
-
-            switch(error.message) {
-              case 'access_denied':
-                status = 403;
-                page = 'unauthorized';
-                break;
-              default:
-                status = 500;
-                page = 'error';
-                break;
-            }
-            res.status(status)
-              .render('applications/' + page, {
-                application: application
-              });
-          });
-        } catch (error) {
-          logger.error(error);
-          error.status = 500;
-          next(error);
         }
       });
   } else {
