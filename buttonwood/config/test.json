@@ -1,0 +1,8 @@
+{
+  "sqs" : {
+    "endpoint": "http://localhost:4568",
+    "accessKeyId": "access key id",
+    "secretAccessKey": "secret access key",
+    "region": "region"
+  }
+}
