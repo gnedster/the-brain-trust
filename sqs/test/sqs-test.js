@@ -31,14 +31,17 @@ describe('sqs', function(){
       });
   });
 
-  it('should send message and receive messages', function(done){
-    sqs.sendInstanceMessage('fake-queue', 'message body', '{foo: bar}')
-      .then(function() {
-        return sqs.pollForMessages('fake-queue', false);
-      })
-      .then(function(data) {
-        assert(data.Messages);
-        done();
-      });
+  describe('polling', function() {
+    it('should send message, delete and consume messages', function(done){
+      sqs.sendInstanceMessage('fake-queue', 'message body', '{foo: bar}')
+        .then(function() {
+          return sqs.pollForMessages('fake-queue', true);
+        })
+        .then(function(data) {
+          assert(data.Messages);
+          assert.equal(data.Messages.length, 1);
+          done();
+        });
+    });
   });
 });

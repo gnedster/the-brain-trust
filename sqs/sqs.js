@@ -106,7 +106,7 @@ var sqs = (function() {
         return new Promise(function(resolve, reject) {
           awsSqs.receiveMessage({
             QueueUrl: queueUrl,
-            WaitTimeSeconds: 1, // Enable long-polling (3-seconds).
+            WaitTimeSeconds: 3,
             VisibilityTimeout: 10
           }, function(err, data){
             if (err) {
@@ -123,7 +123,12 @@ var sqs = (function() {
         return new Promise(function(resolve, reject) {
           if (deleteOnArrival) {
             awsSqs.deleteMessageBatch({
-              Entries: messages.Messages,
+              Entries: _.map(messages.Messages, function(message) {
+                return {
+                  Id: message.MessageId,
+                  ReceiptHandle: message.ReceiptHandle
+                };
+              }),
               QueueUrl: queueUrl
             }, function(err, data){
               if (err) {
