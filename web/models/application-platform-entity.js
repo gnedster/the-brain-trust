@@ -1,5 +1,5 @@
 var rds = require('@the-brain-trust/rds');
-var sqs = require('../lib/sqs');
+var sqs = require('@the-brain-trust/sqs');
 
 rds.models.ApplicationPlatformEntity
   .hook('afterCreate', function(instance, options) {
