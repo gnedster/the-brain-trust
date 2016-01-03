@@ -19,9 +19,18 @@ var sqs = new AWS.SQS(_.merge(sqsConfig, {
  * @param  {Function} done Callback to indicate queue creation is complete
  */
 function createQueue(name, done) {
-  sqs.createQueue({
+  return new Promise(function(resolve, reject){
+    sqs.createQueue({
       QueueName: name
-    }, done);
+    }, function(err, data){
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+
 }
 
 module.exports = {
