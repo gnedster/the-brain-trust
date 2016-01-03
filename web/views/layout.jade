@@ -13,7 +13,8 @@ html
     meta(name='description' content='Makers of buttonwood, the financial markets Slack app.')
 
   body
-    google-analytics(code='UA-71658652-1')
+    if process.env.NODE_ENV == 'production'
+      google-analytics(code='UA-71658652-1')
     if error && error.length > 0
       .flash.alert-danger(role='alert')
         span.glyphicon.glyphicon-exclamation-sign(aria-hidden="true") &nbsp;
