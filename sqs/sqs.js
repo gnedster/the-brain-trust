@@ -23,11 +23,11 @@ var sqs = (function() {
    */
   function getQueueUrl(name) {
     var promise = new Promise(function(resolve, reject) {
-      if (name in queueUrls) {
-        resolve(queueUrls[name]);
+      if (queueUrls.has(name)) {
+        queueUrls.get(name);
       }
 
-      sqs.getQueueUrl({
+      awsSqs.getQueueUrl({
         QueueName: name
         }, function(err, data) {
         if (err) {
@@ -37,8 +37,8 @@ var sqs = (function() {
           logger.debug(JSON.stringify(data, null, 2));
 
           if ('QueueUrl' in data) {
-            queueUrls[name] = data.QueueUrl;
-            resolve(queueUrls[name]);
+            queueUrls.set(name, data.QueueUrl);
+            resolve(queueUrls.get(name));
           }
 
           reject(new Error('Queue url could not be retrieved.'));
@@ -75,7 +75,7 @@ var sqs = (function() {
         };
 
         return new Promise(function(resolve, reject) {
-          sqs.sendMessage(params, function(err, data) {
+          awsSqs.sendMessage(params, function(err, data) {
             if (err) {
               logger.error(err, err.stack);
               reject(err);
@@ -91,7 +91,63 @@ var sqs = (function() {
       });
   }
 
-  var queueUrls = {};
+  /**
+   * Poll for messages, with the option to delete message on arrival
+   * @param  {String}   queueName         The queue name
+   * @param  {Boolean}  deleteOnArrival   Optional delete mechanism
+   * @return {Promise}                    Promise containing data returned by
+   *                                      the receiveMessage API.
+   */
+  function pollForMessages(queueName, deleteOnArrival) {
+    logger.info('starting long poll operation.');
+
+    return getQueueUrl(queueName)
+      .then(function(queueUrl) {
+        return new Promise(function(resolve, reject) {
+          awsSqs.receiveMessage({
+            QueueUrl: queueUrl,
+            WaitTimeSeconds: 3,
+            VisibilityTimeout: 10
+          }, function(err, data){
+            if (err) {
+              reject(err);
+            } else {
+              resolve([queueUrl, data]);
+            }
+          });
+        });
+      })
+      .then(function(tuple) {
+        var queueUrl = tuple[0];
+        var messages = tuple[1];
+        return new Promise(function(resolve, reject) {
+          if (deleteOnArrival) {
+            awsSqs.deleteMessageBatch({
+              Entries: _.map(messages.Messages, function(message) {
+                return {
+                  Id: message.MessageId,
+                  ReceiptHandle: message.ReceiptHandle
+                };
+              }),
+              QueueUrl: queueUrl
+            }, function(err, data){
+              if (err) {
+                reject(err);
+              } else {
+                resolve(messages);
+              }
+            });
+          } else {
+            resolve(messages);
+          }
+        });
+      })
+      .catch(function(err) {
+        logger.error('queueUrl undefined, aborting: ', err);
+      });
+  }
+
+  var queueUrls = new Map();
 
   if (util.isProduction()) {
     sqsConfig.accessKeyId = process.env.SQS_ACCESS_KEY_ID;
@@ -102,12 +158,13 @@ var sqs = (function() {
   logger.debug('starting sqs connection with config:\n' +
     JSON.stringify(sqsConfig, null, 2));
 
-  var sqs = new AWS.SQS(_.merge(sqsConfig, {
+  var awsSqs = new AWS.SQS(_.merge(sqsConfig, {
     logger: logger.stream
   }));
 
   return {
-    sendInstanceMessage: sendInstanceMessage
+    sendInstanceMessage: sendInstanceMessage,
+    pollForMessages: pollForMessages
   };
 })();
 
