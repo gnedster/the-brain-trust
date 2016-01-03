@@ -27,7 +27,7 @@ var sqs = (function() {
         queueUrls.get(name);
       }
 
-      sqs.getQueueUrl({
+      awsSqs.getQueueUrl({
         QueueName: name
         }, function(err, data) {
         if (err) {
@@ -75,7 +75,7 @@ var sqs = (function() {
         };
 
         return new Promise(function(resolve, reject) {
-          sqs.sendMessage(params, function(err, data) {
+          awsSqs.sendMessage(params, function(err, data) {
             if (err) {
               logger.error(err, err.stack);
               reject(err);
@@ -84,6 +84,57 @@ var sqs = (function() {
               resolve(data);
             }
           });
+        });
+      })
+      .catch(function(err) {
+        logger.error('queueUrl undefined, aborting: ', err);
+      });
+  }
+
+  /**
+   * Poll for messages, with the option to delete message on arrival
+   * @param  {String}   queueName         The queue name
+   * @param  {Boolean}  deleteOnArrival   Optional delete mechanism
+   * @return {Promise}                    Promise containing data returned by
+   *                                      the receiveMessage API.
+   */
+  function pollForMessages(queueName, deleteOnArrival) {
+    logger.info('starting long poll operation.');
+
+    return getQueueUrl(queueName)
+      .then(function(queueUrl) {
+        return new Promise(function(resolve, reject) {
+          awsSqs.receiveMessage({
+            QueueUrl: queueUrl,
+            WaitTimeSeconds: 1, // Enable long-polling (3-seconds).
+            VisibilityTimeout: 10
+          }, function(err, data){
+            if (err) {
+              reject(err);
+            } else {
+              resolve([queueUrl, data]);
+            }
+          });
+        });
+      })
+      .then(function(tuple) {
+        var queueUrl = tuple[0];
+        var messages = tuple[1];
+        return new Promise(function(resolve, reject) {
+          if (deleteOnArrival) {
+            awsSqs.deleteMessageBatch({
+              Entries: messages.Messages,
+              QueueUrl: queueUrl
+            }, function(err, data){
+              if (err) {
+                reject(err);
+              } else {
+                resolve(messages);
+              }
+            });
+          } else {
+            resolve(messages);
+          }
         });
       })
       .catch(function(err) {
@@ -102,12 +153,13 @@ var sqs = (function() {
   logger.debug('starting sqs connection with config:\n' +
     JSON.stringify(sqsConfig, null, 2));
 
-  var sqs = new AWS.SQS(_.merge(sqsConfig, {
+  var awsSqs = new AWS.SQS(_.merge(sqsConfig, {
     logger: logger.stream
   }));
 
   return {
-    sendInstanceMessage: sendInstanceMessage
+    sendInstanceMessage: sendInstanceMessage,
+    pollForMessages: pollForMessages
   };
 })();
 
