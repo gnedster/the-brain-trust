@@ -80,12 +80,12 @@ function listenForStockInfo(controller) {
  * @class
  * @param {String} Bot token
  */
-function Bot(token) {
+function Bot(inToken) {
   this.controller = Botkit.slackbot({
     debug: util.isProduction() ? false : true
   });
 
-  this.bot = this.controller.spawn({token:token});
+  this.bot = this.controller.spawn({token:inToken});
 }
 
 Bot.prototype.listen = function(){

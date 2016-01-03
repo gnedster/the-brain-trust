@@ -24,14 +24,13 @@ function createBot(applicationPlatformEntity) {
   if (botInstance instanceof Bot) {
     logger.info('bot for applicationPlatformEntity', id, 'already created.');
   } else {
-    //TODO parse which bot and pass in relavent info
-
     token = _.get(applicationPlatformEntity,
       'credentials.bot.bot_access_token'
       );
 
-    if (_.isString(token instanceof String)) {
-      bot = new Bot(applicationPlatformEntity);
+    if (_.isString(token)) {
+//TODO more token sanity check needed
+      bot = new Bot(token);
       bot.listen();
       botInstanceMap.set(id, bot);
       logger.info('bot for applicationPlatformEntity', id, 'created.');
@@ -57,8 +56,9 @@ function initializeBots(platformName, applicationName) {
       where: {
         name: applicationName
       }
-    })
-    ], function(platform, application) {
+    })]).then(function(results) {
+      var platform = results[0];
+      var application = results[1];
       if (platform instanceof rds.models.Platform.Instance &&
         application instanceof rds.models.Application.Instance) {
 
@@ -81,7 +81,7 @@ function initializeBots(platformName, applicationName) {
       }
     }).then(function(applicationPlatformEntities) {
       if (applicationPlatformEntities[0]) {
-        _.each(applicationPlatformEntities[0],
+        _.each(applicationPlatformEntities,
           function(applicationPlatformEntity) {
             createBot(applicationPlatformEntity);
           });
