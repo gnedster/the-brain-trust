@@ -31,31 +31,46 @@ function createBot(instance) {
 }
 
 
-function spawnBot(platformName, ApplicationName)
+function spawnBot(platformName, applicationName)
 {
   var platformId, applicationId;
   var promiseSlackerPlatform, promiseSlackerApplication;
 
   /* Returns Promise for querying for platform ID */
   promiseSlackerPlatform = rds.models.Platform.findOne({
+      where: {
         name: platformName
+      }});
+  promiseSlackerApplication = rds.models.Application.findOne({
+        name: applicationName
       });
 
-  promiseSlackerApplication = rds.models.Application.findOne({
-        name: ApplicationName
-      });
+//TODO need to figure out how to handle errors
+  /* Wait for responses from above Promises */
   promiseSlackerPlatform.then(function (platform){
-    if (_.isUndefined(platform)){
+    if (_.isNull(platform)){
       //TODO error out
+      logger.error('platform ' + platformName + ' could not be found');
+    } else {
+      platformId = platform.id;
     }
-    platformId = platform.id;
-    //TODO now read back application id and then call findAll
-  });
-/**
- * Initialize all bot instances withing RDS to run
- */
-  //TODO use results
-  rds.models.ApplicationPlatformEntity.findAll().then(function(results){
+    return promiseSlackerApplication;
+  }).then(function (application){
+    if (_.isNull(application)){
+      //TODO error out
+      logger.error('application ' + applicationName + ' could not be found');
+    }
+    applicationId = application.id;
+    logger.info('TMsg plat ' + platformId + ' apps ' + applicationId);
+    return rds.models.ApplicationPlatformEntity.findAll({
+      where: {
+        application_id : applicationId,
+        platform_id: platformId}});
+  }).then(function(results){
+    /**
+     * Initialize all bot instances withing RDS to run
+     */
+logger.info('TMsg start ' + platformName + ' ' + applicationName)
     results.forEach(function(instance) {
       createBot(instance);
     });
