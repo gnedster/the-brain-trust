@@ -137,6 +137,33 @@ describe('/applications', function() {
           logger.debug(state);
 
           testSession
+            .get('/applications/buttonwood/' +
+              faker.finance.account() +
+              '/authorize?code=1&state=' +
+              state)
+            .set('Accept', 'text/html')
+            .set('Content-Type', 'text/html; charset=utf8')
+            .expect(404, done);
+      });
+    });
+
+    /**
+     * Fake OAuth server needs to be up.
+     */
+    it('responds with 200 with valid code and state', function(done){
+      var testSession = session(app);
+
+      testSession
+        .get('/applications/buttonwood')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .end(function(err, res) {
+          // Grab the state from the html page (not ideal)
+          var state = res.text.match(/state=(\w+)/)[1];
+
+          logger.debug(state);
+
+          testSession
             .get('/applications/buttonwood/slack/authorize?code=1&state=' + state)
             .set('Accept', 'text/html')
             .set('Content-Type', 'text/html; charset=utf8')
@@ -149,8 +176,8 @@ describe('/applications', function() {
                 .set('Accept', 'text/html')
                 .set('Content-Type', 'text/html; charset=utf8')
                 .expect(500, done);
-            });
         });
+      });
     });
   });
 });

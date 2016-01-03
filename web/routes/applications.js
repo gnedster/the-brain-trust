@@ -123,11 +123,13 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
     var application = req.application;
 
     rds.models.Platform.findOne({
-        name: req.params.platform_name
+        where: {
+          name: req.params.platform_name
+        }
       })
       .then(function(platform) {
         var err;
-        if (_.isUndefined(platform)) {
+        if (_.isNull(platform)) {
           err = new Error('not found');
           err.status = 404;
           next(err);
