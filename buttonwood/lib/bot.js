@@ -22,7 +22,7 @@ var introduction = ['I\'m buttonwood, it\'s nice to meet you!',
 
 /**
  * Return usage information.
- * @param  {CoreController} 
+ * @param  {CoreController}
  */
 function listenForUsageInfo(controller) {
   controller.hears(['hello', 'hi'],'direct_message,direct_mention,mention',
@@ -39,7 +39,7 @@ function listenForUsageInfo(controller) {
 
 /**
  * Return stock information when a ticker symbol is provided.
- * @param  {CoreController} 
+ * @param  {CoreController}
  */
 function listenForStockInfo(controller) {
   controller.hears(['(\$[A-z]*)'],
@@ -78,24 +78,23 @@ function listenForStockInfo(controller) {
 /**
  * Instance of a bot
  * @class
- * @param {Token} Bot token
+ * @param {String} Bot token
  */
-function Bot(inToken) {
+function Bot(token) {
   this.controller = Botkit.slackbot({
     debug: util.isProduction() ? false : true
   });
 
-  this.bot = this.controller.spawn(
-    {
-      token:inToken
-    });
+  this.bot = this.controller.spawn({token:token});
 }
 
 Bot.prototype.listen = function(){
   this.bot.startRTM();
-  
+
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
+
+  return this;
 };
 
 module.exports = Bot;
