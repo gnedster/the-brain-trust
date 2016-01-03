@@ -17,12 +17,6 @@ block content
 
   .row.application-content
     .col-md-3
-      embed.application-icon(src='/images/applications/#{application.name}/icon.svg')
-      div.application-menu
-        ul.list-unstyled
-          li #[a(href="/applications/#{application.name}/changelog") changelog]
-          li #[a(href="mailto:#{application.contact}") contact]
-          if isAuthenticated
-            li #[a(href="/applications/#{application.name}/edit") edit]
+      include ./sidebar.jade
     .col-md-9
       .application-description!= marked(application.description)
