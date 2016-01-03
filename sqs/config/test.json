@@ -1,7 +1,8 @@
 {
   "sqs" : {
-    "endpoint": "http://localhost:4568",
+    "apiVersion" : "2012-11-05",
     "accessKeyId": "access key id",
+    "endpoint": "http://localhost:4568",
     "secretAccessKey": "secret access key",
     "region": "region"
   }

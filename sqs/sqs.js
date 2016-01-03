@@ -4,11 +4,15 @@
  * we want better management of queue url retrieval and
  * error handling so we wrap into this singleton.
  */
+var path = require('path');
+var env = process.env.NODE_ENV || 'development';
+
 var _ = require('lodash');
 var AWS = require('aws-sdk');
-var config = require('config');
+var config = require('config.json')
+  (path.join(__dirname, 'config', env + '.json'));
 var logger = require('@the-brain-trust/logger');
-var sqsConfig = config.get('sqs');
+var sqsConfig = config.sqs;
 var util = require('@the-brain-trust/utility');
 
 var sqs = (function() {
@@ -50,11 +54,13 @@ var sqs = (function() {
    * @param  {String} queueName    The queue name
    * @param  {String} messageBody  Message body
    * @param  {Model} payload       Additional information
+   * @return {Promise}             A promise returning the data returned or
+   *                               an error for SQS.
    */
   function sendInstanceMessage(queueName, messageBody, payload) {
     logger.info('Sending message to SQS.');
 
-    getQueueUrl(queueName)
+    return getQueueUrl(queueName)
       .then(function(queueUrl) {
         var params = {
           MessageBody: messageBody,
@@ -68,12 +74,16 @@ var sqs = (function() {
           }
         };
 
-        sqs.sendMessage(params, function(err, data) {
-          if (err) {
-            logger.error(err, err.stack);
-          } else {
-            logger.log(data);
-          }
+        return new Promise(function(resolve, reject) {
+          sqs.sendMessage(params, function(err, data) {
+            if (err) {
+              logger.error(err, err.stack);
+              reject(err);
+            } else {
+              logger.debug(data);
+              resolve(data);
+            }
+          });
         });
       })
       .catch(function(err) {
