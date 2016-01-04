@@ -121,7 +121,9 @@ var sqs = (function() {
         var queueUrl = tuple[0];
         var messages = tuple[1];
         return new Promise(function(resolve, reject) {
-          if (deleteOnArrival) {
+          if (deleteOnArrival &&
+            messages.Messages instanceof Array &&
+            messages.Messages.length > 0) {
             awsSqs.deleteMessageBatch({
               Entries: _.map(messages.Messages, function(message) {
                 return {
