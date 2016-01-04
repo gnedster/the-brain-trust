@@ -2,11 +2,14 @@ var bodyParser = require('body-parser');
 var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
+var flash = require('connect-flash');
 var httpsRedirect = require('./lib/https-redirect');
 var helmet = require('helmet');
 var logger = require('@the-brain-trust/logger');
+var marked = require('marked');
 var morgan = require('morgan');
 var path = require('path');
+var passport = require('passport');
 var sessionStore = require('./lib/session-store');
 var session = require('express-session');
 var util = require('@the-brain-trust/utility');
@@ -14,6 +17,7 @@ var util = require('@the-brain-trust/utility');
 // Routes
 var index = require('./routes/index');
 var applications = require('./routes/applications');
+var admin = require('./routes/admin');
 
 var app = express();
 
@@ -29,6 +33,10 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components',
+  express.static(path.join(__dirname,'/bower_components')));
+
 app.use(morgan('combined', { stream: logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -39,16 +47,24 @@ app.use(session({
   store: sessionStore,
   saveUninitialized: true
 }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/bower_components',
-  express.static(path.join(__dirname,'/bower_components')));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
+// add isAuthenticated to every view
+app.use('*', function(req, res, next){
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.user = req.user;
+  res.locals.marked = marked;
+  next();
+});
 app.use('/', index);
 app.use('/applications', applications);
+app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  var err = new Error('not found');
   err.status = 404;
   next(err);
 });

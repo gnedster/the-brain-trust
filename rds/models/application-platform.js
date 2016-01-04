@@ -6,9 +6,13 @@ var sequelize = require('../sequelize');
  * @type {Model}
  */
 var ApplicationPlatform = sequelize.define('ApplicationPlatform', {
-  credentials: {
-    type: Sequelize.JSON,
-    allowNull : false
+  token: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  clientId: {
+    type: Sequelize.STRING,
+    field: 'client_id'
   }
 });
 

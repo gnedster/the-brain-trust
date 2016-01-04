@@ -1,0 +1,8 @@
+.application-sidebar
+  embed.application-icon(src='/images/applications/#{application.name}/icon.svg')
+  .application-menu
+    ul.list-unstyled
+      li #[a(href="/applications/#{application.name}/changelog") changelog]
+      li #[a(href="mailto:#{application.contact}") contact]
+      if isAuthenticated
+        li #[a(href="/applications/#{application.name}/edit") edit]

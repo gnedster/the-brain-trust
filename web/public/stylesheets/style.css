@@ -1,24 +1,15 @@
-body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.container {
+  max-width: 800px;
 }
-
-a {
-  color: #00B7FF;
-}
-
 .header-title {
   color: rgb(0, 0, 0);
 }
-
+.header-links {
+  margin-top: 5px;
+}
 .application-header {
   margin-top: -10px;
 }
-
-.application-header a {
-  color: rgb(0, 0, 0);
-}
-
-
 .application-header .application-addToSlackBtn {
   position: relative;
   top: 15px;
@@ -26,6 +17,19 @@ a {
 .application-icon {
   display: block;
   margin: auto;
-  max-width: 200px;
+  max-width: 220px;
   width: 100%;
+}
+.flash {
+  display: block;
+  padding: 7px 10px;
+}
+.login {
+  max-width: 400px;
+}
+.models td {
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  max-width: 200px;
 }

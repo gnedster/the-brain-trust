@@ -1,8 +1,10 @@
-var Botkit = require('botkit');
-var yahooFinance = require('yahoo-finance');
 var _ = require('lodash');
-var util = require('@the-brain-trust/utility');
+var Botkit = require('botkit');
 var logger = require('@the-brain-trust/logger');
+var moment = require('moment');
+var number = require('./lib/number');
+var util = require('@the-brain-trust/utility');
+var yahooFinance = require('yahoo-finance');
 
 /*
  * Global bot responses, TODO move buttonwood specific details to bot module
@@ -55,21 +57,60 @@ function listenForStockInfo(controller) {
 
     yahooFinance.snapshot({
       symbols: symbols,
-      fields: ['s', 'n', 'l1']
+      /**
+       * s = symbol
+       * n = name
+       * l1 = lastTradePriceOnly
+       * p2 = changeInPercent
+       * d1 = lastTradeDate
+       * t1 = lastTradeTime
+       */
+      fields: ['s', 'n', 'l1', 'p2', 'd1', 't1']
     }, function (err, snapshot) {
       if (err) {
-        logger.error(err);
         bot.reply(message,'Sorry, something went terribly wrong.');
       } else {
-        var messages = _.map(snapshot, function(data) {
+        var attachments = _.map(snapshot, function(data) {
+          logger.debug(data);
           if (_.isEmpty(data.name)) {
-            return notFoundTpl(data);
+            return {
+              fallback: notFoundTpl(data),
+              text: notFoundTpl(data),
+              mrkdwn_in : ['text']
+            };
           } else {
-            return priceTpl(data);
+            return {
+              fallback: priceTpl(data),
+              color: number.color(data.changeInPercent),
+              title: _.template('<%= symbol %> (<%= name %>)')(data),
+              text: _.template([
+                '<%=lastTradeDate%> <%=lastTradeTime%> ET',
+                '*<%= lastTrade %>* (<%= sign %><%= percent %>)'
+                ].join('\n')
+                )({
+                lastTradeDate: moment(data.lastTradeDate).format('LL'),
+                lastTradeTime: data.lastTradeTime,
+                lastTrade: number.currency(data.lastTradePriceOnly),
+                sign: number.sign(data.changeInPercent),
+                percent: number.percent(Math.abs(data.changeInPercent))
+              }),
+              mrkdwn_in : ['title', 'text']
+            };
           }
         });
 
-        bot.reply(message, messages.join('\n'));
+        bot.reply(message, {attachments: attachments}, function(err, resp) {
+          logger.debug(err, resp);
+
+          if (err) {
+            bot.reply(message, {
+              attachments: [{
+                fallback: 'something went horribly wrong',
+                pretext: 'something went horribly wrong'
+              }]
+            });
+          }
+        });
       }
     });
   });

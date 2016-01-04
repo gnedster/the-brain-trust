@@ -1,0 +1,38 @@
+{
+  "name": "buttonwood",
+  "description": "A Slack app providing information about stocks.",
+  "engines": {
+    "node": "4.1.1",
+    "npm": "2.14.4"
+  },
+  "version": "0.0.1",
+  "private": true,
+<<<<<<< HEAD
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./bin/main"
+=======
+  "scripts": {
+    "test": "mocha"
+>>>>>>> master
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gnedster/the-brain-trust"
+  },
+  "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
+<<<<<<< HEAD
+    "@the-brain-trust/rds": "0.3.10",
+    "@the-brain-trust/utility": "0.0.1",
+=======
+>>>>>>> master
+    "botkit": "^0.0.4",
+    "lodash": "^3.10.1",
+    "moment": "^2.11.0",
+    "yahoo-finance": "^0.2.12"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
+  }
+}

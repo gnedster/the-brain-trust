@@ -5,8 +5,5 @@
   },
   "express-session" : {
     "secret": "uPs^gCsNUC3MabihEUg-e8"
-  },
-  "sqs" : {
-    "apiVersion" : "2012-11-05"
   }
 }
