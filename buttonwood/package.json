@@ -7,14 +7,21 @@
   },
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "test": "mocha"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gnedster/the-brain-trust"
   },
   "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
     "botkit": "^0.0.4",
     "lodash": "^3.10.1",
     "moment": "^2.11.0",
     "yahoo-finance": "^0.2.12"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4"
   }
 }
