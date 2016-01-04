@@ -19,24 +19,27 @@ var botInstanceMap = new Map();
 function createBot(applicationPlatformEntity) {
   var bot, token;
   var id = applicationPlatformEntity.id;
-  var botInstance = botInstanceMap.get(id);
+  var botInstance;
+
+  token = _.get(applicationPlatformEntity,
+    'credentials.bot.bot_access_token'
+    );
+  if (_.isString(token)) {
+//TODO more token sanity check needed
+    botInstance = botInstanceMap.get(token);
+  } else {
+    logger.warn('invalid token for applicationPlatformEntity', id);
+    return;
+  }
+
 
   if (botInstance instanceof Bot) {
     logger.info('bot for applicationPlatformEntity', id, 'already created.');
   } else {
-    token = _.get(applicationPlatformEntity,
-      'credentials.bot.bot_access_token'
-      );
-
-    if (_.isString(token)) {
-//TODO more token sanity check needed
-      bot = new Bot(token);
-      bot.listen();
-      botInstanceMap.set(id, bot);
-      logger.info('bot for applicationPlatformEntity', id, 'created.');
-    } else {
-      logger.warn('invalid token for applicationPlatformEntity', id);
-    }
+    bot = new Bot(token);
+    bot.listen();
+    botInstanceMap.set(token, bot);
+    logger.info('bot for applicationPlatformEntity', id, 'created.');
   }
 }
 

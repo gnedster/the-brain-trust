@@ -90,9 +90,9 @@ function listenForStockInfo(controller) {
                 )({
                 lastTradeDate: moment(data.lastTradeDate).format('LL'),
                 lastTradeTime: data.lastTradeTime,
-                lastTrade: number.currency(data.lastTradePriceOnly),
+                lastTrade: number.toCurrency(data.lastTradePriceOnly),
                 sign: number.sign(data.changeInPercent),
-                percent: number.percent(Math.abs(data.changeInPercent))
+                percent: number.toPercent(Math.abs(data.changeInPercent))
               }),
               mrkdwn_in : ['title', 'text']
             };
