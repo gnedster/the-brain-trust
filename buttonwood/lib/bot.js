@@ -117,14 +117,16 @@ function listenForStockInfo(controller) {
 }
 
 /**
- * Instance of a bot
+ * Buttonwood Bot class
  * @class
- * @param {String} Bot token
+ * @param {String} inToken Token for use against Slack's APIs
  */
 function Bot(inToken) {
-  if (!(inToken.startsWith('xoxb'))) {
-    throw new Error('Note a valid token');
+  if (inToken.startsWith('xoxb') === false) {
+    logger.warn('invalid Slack token');
+    return;
   }
+
   this.controller = Botkit.slackbot({
     debug: util.isProduction() ? false : true
   });

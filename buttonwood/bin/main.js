@@ -1,3 +1,6 @@
 var listener = require('../listener.js');
 
-listener.initializeBots('slack', 'buttonwood');
+const platformName = 'slack';
+const applicationName = 'buttonwood';
+
+listener.initializeBots(platformName, applicationName);

@@ -5,14 +5,10 @@ var assert = require('assert');
 var Bot = require('../lib/bot');
 
 describe('Bot', function(){
-  it('should create bot and listen', function(done){
-    var bot;
-    try {
-      bot = new Bot('xoxb-16835262720-Tpn5RK1ymtSSldGuwVMv0PBm');
-    } catch (err) {
-      assert(false);
-    }
-    assert.equal(bot.listen(), bot);
+  it('should initialize bot', function(done){
+    var token = 'xoxb-16835262720-13214213213';
+
+    assert(new Bot(token));
     done();
   });
 });

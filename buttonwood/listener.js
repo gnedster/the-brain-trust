@@ -17,9 +17,8 @@ var botInstanceMap = new Map();
  *                                                               possibly be created
  */
 function createBot(applicationPlatformEntity) {
-  var bot, token;
+  var bot, botInstance, token;
   var id = applicationPlatformEntity.id;
-  var botInstance;
 
   token = _.get(applicationPlatformEntity,
     'credentials.bot.bot_access_token'
@@ -31,7 +30,6 @@ function createBot(applicationPlatformEntity) {
     logger.warn('invalid token for applicationPlatformEntity', id);
     return;
   }
-
 
   if (botInstance instanceof Bot) {
     logger.info('bot for applicationPlatformEntity', id, 'already created.');
@@ -49,6 +47,7 @@ function createBot(applicationPlatformEntity) {
  * @param  {String} applicationName  Application to initialize bots against
  */
 function initializeBots(platformName, applicationName) {
+  logger.info('initializing bots for', platformName, applicationName);
   Promise.all([
     rds.models.Platform.findOne({
       where: {
