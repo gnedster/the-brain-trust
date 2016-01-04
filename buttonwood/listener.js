@@ -46,6 +46,7 @@ function createBot(applicationPlatformEntity) {
  * Initialize set of listeners
  * @param  {String} platformName     Platform to initialize bots against
  * @param  {String} applicationName  Application to initialize bots against
+ * @return {Promise}
  */
 function initializeBots(platformName, applicationName) {
   logger.info('initializing bots for', platformName, applicationName);
@@ -83,14 +84,22 @@ function initializeBots(platformName, applicationName) {
         return Promise.resolve([]);
       }
     }).then(function(applicationPlatformEntities) {
-      if (applicationPlatformEntities[0]) {
-        _.each(applicationPlatformEntities,
-          function(applicationPlatformEntity) {
-            createBot(applicationPlatformEntity);
-          });
-      } else {
-        logger.warn('no permissions found for', platformName, applicationName);
-      }
+      return new Promise(function(resolve, reject) {
+        try {
+          if (applicationPlatformEntities[0]) {
+            _.each(applicationPlatformEntities,
+                function(applicationPlatformEntity) {
+                  createBot(applicationPlatformEntity);
+                });
+          } else {
+            logger.warn('no permissions found for', platformName, applicationName);
+          }
+          resolve();
+        } catch(err) {
+          reject(err);
+        }
+      });
+
     }).catch(function(err) {
       logger.error(err);
     });
