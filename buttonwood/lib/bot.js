@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Botkit = require('botkit');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
-var number = require('./lib/number');
+var number = require('./number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
