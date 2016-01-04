@@ -8,6 +8,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "start": "node ./bin/main",
     "test": "mocha"
   },
   "repository": {
@@ -16,6 +17,8 @@
   },
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
+    "@the-brain-trust/rds": "0.3.10",
+    "@the-brain-trust/utility": "0.0.1",
     "botkit": "^0.0.4",
     "lodash": "^3.10.1",
     "moment": "^2.11.0",
