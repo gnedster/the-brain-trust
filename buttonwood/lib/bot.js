@@ -122,6 +122,9 @@ function listenForStockInfo(controller) {
  * @param {String} Bot token
  */
 function Bot(inToken) {
+  if (!(inToken.startsWith('xoxb'))) {
+    throw new Error('Note a valid token');
+  }
   this.controller = Botkit.slackbot({
     debug: util.isProduction() ? false : true
   });
