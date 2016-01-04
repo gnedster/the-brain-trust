@@ -2,13 +2,14 @@ var _ = require('lodash');
 var Bot = require('./lib/bot');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
+var sqs = require('@the-brain-trust/sqs');
+
+const queueName = 'application';
 
 /**
  * Map Object to hold all bot instances
  */
 var botInstanceMap = new Map();
-
-// TODO: Create sqs listener
 
 /**
  * Create bot object if bot does not already exist
@@ -48,7 +49,7 @@ function createBot(applicationPlatformEntity) {
  */
 function initializeBots(platformName, applicationName) {
   logger.info('initializing bots for', platformName, applicationName);
-  Promise.all([
+  return Promise.all([
     rds.models.Platform.findOne({
       where: {
         name: platformName
@@ -95,6 +96,44 @@ function initializeBots(platformName, applicationName) {
     });
 }
 
+/**
+ * Initialize th function to listen for SQS messages. This function
+ * recursively calls itself indefinitely.
+ * @param  {String}   queueName Queue name to listen to messages against
+ * @return {Promise}
+ */
+function initializeSqsListener(platformName, applicationName, queueName) {
+  return sqs.pollForMessages(queueName, true)
+    .then(function(data){
+      // TODO: Use data provided by queue instead of attempting to
+      // initialize bots again
+
+      if (_.get(data, 'Messages')) {
+        return initializeBots(platformName, applicationName);
+      } else {
+        return new Promise(function(resolve, reject) {
+          // Artifical delay of 3 seconds
+          setTimeout(resolve, 3000);
+        });
+      }
+    })
+    .then(function() {
+      // Unsure whether or not we need to wrap this promise
+      return new Promise(function(resolve, reject) {
+        initializeSqsListener(platformName, applicationName, queueName);
+        resolve();
+      });
+    })
+    .catch(function(err) {
+      logger.error(err);
+    });
+}
+
+function init(platformName, applicationName){
+  initializeBots(platformName, applicationName);
+  initializeSqsListener(platformName, applicationName, queueName);
+}
+
 module.exports = {
-  initializeBots: initializeBots
+  init: init
 };
