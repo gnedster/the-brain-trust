@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var accounting = require('accounting');
 var Botkit = require('botkit');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
@@ -47,6 +48,7 @@ function listenForStockInfo(controller) {
   controller.hears(['(\$[A-z]*)'],
       'direct_message,direct_mention,mention,ambient',function(bot,message) {
     var matches = message.text.match(/\$([A-z]*)/ig);
+    var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();
     }));
@@ -55,64 +57,96 @@ function listenForStockInfo(controller) {
       return;
     }
 
+    /**
+     * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
+     * s = symbol
+     * n = name
+     * l1 = lastTradePriceOnly
+     * p2 = changeInPercent
+     * d1 = lastTradeDate
+     * t1 = lastTradeTime
+     * v = volume
+     * r = peRatio
+     * w = 52WeekRange
+     * e = earningsPerShare
+     * m = daysRange
+     * j1 = marketCap
+     */
+    var fieldsBasic = ['s', 'n', 'l1', 'p2', 'd1', 't1'];
+    var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
+
     yahooFinance.snapshot({
       symbols: symbols,
-      /**
-       * s = symbol
-       * n = name
-       * l1 = lastTradePriceOnly
-       * p2 = changeInPercent
-       * d1 = lastTradeDate
-       * t1 = lastTradeTime
-       */
-      fields: ['s', 'n', 'l1', 'p2', 'd1', 't1']
-    }, function (err, snapshot) {
-      if (err) {
-        bot.reply(message,'Sorry, something went terribly wrong.');
-      } else {
-        var attachments = _.map(snapshot, function(data) {
-          logger.debug(data);
-          if (_.isEmpty(data.name)) {
-            return {
-              fallback: notFoundTpl(data),
-              text: notFoundTpl(data),
-              mrkdwn_in : ['text']
-            };
-          } else {
-            return {
-              fallback: priceTpl(data),
-              color: number.color(data.changeInPercent),
-              title: _.template('<%= symbol %> (<%= name %>)')(data),
-              title_link: `https://finance.yahoo.com/q?s=${data.symbol}`,
-              text: _.template([
-                '<%=lastTradeDate%> <%=lastTradeTime%> ET',
-                '*<%= lastTrade %>* (<%= sign %><%= percent %>)'
-                ].join('\n')
-                )({
-                lastTradeDate: moment(data.lastTradeDate).format('LL'),
-                lastTradeTime: data.lastTradeTime,
-                lastTrade: number.toCurrency(data.lastTradePriceOnly),
-                sign: number.sign(data.changeInPercent),
-                percent: number.toPercent(Math.abs(data.changeInPercent))
-              }),
-              mrkdwn_in : ['title', 'text']
-            };
-          }
-        });
+      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+    }).then(function (snapshots) {
+      var attachments = _.map(snapshots, function(data) {
+        logger.debug(data);
 
-        bot.reply(message, {attachments: attachments}, function(err, resp) {
-          logger.debug(err, resp);
+        var attachmentFieldsBasic = [{
+          title: 'Last Trade',
+          value: `${accounting.formatMoney(data.lastTradePriceOnly)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+          short: true
+        }];
 
-          if (err) {
-            bot.reply(message, {
-              attachments: [{
-                fallback: 'something went horribly wrong',
-                pretext: 'something went horribly wrong'
-              }]
-            });
-          }
-        });
-      }
+        var attachmentFieldsDetailed = [{
+          title: 'Volume',
+          value: accounting.formatNumber(data.volume),
+          short: true
+        }, {
+          title: 'Day Range',
+          value: data.daysRange || 'n/a',
+          short: true
+        }, {
+          title: '52 Week Range',
+          value: data['52WeekRange'] || 'n/a',
+          short: true
+        }, {
+          title: 'P/E',
+          value: data.peRatio || 'n/a',
+          short: true
+        }, {
+          title: 'EPS',
+          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+          short: true
+        }, {
+          title: 'Market Capitalization',
+          value: data.marketCapitalization || 'n/a',
+          short: true
+        }];
+
+        if (_.isEmpty(data.name)) {
+          return {
+            fallback: notFoundTpl(data),
+            text: notFoundTpl(data),
+            mrkdwn_in : ['text']
+          };
+        } else {
+          return {
+            fallback: priceTpl(data),
+            color: number.color(data.changeInPercent),
+            title: _.template('<%= symbol %> (<%= name %>)')(data),
+            title_link: `https://finance.yahoo.com/q?s=${data.symbol}`,
+            text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
+            fields:  isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+            mrkdwn_in : ['title', 'text']
+          };
+        }
+      });
+
+      bot.reply(message, {attachments: attachments}, function(err, resp) {
+        logger.debug(err, resp);
+
+        if (err) {
+          bot.reply(message, {
+            attachments: [{
+              fallback: 'something went horribly wrong',
+              pretext: 'something went horribly wrong'
+            }]
+          });
+        }
+      });
+    }).catch(function(err){
+      logger.error(err);
     });
   });
 }

@@ -19,19 +19,6 @@ describe('number', function(){
     done();
   });
 
-  it('should toCurrency', function(done){
-    assert.equal(number.toCurrency(2321.2123), '$2321.21');
-    assert.equal(number.toCurrency(0.2), '$0.20');
-    done();
-  });
-
-  it('should toFixed', function(done){
-    assert.equal(number.toFixed(2321.2123), 2321.21);
-    assert.equal(number.toFixed(0.2), 0.20);
-    done();
-  });
-
-
   it('should toPercent', function(done){
     assert.equal(number.toPercent(2321.2123), '232121.23%');
     assert.equal(number.toPercent(0.2), '20.00%');
