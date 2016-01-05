@@ -26,7 +26,7 @@ function createBot(applicationPlatformEntity) {
     'credentials.bot.bot_access_token'
     );
   if (_.isString(token)) {
-//TODO more token sanity check needed
+  //TODO more token sanity check needed
     botInstance = botInstanceMap.get(token);
   } else {
     logger.warn('invalid token for applicationPlatformEntity', id);

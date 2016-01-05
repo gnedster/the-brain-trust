@@ -62,6 +62,7 @@ function listenForStockInfo(controller) {
      * s = symbol
      * n = name
      * l1 = lastTradePriceOnly
+     * c1 = change
      * p2 = changeInPercent
      * d1 = lastTradeDate
      * t1 = lastTradeTime
@@ -72,7 +73,7 @@ function listenForStockInfo(controller) {
      * m = daysRange
      * j1 = marketCap
      */
-    var fieldsBasic = ['s', 'n', 'l1', 'p2', 'd1', 't1'];
+    var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
     var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
 
     yahooFinance.snapshot({
@@ -84,7 +85,11 @@ function listenForStockInfo(controller) {
 
         var attachmentFieldsBasic = [{
           title: 'Last Trade',
-          value: `${accounting.formatMoney(data.lastTradePriceOnly)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+          short: true
+        }, {
+          title: 'Change',
+          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
           short: true
         }];
 
