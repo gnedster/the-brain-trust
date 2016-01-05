@@ -29,23 +29,14 @@ function sign(number) {
 }
 
 /**
- * Attach a currency symbol for a given number
- * @param  {Number} number  Number to get sign for
- * @return {String}         Currency value
+ * Add spacing to number so large numbers are readable.
+ * @param  {Number} number Number to adjust
+ * @return {Number}        Adjusted number
  */
-function toCurrency(number) {
-  return '$' + toFixed(number);
-}
-
-/**
- * toFixed wrapper for consistency
- * @param  {Number} number         Number to adjust
- * @param  {Number} [precision=2]  Digits to fix to
- * @return {Number}                Adjusted number
- */
-function toFixed(number, precision) {
-  precision = precision || 2;
-  return Number.prototype.toFixed.call(number, precision);
+function addSpacing(number) {
+  var parts = number.toString().split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return parts.join('.');
 }
 
 /**
@@ -60,9 +51,8 @@ function toPercent(number, precision) {
 }
 
 module.exports = {
+  addSpacing: addSpacing,
   color: color,
   sign: sign,
-  toCurrency: toCurrency,
-  toFixed: toFixed,
   toPercent: toPercent
 };

@@ -3,6 +3,7 @@ var Bot = require('./lib/bot');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 var sqs = require('@the-brain-trust/sqs');
+var util = require('@the-brain-trust/utility');
 
 const queueName = 'application';
 
@@ -140,7 +141,9 @@ function initializeSqsListener(platformName, applicationName, queueName) {
 
 function init(platformName, applicationName){
   initializeBots(platformName, applicationName);
-  initializeSqsListener(platformName, applicationName, queueName);
+  if (util.isProduction()) {
+    initializeSqsListener(platformName, applicationName, queueName);
+  }
 }
 
 module.exports = {
