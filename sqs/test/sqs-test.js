@@ -1,8 +1,8 @@
 /**
  * Add tests for the rds module.
  */
-var assert = require('assert');
 var _ = require('lodash');
+var assert = require('assert');
 var sqs = require('../sqs');
 var specHelper = require('./lib/spec-helper');
 
