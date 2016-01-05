@@ -24,7 +24,7 @@ var sqs = (function() {
   function getQueueUrl(name) {
     var promise = new Promise(function(resolve, reject) {
       if (queueUrls.has(name)) {
-        queueUrls.get(name);
+        return resolve(queueUrls.get(name));
       }
 
       awsSqs.getQueueUrl({
