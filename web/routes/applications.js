@@ -27,6 +27,7 @@ router.all('/:name*', function(req, res, next) {
       })
       .then(function(application){
         if (application instanceof rds.models.Application.Instance) {
+          res.locals.metaDescription = application.shortDescription;
           req.application = application;
           next();
         } else {

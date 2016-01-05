@@ -15,6 +15,7 @@ factory.define('application', rds.models.Application, {
   name: 'buttonwood',
   author: faker.company.companyName(),
   description: faker.lorem.paragraphs(),
+  shortDescription: faker.lorem.sentence(),
   changelog: faker.lorem.paragraphs(),
   contact: faker.internet.email()
 });

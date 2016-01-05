@@ -19,6 +19,11 @@ var Application = sequelize.define('Application', {
     type: Sequelize.TEXT,
     allowNull: false
   },
+  shortDescription: {
+    type: Sequelize.STRING,
+    field: 'short_description',
+    allowNull: false
+  },
   changelog: {
     type: Sequelize.TEXT,
     allowNull: false
