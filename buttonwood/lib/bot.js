@@ -83,6 +83,7 @@ function listenForStockInfo(controller) {
               fallback: priceTpl(data),
               color: number.color(data.changeInPercent),
               title: _.template('<%= symbol %> (<%= name %>)')(data),
+              title_link: `https://finance.yahoo.com/q?s=${data.symbol}`,
               text: _.template([
                 '<%=lastTradeDate%> <%=lastTradeTime%> ET',
                 '*<%= lastTrade %>* (<%= sign %><%= percent %>)'
