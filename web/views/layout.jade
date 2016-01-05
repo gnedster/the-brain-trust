@@ -10,7 +10,10 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='import', href='/bower_components/google-analytics/google-analytics.html')
     meta(name='viewport' content='width=device-width, initial-scale=1')
-    meta(name='description' content='Makers of buttonwood, the financial markets Slack app.')
+    if metaDescription
+      meta(name='description' content=metaDescription)
+    else
+      meta(name='description' content='Makers of buttonwood, the financial markets Slack app.')
 
   body
     if process.env.NODE_ENV == 'production'
