@@ -14,6 +14,11 @@
   position: relative;
   top: 15px;
 }
+.application-description img,
+.application-changelog img {
+  max-width: 100%;
+  height: auto;
+}
 .application-icon {
   display: block;
   margin: auto;
