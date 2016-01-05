@@ -2,6 +2,7 @@
  * Add tests for the rds module.
  */
 var assert = require('assert');
+var _ = require('lodash');
 var sqs = require('../sqs');
 var specHelper = require('./lib/spec-helper');
 
@@ -25,9 +26,8 @@ describe('sqs', function(){
 
   it('should fail sending message for non-existent queue', function(done){
     sqs.sendInstanceMessage('non-existent-queue', 'message body', '{foo: bar}')
-      .then(assert.fail)
-      .catch(function(err){
-        assert(err);
+      .then(function(data){
+        assert(_.isUndefined(data));
         done();
       });
   });
