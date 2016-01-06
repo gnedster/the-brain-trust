@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/sqs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "sqs wrapper for the brain trust",
   "main": "sqs.js",
   "scripts": {
