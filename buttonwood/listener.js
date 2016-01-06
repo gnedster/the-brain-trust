@@ -37,9 +37,14 @@ function createBot(applicationPlatformEntity) {
     logger.info('bot for applicationPlatformEntity', id, 'already created.');
   } else {
     bot = new Bot(token);
-    bot.listen();
-    botInstanceMap.set(token, bot);
-    logger.info('bot for applicationPlatformEntity', id, 'created.');
+    bot.startRTM(function(err){
+      if (!_.isNull(err)){
+        bot.listen();
+        botInstanceMap.set(token, bot);
+        bot.initRTMPulse();
+        logger.info('bot for applicationPlatformEntity', id, 'created.');
+      } //TODO can we delete bot?
+    });
   }
 }
 

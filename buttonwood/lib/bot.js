@@ -169,6 +169,16 @@ function listenForStockInfo(controller) {
   });
 }
 
+function listenForPongResponse(bot, controller) {
+  controller.on('message_received', function(inBot, msg){
+    var msgType = _.get(msg,'type');
+    var replyTo = parseInt(_.get(msg,'reply_to'));
+    if (msgType === 'pong') {
+      bot.pongResponseID = replyTo;
+    }
+  });
+}
+
 /**
  * Buttonwood Bot class
  * @class
@@ -185,13 +195,67 @@ function Bot(inToken) {
   });
 
   this.bot = this.controller.spawn({token:inToken});
+  this.pongResponseID = 0;
 }
 
+function startBot(bot){
+  bot.startRTM(function(err, inBot, payload) {
+    if (_.isNull(err)) {
+      bot.initRTMPulse();
+    } else {
+      //Wait 5 secs before trying to restart bot
+      setTimeout(function(){startBot(bot)}, 5000);
+    }
+  });
+}
+
+Bot.prototype.initRTMPulse = function(){
+  var pingID = this.bot.msgcount;
+  return new Promise(function(resolve, reject) {
+    this.bot.say(
+    {
+      type:'ping'
+    },function(err){
+      //console.log('New Msg ' + err);
+      if (!_.isNull(err)) {
+        reject(err);
+      }
+      setTimeout(function(){
+        if(this.pongResponseID >= pingID) {
+          resolve();
+        } else {
+          reject(new Error('No pong response in 5 seconds'));
+        }
+      }, 5000);
+    })
+  })
+  .then(function(resp){
+    logger.verbose('Bot has heartbeat');
+    /* Sleep for 5 seconds */
+    setTimeout(function() {return new Promise(function (resolve, reject){
+      this.initRTMPulse();
+      resolve();
+    })}, 5000);
+  })
+  .catch(function(err){
+    //Restart connection
+    logger.verbose('Bot is Dead restart');
+    this.bot.closeRTM();
+    startBot(this.bot);
+  });
+}
+
+Bot.prototype.startRTM = function(cb) {
+  this.bot.startRTM(function(err, inBot, payload) {
+    cb(err);
+  });
+};
+
 Bot.prototype.listen = function(){
-  this.bot.startRTM();
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
+  listenForPongResponse(this.bot, this.controller)
 
   return this;
 };
