@@ -208,6 +208,8 @@ Bot.prototype.listen = function (){
   this.handlePong();
   this.startRtm();
 
+
+
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
 
@@ -223,7 +225,7 @@ Bot.prototype.startRtm = function() {
   this.bot.startRTM(function(err, resp){
     if (err) {
       logger.error(err);
-      setTimeout(self.startRtm, rtmInterval);
+      setTimeout(_.bind(self.startRtm, self), rtmInterval);
     } else {
       self.ping();
     }
@@ -252,7 +254,7 @@ Bot.prototype.handlePong = function() {
  */
 Bot.prototype.ping = function() {
   // If pong does not come back in rtmInterval, restart the rtm connection
-  this.timeToLiveTimeout = setTimeout(this.startRtm, rtmInterval);
+  this.timeToLiveTimeout = setTimeout(_.bind(this.startRtm, this), rtmInterval);
   this.bot.say({
     type: 'ping',
     time: moment.now(),
