@@ -16,7 +16,7 @@ describe('metric', function(){
       });
   });
 
-  it('should write event', function(done){
+  xit('should write event', function(done){
     metric.write({
       teamId: 'T024BE7LD',
       channelId: 'C2147483705',
