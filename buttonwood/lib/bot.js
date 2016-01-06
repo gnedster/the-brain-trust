@@ -8,6 +8,8 @@ var number = require('./number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
+const rtmInterval = 5000;
+
 /*
  * Global bot responses, TODO move buttonwood specific details to bot module
  */
@@ -203,23 +205,8 @@ function Bot(token) {
  * Bot should start listening
  */
 Bot.prototype.listen = function (){
-  var self = this;
-
-  this.controller.hears(['ping'], 'pong', function(bot, message) {
-    if (message.type === 'pong') {
-      logger.info('latency', moment.now() - message.time);
-      clearTimeout(self.ttl);
-      setTimeout(_.bind(self.ping, self), 5000);
-    }
-  });
-
-  this.bot.startRTM(function(err, resp){
-    if (err) {
-      logger.error(err);
-    } else {
-      self.ping();
-    }
-  });
+  this.handlePong();
+  this.startRtm();
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
@@ -228,11 +215,44 @@ Bot.prototype.listen = function (){
 };
 
 /**
+ * Open up websocket
+ */
+Bot.prototype.startRtm = function() {
+  var self = this;
+
+  this.bot.startRTM(function(err, resp){
+    if (err) {
+      logger.error(err);
+      setTimeout(self.startRtm, rtmInterval);
+    } else {
+      self.ping();
+    }
+  });
+};
+
+/**
+ * Handle pong message
+ */
+Bot.prototype.handlePong = function() {
+  var self = this;
+
+  this.controller.hears(['ping'], 'pong', function(bot, message) {
+    if (message.type === 'pong') {
+      // Reset time to live
+      clearTimeout(self.timeToLiveTimeout);
+      // Ping again in rtm interval
+      setTimeout(_.bind(self.ping, self), rtmInterval);
+    }
+  });
+};
+
+/**
  * Start ping/pong to determine connectivity, monitor latency,
  * and recover if possible.
  */
 Bot.prototype.ping = function() {
-  this.ttl = setTimeout(this.listen, 5000);
+  // If pong does not come back in rtmInterval, try starting the Rtm again
+  this.timeToLiveTimeout = setTimeout(this.startRtm, rtmInterval);
   this.bot.say({
     type: 'ping',
     time: moment.now(),
