@@ -154,6 +154,18 @@ function listenForStockInfo(controller) {
       bot.reply(message, {attachments: attachments}, function(err, resp) {
         logger.debug(err, resp);
 
+        metric.write({
+          teamId: bot.team_info.id,
+          channelId: resp.channel,
+          userId: message.user,
+          initiator: 'server x app',
+          timestamp: resp.ts,
+          name: 'chat:buttonwood:slack:​*:*​:reply',
+          details: {
+            symbols: symbols
+          }
+        });
+
         if (err) {
           bot.reply(message, {
             attachments: [{
