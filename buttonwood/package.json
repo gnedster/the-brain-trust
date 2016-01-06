@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "0.3.12",
+    "@the-brain-trust/rds": "0.4.1",
     "@the-brain-trust/sqs": "0.0.3",
     "@the-brain-trust/utility": "0.0.1",
     "accounting": "^0.4.1",

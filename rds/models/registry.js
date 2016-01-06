@@ -1,6 +1,7 @@
 var Application = require('./application');
 var ApplicationPlatform = require('./application-platform');
 var ApplicationPlatformEntity = require('./application-platform-entity');
+var Event = require('./event');
 var Platform = require('./platform');
 var User = require('./user');
 
@@ -24,6 +25,7 @@ module.exports = {
   Application: Application,
   ApplicationPlatform: ApplicationPlatform,
   ApplicationPlatformEntity: ApplicationPlatformEntity,
+  Event: Event,
   Platform: Platform,
   User: User
 };
