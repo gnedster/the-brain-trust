@@ -184,10 +184,10 @@ function listenForStockInfo(controller) {
 /**
  * Buttonwood Bot class
  * @class
- * @param {String} inToken Token for use against Slack's APIs
+ * @param {String} token Token for use against Slack's APIs
  */
-function Bot(inToken) {
-  if (inToken.startsWith('xoxb') === false) {
+function Bot(token) {
+  if (token.startsWith('xoxb') === false) {
     logger.warn('invalid Slack token');
     return;
   }
@@ -196,16 +196,48 @@ function Bot(inToken) {
     debug: util.isProduction() ? false : true
   });
 
-  this.bot = this.controller.spawn({token:inToken});
+  this.bot = this.controller.spawn({token:token});
 }
 
-Bot.prototype.listen = function(){
-  this.bot.startRTM();
+/**
+ * Bot should start listening
+ */
+Bot.prototype.listen = function (){
+  var self = this;
+
+  this.controller.hears(['ping'], 'pong', function(bot, message) {
+    if (message.type === 'pong') {
+      logger.info('latency', moment.now() - message.time);
+      clearTimeout(self.ttl);
+      setTimeout(_.bind(self.ping, self), 5000);
+    }
+  });
+
+  this.bot.startRTM(function(err, resp){
+    if (err) {
+      logger.error(err);
+    } else {
+      self.ping();
+    }
+  });
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
 
   return this;
+};
+
+/**
+ * Start ping/pong to determine connectivity, monitor latency,
+ * and recover if possible.
+ */
+Bot.prototype.ping = function() {
+  this.ttl = setTimeout(this.listen, 5000);
+  this.bot.say({
+    type: 'ping',
+    time: moment.now(),
+    text: 'ping'
+  });
 };
 
 module.exports = Bot;
