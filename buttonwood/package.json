@@ -22,7 +22,7 @@
     "@the-brain-trust/sqs": "0.0.3",
     "@the-brain-trust/utility": "0.0.1",
     "accounting": "^0.4.1",
-    "botkit": "^0.0.4",
+    "botkit": "^0.0.5",
     "lodash": "^3.10.1",
     "moment": "^2.11.0",
     "yahoo-finance": "^0.2.12"

@@ -181,6 +181,17 @@ function listenForStockInfo(controller) {
   });
 }
 
+function listenForPongResponse(bot, controller) {
+  controller.on('message_received', function(inBot, msg){
+    var msgType = _.get(msg,'type');
+    var replyTo = parseInt(_.get(msg,'reply_to'));
+    if (msgType === 'pong') {
+      logger.info('TMsg Pong ' + replyTo);
+      bot.pongResponseID = replyTo;
+    }
+  });
+}
+
 /**
  * Buttonwood Bot class
  * @class
@@ -197,13 +208,71 @@ function Bot(inToken) {
   });
 
   this.bot = this.controller.spawn({token:inToken});
+  this.pongResponseID = 0;
 }
 
+function startBot(ourBot){
+  var bot = ourBot;
+  bot.startRTM(function(err, inBot, payload) {
+    if (_.isNull(err)) {
+      bot.initRTMPulse(ourBot);
+    } else {
+      //Wait 5 secs before trying to restart bot
+      setTimeout(function(){startBot(ourBot)}, 5000);
+    }
+  });
+}
+
+Bot.prototype.initRTMPulse = function(ourBot){
+  var bot = ourBot.bot
+  var pingID = bot.msgcount;
+  return new Promise(function(resolve, reject) {
+    bot.say(
+    {
+      type:'ping'
+    },function(err){
+      //console.log('New Msg ' + err);
+      if (!_.isNull(err)) {
+        reject(err);
+      }
+      setTimeout(function(){
+        if(ourBot.pongResponseID >= pingID) {
+          resolve();
+        } else {
+          reject(new Error('No pong response in 5 seconds'+ourBot.pongResponseID+' '+pingID));
+        }
+      }, 5000);
+    })
+  })
+  .then(function(resp){
+    logger.info('Bot has heartbeat');
+    /* Sleep for 5 seconds */
+    setTimeout(function() {return new Promise(function (resolve, reject){
+      ourBot.initRTMPulse(ourBot);
+      resolve();
+    })}, 5000);
+  })
+  .catch(function(err){
+    //Restart connection
+    logger.info('Bot is Dead restart ' + err);
+    bot.closeRTM();
+    startBot(ourBot);
+  });
+}
+
+Bot.prototype.startRTM = function(cb) {
+    logger.info('TMsg start RTM');
+  this.bot.startRTM(function(err, inBot, payload) {
+    logger.info('TMsg start RTM Done', err);
+    cb(err);
+  });
+};
+
 Bot.prototype.listen = function(){
-  this.bot.startRTM();
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
+  listenForPongResponse(this, this.controller);
 
   return this;
 };
