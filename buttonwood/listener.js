@@ -38,12 +38,15 @@ function createBot(applicationPlatformEntity) {
   } else {
     bot = new Bot(token);
     bot.startRTM(function(err){
-      if (!_.isNull(err)){
+      if (_.isNull(err)){
         bot.listen();
         botInstanceMap.set(token, bot);
-        bot.initRTMPulse();
+        bot.initRTMPulse(bot);
         logger.info('bot for applicationPlatformEntity', id, 'created.');
-      } //TODO can we delete bot?
+      } else {
+        //TODO can we delete bot?
+        logger.error('startRTM failed token might be bad' + token);
+      }
     });
   }
 }

@@ -174,6 +174,7 @@ function listenForPongResponse(bot, controller) {
     var msgType = _.get(msg,'type');
     var replyTo = parseInt(_.get(msg,'reply_to'));
     if (msgType === 'pong') {
+      logger.info('TMsg Pong ' + replyTo);
       bot.pongResponseID = replyTo;
     }
   });
@@ -198,21 +199,23 @@ function Bot(inToken) {
   this.pongResponseID = 0;
 }
 
-function startBot(bot){
+function startBot(ourBot){
+  var bot = ourBot;
   bot.startRTM(function(err, inBot, payload) {
     if (_.isNull(err)) {
-      bot.initRTMPulse();
+      bot.initRTMPulse(ourBot);
     } else {
       //Wait 5 secs before trying to restart bot
-      setTimeout(function(){startBot(bot)}, 5000);
+      setTimeout(function(){startBot(ourBot)}, 5000);
     }
   });
 }
 
-Bot.prototype.initRTMPulse = function(){
-  var pingID = this.bot.msgcount;
+Bot.prototype.initRTMPulse = function(ourBot){
+  var bot = ourBot.bot
+  var pingID = bot.msgcount;
   return new Promise(function(resolve, reject) {
-    this.bot.say(
+    bot.say(
     {
       type:'ping'
     },function(err){
@@ -221,32 +224,34 @@ Bot.prototype.initRTMPulse = function(){
         reject(err);
       }
       setTimeout(function(){
-        if(this.pongResponseID >= pingID) {
+        if(ourBot.pongResponseID >= pingID) {
           resolve();
         } else {
-          reject(new Error('No pong response in 5 seconds'));
+          reject(new Error('No pong response in 5 seconds'+ourBot.pongResponseID+' '+pingID));
         }
       }, 5000);
     })
   })
   .then(function(resp){
-    logger.verbose('Bot has heartbeat');
+    logger.info('Bot has heartbeat');
     /* Sleep for 5 seconds */
     setTimeout(function() {return new Promise(function (resolve, reject){
-      this.initRTMPulse();
+      ourBot.initRTMPulse(ourBot);
       resolve();
     })}, 5000);
   })
   .catch(function(err){
     //Restart connection
-    logger.verbose('Bot is Dead restart');
-    this.bot.closeRTM();
-    startBot(this.bot);
+    logger.info('Bot is Dead restart ' + err);
+    bot.closeRTM();
+    startBot(ourBot);
   });
 }
 
 Bot.prototype.startRTM = function(cb) {
+    logger.info('TMsg start RTM');
   this.bot.startRTM(function(err, inBot, payload) {
+    logger.info('TMsg start RTM Done', err);
     cb(err);
   });
 };
@@ -255,7 +260,7 @@ Bot.prototype.listen = function(){
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
-  listenForPongResponse(this.bot, this.controller)
+  listenForPongResponse(this, this.controller);
 
   return this;
 };
