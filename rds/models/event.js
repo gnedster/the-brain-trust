@@ -37,6 +37,11 @@ var Event = sequelize.define('Event', {
     type: Sequelize.JSON,
     allowNull: false
   }
+}, {
+  updatedAt: false,
+  paranoid: false
 });
+
+Event.removeAttribute('id');
 
 module.exports = Event;
