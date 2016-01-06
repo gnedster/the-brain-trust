@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var Bot = require('./lib/Bot');
+var Bot = require('./lib/bot');
 var accounting = require('accounting');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
