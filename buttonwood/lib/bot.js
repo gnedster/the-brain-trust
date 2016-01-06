@@ -8,6 +8,8 @@ var number = require('./number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
+const rtmInterval = 5000;
+
 /*
  * Global bot responses, TODO move buttonwood specific details to bot module
  */
@@ -184,10 +186,10 @@ function listenForStockInfo(controller) {
 /**
  * Buttonwood Bot class
  * @class
- * @param {String} inToken Token for use against Slack's APIs
+ * @param {String} token Token for use against Slack's APIs
  */
-function Bot(inToken) {
-  if (inToken.startsWith('xoxb') === false) {
+function Bot(token) {
+  if (token.startsWith('xoxb') === false) {
     logger.warn('invalid Slack token');
     return;
   }
@@ -196,16 +198,66 @@ function Bot(inToken) {
     debug: util.isProduction() ? false : true
   });
 
-  this.bot = this.controller.spawn({token:inToken});
+  this.bot = this.controller.spawn({token:token});
 }
 
-Bot.prototype.listen = function(){
-  this.bot.startRTM();
+/**
+ * Bot should start listening
+ */
+Bot.prototype.listen = function (){
+  this.handlePong();
+  this.startRtm();
 
   listenForUsageInfo(this.controller);
   listenForStockInfo(this.controller);
 
   return this;
+};
+
+/**
+ * Open up websocket
+ */
+Bot.prototype.startRtm = function() {
+  var self = this;
+
+  this.bot.startRTM(function(err, resp){
+    if (err) {
+      logger.error(err);
+      setTimeout(self.startRtm, rtmInterval);
+    } else {
+      self.ping();
+    }
+  });
+};
+
+/**
+ * Handle pong message
+ */
+Bot.prototype.handlePong = function() {
+  var self = this;
+
+  this.controller.hears(['ping'], 'pong', function(bot, message) {
+    if (message.type === 'pong') {
+      // Reset time to live
+      clearTimeout(self.timeToLiveTimeout);
+      // Ping again in rtm interval
+      setTimeout(_.bind(self.ping, self), rtmInterval);
+    }
+  });
+};
+
+/**
+ * Start ping/pong to determine connectivity, monitor latency,
+ * and recover if possible.
+ */
+Bot.prototype.ping = function() {
+  // If pong does not come back in rtmInterval, try starting the Rtm again
+  this.timeToLiveTimeout = setTimeout(this.startRtm, rtmInterval);
+  this.bot.say({
+    type: 'ping',
+    time: moment.now(),
+    text: 'ping'
+  });
 };
 
 module.exports = Bot;
