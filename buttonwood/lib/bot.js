@@ -2,6 +2,7 @@ var _ = require('lodash');
 var accounting = require('accounting');
 var Botkit = require('botkit');
 var logger = require('@the-brain-trust/logger');
+var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
 var number = require('./number');
 var util = require('@the-brain-trust/utility');
@@ -56,6 +57,18 @@ function listenForStockInfo(controller) {
     if (_.isEmpty(symbols)) {
       return;
     }
+
+    metric.write({
+      teamId: bot.team_info.id,
+      channelId: message.channel,
+      userId: message.user,
+      initiator: 'client x user',
+      timestamp: message.ts,
+      name: 'chat:buttonwood:slack:​*:*​:message',
+      details: {
+        text: message.text
+      }
+    });
 
     /**
      * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
