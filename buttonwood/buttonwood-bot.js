@@ -59,26 +59,62 @@ function hearsSymbol(controller) {
       }
     });
 
-    /**
-     * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
-     * s = symbol
-     * n = name
-     * l1 = lastTradePriceOnly
-     * c1 = change
-     * p2 = changeInPercent
-     * d1 = lastTradeDate
-     * t1 = lastTradeTime
-     * v = volume
-     * r = peRatio
-     * w = 52WeekRange
-     * e = earningsPerShare
-     * m = daysRange
-     * j1 = marketCap
-     */
-    var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
-    var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
 
-    yahooFinance.snapshot({
+    quoteMessage(symbols, isDetailed)
+      .then(function(response) {
+        return new Promise(function(resolve, reject) {
+          bot.reply(message, response, function(err, resp) {
+            if (err) {
+              reject(err);
+            }
+
+            metric.write({
+              teamId: bot.team_info.id,
+              channelId: resp.channel,
+              userId: message.user,
+              initiator: 'server x app',
+              timestamp: resp.ts,
+              name: 'chat:buttonwood:slack:​*:*​:reply',
+              details: {
+                symbols: symbols
+              }
+            });
+          });
+        });
+      }).catch(function(err){
+        bot.reply(message, 'something went horribly wrong');
+        logger.error(err);
+      });
+  });
+}
+
+/**
+ * Return formatted message
+ * @param  {String[]} symbols     Symbols to get price quotes for
+ * @param  {String[]} isDetailed  Provide more information than necessary
+ * @return {Object[]}             Slack messages for a response
+ */
+function quoteMessage(symbols, isDetailed) {
+  /**
+   * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
+   * s = symbol
+   * n = name
+   * l1 = lastTradePriceOnly
+   * c1 = change
+   * p2 = changeInPercent
+   * d1 = lastTradeDate
+   * t1 = lastTradeTime
+   * v = volume
+   * r = peRatio
+   * w = 52WeekRange
+   * e = earningsPerShare
+   * m = daysRange
+   * j1 = marketCap
+   */
+  var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
+  var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
+
+  return yahooFinance.snapshot({
       symbols: symbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
@@ -134,40 +170,16 @@ function hearsSymbol(controller) {
             title: _.template('<%= symbol %> (<%= name %>)')(data),
             title_link: `https://finance.yahoo.com/q?s=${data.symbol}`,
             text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-            fields:  isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+            fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
             mrkdwn_in : ['title', 'text']
           };
         }
       });
 
-      bot.reply(message, {attachments: attachments}, function(err, resp) {
-        logger.debug(err, resp);
-
-        metric.write({
-          teamId: bot.team_info.id,
-          channelId: resp.channel,
-          userId: message.user,
-          initiator: 'server x app',
-          timestamp: resp.ts,
-          name: 'chat:buttonwood:slack:​*:*​:reply',
-          details: {
-            symbols: symbols
-          }
-        });
-
-        if (err) {
-          bot.reply(message, {
-            attachments: [{
-              fallback: 'something went horribly wrong',
-              pretext: 'something went horribly wrong'
-            }]
-          });
-        }
-      });
-    }).catch(function(err){
-      logger.error(err);
+      return {
+        attachments: attachments
+      };
     });
-  });
 }
 
 /**
