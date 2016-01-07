@@ -8,15 +8,14 @@ var number = require('./lib/number');
 var yahooFinance = require('yahoo-finance');
 
 const priceTpl = _.template([
-  '*<%= symbol %>* (<%= name %>) last traded at *$<%= lastTradePriceOnly %>*.',
-  'https://finance.yahoo.com/q?s=<%= symbol %>'
+  '<%= symbol %> (<%= name %>) last traded at $<%= lastTradePriceOnly %>.'
   ].join('\n')
 );
 const notFoundTpl =
-  _.template('*<%= symbol %>* doesn\'t look like a valid symbol.');
+  _.template('<%= symbol %> doesn\'t look like a valid symbol.');
 const introduction = [
   'I\'m buttonwood, it\'s nice to meet you!',
-  'Type out a stock symbol like *$AAPL*, and I\'ll get the latest price for you.'
+  'Type out a stock symbol like *$AAPL*, and I\'ll get a price quote for you.'
   ].join('\n');
 
 /**
