@@ -1,100 +1,20 @@
+/**
+ * Contains the business logic for constructing responses
+ */
 var _ = require('lodash');
-var Bot = require('./lib/bot');
 var accounting = require('accounting');
 var logger = require('@the-brain-trust/logger');
-var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
-var number = require('./lib/number');
+var number = require('../lib/number');
 var yahooFinance = require('yahoo-finance');
-
-const priceTpl = _.template([
-  '<%= symbol %> (<%= name %>) last traded at $<%= lastTradePriceOnly %>.'
-  ].join('\n')
-);
-const notFoundTpl =
-  _.template('<%= symbol %> doesn\'t look like a valid symbol.');
-const introduction = [
-  'I\'m buttonwood, it\'s nice to meet you!',
-  'Type out a stock symbol like *$AAPL*, and I\'ll get a price quote for you.'
-  ].join('\n');
-
-/**
- * Return usage information.
- * @param  {CoreController}
- */
-function hearsHello(controller) {
-  controller.hears(['hello', 'hi'],
-    'hello,direct_message,direct_mention,mention',
-    function(bot,message) {
-      bot.reply(message, introduction);
-    });
-}
-
-/**
- * Return stock information when a ticker symbol is provided.
- * @param  {CoreController}
- */
-function hearsSymbol(controller) {
-  controller.hears(['(\$[A-z]*)'],
-    'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var matches = message.text.match(/\$([A-z]*)/ig);
-    var isDetailed = /detail/ig.test(message.text);
-    var symbols = _.compact(_.map(matches, function(symbol) {
-      return symbol.substring(1).toUpperCase();
-    }));
-
-    if (_.isEmpty(symbols)) {
-      return;
-    }
-
-    metric.write({
-      teamId: bot.team_info.id,
-      channelId: message.channel,
-      userId: message.user,
-      initiator: 'client x user',
-      timestamp: message.ts,
-      name: 'chat:buttonwood:slack:​*:*​:message',
-      details: {
-        text: message.text
-      }
-    });
-
-
-    quoteMessage(symbols, isDetailed)
-      .then(function(response) {
-        return new Promise(function(resolve, reject) {
-          bot.reply(message, response, function(err, resp) {
-            if (err) {
-              reject(err);
-            }
-
-            metric.write({
-              teamId: bot.team_info.id,
-              channelId: resp.channel,
-              userId: message.user,
-              initiator: 'server x app',
-              timestamp: resp.ts,
-              name: 'chat:buttonwood:slack:​*:*​:reply',
-              details: {
-                symbols: symbols
-              }
-            });
-          });
-        });
-      }).catch(function(err){
-        bot.reply(message, 'something went horribly wrong');
-        logger.error(err);
-      });
-  });
-}
 
 /**
  * Return formatted message
  * @param  {String[]} symbols     Symbols to get price quotes for
  * @param  {String[]} isDetailed  Provide more information than necessary
- * @return {Object[]}             Slack messages for a response
+ * @return {Promise}              Promise containing Slack messages for symbols
  */
-function quoteMessage(symbols, isDetailed) {
+function messageQuote(symbols, isDetailed) {
   /**
    * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
    * s = symbol
@@ -113,6 +33,13 @@ function quoteMessage(symbols, isDetailed) {
    */
   var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
   var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
+
+  var priceTpl = _.template(
+    '<%= symbol %> (<%= name %>) last traded at $<%= lastTradePriceOnly %>.'
+    );
+  var notFoundTpl =_.template(
+    '<%= symbol %> doesn\'t look like a valid symbol.'
+    );
 
   return yahooFinance.snapshot({
       symbols: symbols,
@@ -182,18 +109,6 @@ function quoteMessage(symbols, isDetailed) {
     });
 }
 
-/**
- * @class
- * Defines the behavior for the buttonwood bot
- * @param {String} token  Slack token
- */
-function ButtonwoodBot(token) {
-  Bot.call(this, token);
-
-  this.listeners = [hearsHello, hearsSymbol];
-}
-
-ButtonwoodBot.prototype = Object.create(Bot.prototype);
-ButtonwoodBot.prototype.constructor = Bot;
-
-module.exports = ButtonwoodBot;
+module.exports = {
+  messageQuote: messageQuote
+};
