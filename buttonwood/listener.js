@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Bot = require('./lib/bot');
+var ButtonwoodBot = require('./buttonwood-bot');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 var sqs = require('@the-brain-trust/sqs');
@@ -26,7 +27,6 @@ function createBot(applicationPlatformEntity) {
     'credentials.bot.bot_access_token'
     );
   if (_.isString(token)) {
-  //TODO more token sanity check needed
     botInstance = botInstanceMap.get(token);
   } else {
     logger.warn('invalid token for applicationPlatformEntity', id);
@@ -36,7 +36,7 @@ function createBot(applicationPlatformEntity) {
   if (botInstance instanceof Bot) {
     logger.info('bot for applicationPlatformEntity', id, 'already created.');
   } else {
-    bot = new Bot(token);
+    bot = new ButtonwoodBot(token);
     bot.listen();
     botInstanceMap.set(token, bot);
     logger.info('bot for applicationPlatformEntity', id, 'created.');
