@@ -2,19 +2,14 @@ var bodyParser = require('body-parser');
 var express = require('express');
 
 var app = express();
-var buttonwood = require('./app/routes');
+var index = require('./routes/index');
+var buttonwood = require('./routes/buttonwood');
 
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use('/health', function (req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.json({
-    status: 'ok'
-  });
-});
-
+app.use('/', index);
 app.use('/buttonwood', buttonwood);
 
 // catch 404 and forward to error handler

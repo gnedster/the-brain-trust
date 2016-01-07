@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var Bot = require('../lib/bot');
-var buttonwood = require('./buttonwood');
+var buttonwood = require('../app/buttonwood');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 

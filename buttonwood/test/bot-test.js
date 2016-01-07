@@ -2,7 +2,7 @@
  * Tests for the bot module
  */
 var assert = require('assert');
-var ButtonwoodBot = require('../app/bot');
+var ButtonwoodBot = require('../bot/buttonwood');
 
 describe('ButtonwoodBot', function(){
   it('should initialize buttonwood bot', function(done){
