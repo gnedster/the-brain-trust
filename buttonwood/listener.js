@@ -2,7 +2,7 @@ var _ = require('lodash');
 var Bot = require('./lib/bot');
 var ButtonwoodBot = require('./bot/buttonwood');
 var logger = require('@the-brain-trust/logger');
-var rds = require('@the-brain-trust/rds');
+var rdsHelper = require('./lib/rds-helper');
 var sqs = require('@the-brain-trust/sqs');
 var util = require('@the-brain-trust/utility');
 
@@ -51,40 +51,8 @@ function createBot(applicationPlatformEntity) {
  */
 function initializeBots(platformName, applicationName) {
   logger.info('initializing bots for', platformName, applicationName);
-  return Promise.all([
-    rds.models.Platform.findOne({
-      where: {
-        name: platformName
-      }
-    }),
-    rds.models.Application.findOne({
-      where: {
-        name: applicationName
-      }
-    })]).then(function(results) {
-      var platform = results[0];
-      var application = results[1];
-      if (platform instanceof rds.models.Platform.Instance &&
-        application instanceof rds.models.Application.Instance) {
-
-        return rds.models.ApplicationPlatformEntity.findAll({
-          where: {
-            application_id : application.id,
-            platform_id: platform.id
-          }
-        });
-      } else {
-        if (_.isNull(platform)) {
-          logger.warn('no platform with name', platformName);
-        }
-
-        if (_.isNull(application)) {
-          logger.warn('no application with name', applicationName);
-        }
-
-        return Promise.resolve([]);
-      }
-    }).then(function(applicationPlatformEntities) {
+  return rdsHelper.getApplicationPlatformEntities(platformName, applicationName)
+    .then(function(applicationPlatformEntities) {
       return new Promise(function(resolve, reject) {
         try {
           if (applicationPlatformEntities[0]) {
