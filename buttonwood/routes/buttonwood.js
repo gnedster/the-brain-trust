@@ -38,38 +38,41 @@ router.post('/commands/*', function(req, res, next) {
   });
 });
 
-router.post('/commands/quote', function (req, res, next) {
-  var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
+router.post('/commands/quote*', function(req, res, next) {
+  var symbols = _.compact(_.map((_.get(req, 'body.text') || '').split(' '),
+    function(symbol) {
+      return symbol.replace(/[^A-z]/g, '');
+    }
+  ));
 
   if (symbols.length > 0) {
-    buttonwood.messageQuote(symbols)
-      .then(function(message) {
-        message.response_type = 'ephemeral';
-        res.json(message);
-      })
-      .catch(function(err){
-        next(err);
-      });
+    req.symbols = symbols;
+    next();
   } else {
     res.send('please enter a valid stock ticker symbol');
   }
 });
 
-router.post('/commands/quote_detailed', function (req, res, next) {
-  var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
+router.post('/commands/quote', function (req, res, next) {
+  buttonwood.messageQuote(req.symbols)
+    .then(function(message) {
+      message.response_type = 'ephemeral';
+      res.json(message);
+    })
+    .catch(function(err){
+      next(err);
+    });
+});
 
-  if (symbols.length > 0) {
-    buttonwood.messageQuote(symbols, true)
-      .then(function(message) {
-        message.response_type = 'ephemeral';
-        res.json(message);
-      })
-      .catch(function(err){
-        next(err);
-      });
-  } else {
-    res.send('please enter a valid stock ticker symbol');
-  }
+router.post('/commands/quote_detailed', function (req, res, next) {
+  buttonwood.messageQuote(req.symbols, true)
+    .then(function(message) {
+      message.response_type = 'ephemeral';
+      res.json(message);
+    })
+    .catch(function(err){
+      next(err);
+    });
 });
 
 module.exports = router;

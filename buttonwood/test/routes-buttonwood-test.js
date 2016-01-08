@@ -14,7 +14,7 @@ describe('/buttonwood', function() {
    * Shared behavior for quote commands
    * @param  {Boolean} isDetailed  Test for either detailed or basic quotes
    */
-  function shouldRespondOk(isDetailed) {
+  function shouldRespondToQuotes(isDetailed) {
     it('responds with OK with token', function(done){
       request(app)
         .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
@@ -33,6 +33,39 @@ describe('/buttonwood', function() {
           assert(res.body.attachments);
           done();
         });
+    });
+
+    it('responds 404 without text', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: ''
+        })
+        .expect(200, /valid/, done);
+    });
+
+    it('responds 200 with malformed text', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: '4131'
+        })
+        .expect(200, /valid/, done);
+    });
+
+    it('responds 404 without token', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({ text: 'AAPL' })
+        .expect(404, done);
     });
   }
 
@@ -56,31 +89,10 @@ describe('/buttonwood', function() {
   });
 
   describe('POST commands/quote', function(){
-    shouldRespondOk();
-
-    it('responds 404 without text', function(done){
-      request(app)
-        .post('/buttonwood/commands/quote')
-        .set('Accept', 'application/json')
-        .type('form')
-        .send({
-          token: commandToken,
-          text: ''
-        })
-        .expect(200, /valid/, done);
-    });
-
-    it('responds 404 without token', function(done){
-      request(app)
-        .post('/buttonwood/commands/quote')
-        .set('Accept', 'application/json')
-        .type('form')
-        .send({ text: 'AAPL' })
-        .expect(404, done);
-    });
+    shouldRespondToQuotes();
   });
 
   describe('POST commands/quote_detailed', function(){
-    shouldRespondOk(true);
+    shouldRespondToQuotes(true);
   });
 });
