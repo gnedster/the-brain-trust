@@ -15,10 +15,10 @@ describe('/applications', function() {
   before(function(done) {
     this.timeout(3000);
 
-    rds.sync({logging: logger.stream.write})
+    rds.sync({force: true, logging: logger.stream.write})
       .then(function() {require('../models/registry');})
-      .then(function() {factory.create('application-permission');})
-      .then(function() {factory.create('user');})
+      .then(function() {return factory.create('application-permission');})
+      .then(function() {return factory.create('user');})
       .then(function() {done();})
       .catch(function (err) {
         logger.error(err);

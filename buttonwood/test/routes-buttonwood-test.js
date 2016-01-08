@@ -17,9 +17,9 @@ describe('/buttonwood', function() {
   before(function(done) {
     this.timeout(3000);
 
-    rds.sync({logging: logger.stream.write})
+    rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
-        factory.create('application-permission', {
+        return factory.create('application-permission', {
           commandTokens: commandTokens
         });
       })
