@@ -41,7 +41,9 @@ describe('/buttonwood', function() {
           channel_id: faker.random.uuid(),
           user_id: faker.random.uuid()
         })
+        .expect('Content-Type', 'application/json')
         .end(function(err, res) {
+          assert(res.body.response_type);
           assert(res.body.attachments);
           done();
         });

@@ -29,6 +29,7 @@ router.post('/commands/quote', function (req, res, next) {
 
           buttonwood.messageQuote(symbols)
             .then(function(message) {
+              message.response_type = 'ephemeral';
               res.json(message);
             })
             .catch(function(err){
