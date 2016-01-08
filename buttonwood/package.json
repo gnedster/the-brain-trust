@@ -18,7 +18,7 @@
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
     "@the-brain-trust/metric": "0.0.2",
-    "@the-brain-trust/rds": "0.4.4",
+    "@the-brain-trust/rds": "0.4.5",
     "@the-brain-trust/sqs": "0.0.4",
     "@the-brain-trust/utility": "0.0.1",
     "accounting": "^0.4.1",
@@ -31,7 +31,11 @@
     "yahoo-finance": "^0.2.12"
   },
   "devDependencies": {
+    "factory": "^1.0.3",
+    "factory-girl": "^2.2.1",
+    "factory-girl-sequelize": "^1.0.0",
     "mocha": "^2.3.4",
+    "q": "^1.4.1",
     "supertest": "^1.1.0"
   }
 }
