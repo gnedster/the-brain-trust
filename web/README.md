@@ -51,7 +51,8 @@ return.
 
 ### Fake SQS Server
 
-This lightweight server
+This lightweight server emulates the behavior of Amazon's SQS server. Note
+that the fake SQS behavior does not match exactly that of a live server.
 
 ```
 bundle install
