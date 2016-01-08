@@ -24,6 +24,7 @@ function messageQuote(symbols, isDetailed) {
    * p2 = changeInPercent
    * d1 = lastTradeDate
    * t1 = lastTradeTime
+   * a2 = avgDailyVolume
    * v = volume
    * r = peRatio
    * w = 52WeekRange
@@ -32,7 +33,7 @@ function messageQuote(symbols, isDetailed) {
    * j1 = marketCap
    */
   var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
-  var fieldsDetailed = ['v', 'r', 'w', 'e', 'm', 'j1'];
+  var fieldsDetailed = ['v', 'a2', 'r', 'w', 'e', 'm', 'j1'];
 
   var priceTpl = _.template(
     '<%= symbol %> (<%= name %>) last traded at $<%= lastTradePriceOnly %>.'
@@ -61,6 +62,10 @@ function messageQuote(symbols, isDetailed) {
         var attachmentFieldsDetailed = [{
           title: 'Volume',
           value: accounting.formatNumber(data.volume),
+          short: true
+        }, {
+          title: 'Avg. Daily Volume',
+          value: accounting.formatNumber(data.averageDailyVolume),
           short: true
         }, {
           title: 'Day Range',
