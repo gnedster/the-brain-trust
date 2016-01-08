@@ -10,6 +10,29 @@ var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 
 describe('/buttonwood', function() {
+  function shouldRespondOk(isDetailed) {
+    it('responds with OK with token', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'AAPL',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
+        .expect('Content-Type', 'application/json')
+        .end(function(err, res) {
+          assert(res.body.response_type);
+          assert(res.body.attachments);
+          done();
+        });
+    });
+  }
+
+
   var commandToken = faker.random.uuid();
 
   before(function(done) {
@@ -29,25 +52,7 @@ describe('/buttonwood', function() {
   });
 
   describe('POST commands/quote', function(){
-    it('responds with OK with token', function(done){
-      request(app)
-        .post('/buttonwood/commands/quote')
-        .set('Accept', 'application/json')
-        .type('form')
-        .send({
-          token: commandToken,
-          text: 'AAPL',
-          team_id: faker.random.uuid(),
-          channel_id: faker.random.uuid(),
-          user_id: faker.random.uuid()
-        })
-        .expect('Content-Type', 'application/json')
-        .end(function(err, res) {
-          assert(res.body.response_type);
-          assert(res.body.attachments);
-          done();
-        });
-    });
+    shouldRespondOk();
 
     it('responds 404 without text', function(done){
       request(app)
@@ -69,5 +74,9 @@ describe('/buttonwood', function() {
         .send({ text: 'AAPL' })
         .expect(404, done);
     });
+  });
+
+  describe('POST commands/quote_detailed', function(){
+    shouldRespondOk(true);
   });
 });

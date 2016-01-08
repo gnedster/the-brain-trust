@@ -7,14 +7,12 @@ var rdsHelper = require('../lib/rds-helper');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 
-router.post('/commands/quote', function (req, res, next) {
+router.post('/commands/*', function(req, res, next) {
   rdsHelper.getApplicationPlatform('slack', 'buttonwood')
     .then(function(instance) {
       if (instance instanceof rds.models.ApplicationPlatform.Instance) {
         var token = _.get(instance, 'commandToken');
-        var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
-
-        if (symbols.length > 0 && token && token === _.get(req, 'body.token')) {
+        if (token && token === _.get(req, 'body.token')) {
           metric.write({
             teamId: _.get(req, 'body.team_id'),
             channelId: _.get(req, 'body.channel_id'),
@@ -23,27 +21,55 @@ router.post('/commands/quote', function (req, res, next) {
             timestamp: moment.now(),
             name: 'chat:buttonwood:slack:​*:*​:command',
             details: {
+              command: req.path,
               text: _.get(req, 'body.text')
             }
           });
 
-          buttonwood.messageQuote(symbols)
-            .then(function(message) {
-              message.response_type = 'ephemeral';
-              res.json(message);
-            })
-            .catch(function(err){
-              next(err);
-            });
-        } else {
           next();
+        } else {
+          res.sendStatus(404);
         }
       } else {
-        next();
+        res.sendStatus(404);
       }
   }).catch(function(err) {
-    next(err);
+    res.sendStatus(500);
   });
+});
+
+router.post('/commands/quote', function (req, res, next) {
+  var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
+
+  if (symbols.length > 0) {
+    buttonwood.messageQuote(symbols)
+      .then(function(message) {
+        message.response_type = 'ephemeral';
+        res.json(message);
+      })
+      .catch(function(err){
+        next(err);
+      });
+  } else {
+    next();
+  }
+});
+
+router.post('/commands/quote_detailed', function (req, res, next) {
+  var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
+
+  if (symbols.length > 0) {
+    buttonwood.messageQuote(symbols, true)
+      .then(function(message) {
+        message.response_type = 'ephemeral';
+        res.json(message);
+      })
+      .catch(function(err){
+        next(err);
+      });
+  } else {
+    next();
+  }
 });
 
 module.exports = router;
