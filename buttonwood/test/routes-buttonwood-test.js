@@ -36,12 +36,29 @@ describe('/buttonwood', function() {
         .post('/buttonwood/commands/quote')
         .set('Accept', 'application/json')
         .type('form')
-        .send({ token: commandTokens.quote })
-        .send({ text: 'AAPL' })
+        .send({
+          token: commandTokens.quote,
+          text: 'AAPL',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
         .end(function(err, res) {
           assert(res.body.attachments);
           done();
         });
+    });
+
+    it('responds 404 without text', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote')
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandTokens.quote,
+          text: ''
+        })
+        .expect(404, done);
     });
 
     it('responds 404 without token', function(done){
