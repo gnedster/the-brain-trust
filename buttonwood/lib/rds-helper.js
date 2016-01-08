@@ -3,7 +3,7 @@ var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 
 /**
- * Get ApplicationPlatform with name
+ * Get ApplicationPlatform with names
  * @param  {String} platformName    Name of platform
  * @param  {String} applicationName Name of application
  * @return {Promise}                A Promise containing an ApplicationPlatform
@@ -48,7 +48,7 @@ function getApplicationPlatform(platformName, applicationName) {
 }
 
 /**
- * Get ApplicationPlatformEntities with name
+ * Get ApplicationPlatformEntities with names
  * @param  {String} platformName    Name of platform
  * @param  {String} applicationName Name of application
  * @return {Promise}                A Promise containing a number of
