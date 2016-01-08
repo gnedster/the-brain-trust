@@ -51,7 +51,7 @@ router.post('/commands/quote', function (req, res, next) {
         next(err);
       });
   } else {
-    next();
+    res.send('please enter a valid stock ticker symbol');
   }
 });
 
@@ -68,7 +68,7 @@ router.post('/commands/quote_detailed', function (req, res, next) {
         next(err);
       });
   } else {
-    next();
+    res.send('please enter a valid stock ticker symbol');
   }
 });
 

@@ -10,6 +10,10 @@ var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 
 describe('/buttonwood', function() {
+  /**
+   * Shared behavior for quote commands
+   * @param  {Boolean} isDetailed  Test for either detailed or basic quotes
+   */
   function shouldRespondOk(isDetailed) {
     it('responds with OK with token', function(done){
       request(app)
@@ -63,7 +67,7 @@ describe('/buttonwood', function() {
           token: commandToken,
           text: ''
         })
-        .expect(404, done);
+        .expect(200, /valid/, done);
     });
 
     it('responds 404 without token', function(done){
