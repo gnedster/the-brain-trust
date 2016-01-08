@@ -21,7 +21,7 @@ router.post('/commands/*', function(req, res, next) {
             timestamp: moment.now(),
             name: 'chat:buttonwood:slack:​*:*​:command',
             details: {
-              command: req.path,
+              command: _.last(req.path.split('/')),
               text: _.get(req, 'body.text')
             }
           });
