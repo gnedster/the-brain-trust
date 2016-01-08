@@ -11,7 +11,7 @@ router.post('/commands/quote', function (req, res, next) {
   rdsHelper.getApplicationPlatform('slack', 'buttonwood')
     .then(function(instance) {
       if (instance instanceof rds.models.ApplicationPlatform.Instance) {
-        var token = _.get(instance, 'commandTokens.quote');
+        var token = _.get(instance, 'commandToken');
         var symbols = _.compact((_.get(req, 'body.text') || '').split(' '));
 
         if (symbols.length > 0 && token && token === _.get(req, 'body.token')) {

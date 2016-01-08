@@ -10,9 +10,7 @@ var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 
 describe('/buttonwood', function() {
-  var commandTokens = {
-    quote: faker.random.uuid()
-  };
+  var commandToken = faker.random.uuid();
 
   before(function(done) {
     this.timeout(3000);
@@ -20,7 +18,7 @@ describe('/buttonwood', function() {
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
         return factory.create('application-permission', {
-          commandTokens: commandTokens
+          commandToken: commandToken
         });
       })
       .then(function() {done();})
@@ -37,7 +35,7 @@ describe('/buttonwood', function() {
         .set('Accept', 'application/json')
         .type('form')
         .send({
-          token: commandTokens.quote,
+          token: commandToken,
           text: 'AAPL',
           team_id: faker.random.uuid(),
           channel_id: faker.random.uuid(),
@@ -55,7 +53,7 @@ describe('/buttonwood', function() {
         .set('Accept', 'application/json')
         .type('form')
         .send({
-          token: commandTokens.quote,
+          token: commandToken,
           text: ''
         })
         .expect(404, done);
