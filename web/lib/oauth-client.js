@@ -156,7 +156,7 @@ OAuthClient.prototype.processGetAuthAccessRequest =
 
     try {
       if (results && results.ok === true) {
-        // TODO: specific to Slack, needs to be removed
+        // TODO: specific to Slack, needs to be generic
         rds.models.PlatformEntity
           .findOrCreate({
             where: {
@@ -167,6 +167,12 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           })
           .then(function(tuple) {
             var platformEntity = tuple[0];
+
+            if (_.isString(results.team_name) &&
+              platformEntity.name !== results.team_name) {
+              platformEntity.name = results.team_name;
+              platformEntity.save();
+            }
 
             return rds.models.ApplicationPlatformEntity
               .findOrInitialize({
