@@ -156,18 +156,35 @@ OAuthClient.prototype.processGetAuthAccessRequest =
 
     try {
       if (results && results.ok === true) {
-        var attributes = {
-          platform_id: self.platform.id,
-          application_id: self.application.id,
-          credentials: results
-        };
+        // TODO: specific to Slack, needs to be removed
+        rds.models.PlatformEntity
+          .findOrCreate({
+            where: {
+              entity_id: results.team_id,
+              platform_id: self.platform.id,
+              kind: 'team'
+            }
+          })
+          .then(function(tuple) {
+            var platformEntity = tuple[0];
 
-        rds.models.ApplicationPlatformEntity
-          .create(attributes)
+            return rds.models.ApplicationPlatformEntity
+              .findOrInitialize({
+                where: {
+                  application_id: self.application.id,
+                  platform_entity_id: platformEntity.id,
+                  platform_id: self.platform.id
+                }
+              });
+          })
+          .then(function(tuple) {
+            var applicationPlatformEntity = tuple[0];
+
+            applicationPlatformEntity.credentials = results;
+            return applicationPlatformEntity.save();
+          })
           .then(self.resolve)
-          .catch(function(err){
-            self.reject(new Error(err));
-          });
+          .catch(self.reject);
       } else {
         self.reject(
           new Error(_.isUndefined(results.error) ? 'no response' : results.error)

@@ -3,7 +3,7 @@ var ApplicationPlatform = require('./application-platform');
 var ApplicationPlatformEntity = require('./application-platform-entity');
 var Event = require('./event');
 var Platform = require('./platform');
-var SlackUser = require('./slack-user');
+var PlatformEntity = require('./platform-entity');
 var User = require('./user');
 
 Application.hasMany(ApplicationPlatform, {
@@ -22,8 +22,17 @@ Platform.hasMany(ApplicationPlatformEntity, {
   foreignKey: 'platform_id'
 });
 
-SlackUser.belongsTo(User, {
-  foreignKey: 'user_id'
+PlatformEntity.belongsTo(Platform, {
+  foreign_key: 'platform_id',
+  allowNull: false
+});
+
+PlatformEntity.belongsTo(User, {
+  foreign_key: 'user_id'
+});
+
+PlatformEntity.hasMany(ApplicationPlatformEntity, {
+  foreign_key: 'platform_entity_id'
 });
 
 module.exports = {
@@ -31,7 +40,7 @@ module.exports = {
   ApplicationPlatform: ApplicationPlatform,
   ApplicationPlatformEntity: ApplicationPlatformEntity,
   Event: Event,
+  PlatformEntity: PlatformEntity,
   Platform: Platform,
-  SlackUser: SlackUser,
   User: User
 };
