@@ -7,8 +7,14 @@ rds.models.ApplicationPlatformEntity
       'application',
       'application-platform-entity created',
       instance);
-    }
-);
+  })
+  .hook('afterUpdate', function(instance, options) {
+    sqs.sendInstanceMessage(
+      'application',
+      'application-platform-entity updated',
+      instance);
+  });
+
 
 module.exports = {
   ApplicationPlatformEntity: rds.models.ApplicationPlatformEntity
