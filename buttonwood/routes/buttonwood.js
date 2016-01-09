@@ -133,8 +133,8 @@ router.post('/commands/quote_list', function(req, res, next) {
         next(err);
       });
   } else {
-    res.send('You don\'t have any symbols saved. Use the command /quote_add' +
-      'add symbols to your portfolio.');
+    res.send('You don\'t have any symbols saved. Use the command /quote_add ' +
+      'to add symbols to your portfolio.');
   }
 });
 
