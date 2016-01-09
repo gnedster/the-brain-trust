@@ -28,6 +28,7 @@
     "finalhandler": "^0.4.1",
     "lodash": "^3.10.1",
     "moment": "^2.11.0",
+    "pg": "^4.4.3",
     "sequelize": "^3.17.1",
     "yahoo-finance": "^0.2.12"
   },
