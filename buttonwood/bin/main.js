@@ -3,7 +3,7 @@ var http = require('http');
 var listener = require('../listener.js');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
-require('../rds/registry'); // Load app specific models
+require('../models/registry'); // Load app specific models
 
 const platformName = 'slack';
 const applicationName = 'buttonwood';

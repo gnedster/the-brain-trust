@@ -7,9 +7,9 @@ var sequelize = require('../sequelize');
  * @type {Model}
  */
 var PlatformEntity = sequelize.define('PlatformEntity', {
-  id: {
+  entity_id: {
     type: Sequelize.STRING,
-    primaryKey: true
+    allowNull: false
   },
   name: {
     type: Sequelize.STRING
