@@ -130,6 +130,41 @@ describe('/buttonwood', function() {
         .expect(200, /quote_add/, done);
     });
 
+    it('responds with OK with token and saved quotes', function(done){
+      var userId = faker.random.uuid();
+
+      request(app)
+        .post('/buttonwood/commands/quote_add')
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'AAPL',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: userId
+        })
+        .expect('Content-Type', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+          request(app)
+            .post('/buttonwood/commands/quote_list')
+            .set('Accept', 'application/json')
+            .type('form')
+            .send({
+              token: commandToken,
+              team_id: faker.random.uuid(),
+              channel_id: faker.random.uuid(),
+              user_id: userId
+            })
+            .expect(200)
+            .end(function(err, res) {
+              assert(res.body.attachments);
+              done();
+            });
+        });
+    });
+
     shouldNotBeFoundWithoutToken('list');
   });
 });
