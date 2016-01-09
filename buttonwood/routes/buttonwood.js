@@ -3,6 +3,7 @@ var buttonwood = require('../app/buttonwood');
 var express = require('express');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
+var logger = require('@the-brain-trust/logger');
 var rdsHelper = require('../lib/rds-helper');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
@@ -34,22 +35,27 @@ router.post('/commands/*', function(req, res, next) {
         res.sendStatus(404);
       }
   }).catch(function(err) {
+    logger.error(err);
     res.sendStatus(500);
   });
 });
 
 router.post('/commands/quote*', function(req, res, next) {
-  var symbols = _.compact(_.map((_.get(req, 'body.text') || '').split(' '),
-    function(symbol) {
-      return symbol.replace(/[^A-z]/g, '');
-    }
-  ));
-
-  if (symbols.length > 0) {
-    req.symbols = symbols;
+  if (_.contains(req.path, 'quote_list')) {
     next();
   } else {
-    res.send('please enter a valid stock ticker symbol');
+    var symbols = _.uniq(_.compact(_.map((_.get(req, 'body.text') || '').split(' '),
+      function(symbol) {
+        return symbol.replace(/[^A-z]/g, '');
+      }
+    )));
+
+    if (symbols.length > 0) {
+      req.symbols = symbols;
+      next();
+    } else {
+      res.send('please enter a valid stock ticker symbol');
+    }
   }
 });
 
@@ -73,6 +79,63 @@ router.post('/commands/quote_detailed', function (req, res, next) {
     .catch(function(err){
       next(err);
     });
+});
+
+router.post('/commands/quote*', function(req, res, next) {
+  rds.models.SlackUser.findOrCreate({
+      where: {
+        id: _.get(req, 'body.user_id')
+      }
+    })
+    .then(function(tuple) {
+      var instance = tuple[0];
+
+      return rds.models.Portfolio.findOrCreate({
+        where: {
+          slack_user_id: instance.id
+        }
+      });
+    })
+    .then(function(tuple) {
+      req.portfolio = tuple[0];
+      next();
+    })
+    .catch(function(err) {
+      logger.error(err);
+      res.sendStatus(500);
+    });
+});
+
+router.post('/commands/quote_add', function(req, res, next) {
+  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols));
+  req.portfolio.save()
+    .then(function() {
+      res.end(`Added ${req.symbols} to portfolio.`);
+    });
+});
+
+router.post('/commands/quote_remove', function(req, res, next) {
+  req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols);
+  req.portfolio.save()
+    .then(function() {
+      res.end(`Removed ${req.symbols} from portfolio.`);
+    });
+});
+
+router.post('/commands/quote_list', function(req, res, next) {
+  if (req.portfolio.symbols.length > 0) {
+    buttonwood.messageQuote(req.portfolio.symbols, false)
+      .then(function(message) {
+        message.response_type = 'ephemeral';
+        res.json(message);
+      })
+      .catch(function(err){
+        next(err);
+      });
+  } else {
+    res.send('You don\'t have any symbols saved. Use the command /quote_add' +
+      'add symbols to your portfolio.');
+  }
 });
 
 module.exports = router;

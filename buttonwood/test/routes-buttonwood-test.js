@@ -12,12 +12,14 @@ var request = require('supertest');
 describe('/buttonwood', function() {
   /**
    * Shared behavior for quote commands
-   * @param  {Boolean} isDetailed  Test for either detailed or basic quotes
+   * @param  {String} command  Test for either detailed or basic quotes
    */
-  function shouldRespondToQuotes(isDetailed) {
+  function shouldRespondToQuoteRequest(command) {
+    command = command ? '_' + command : '';
+
     it('responds with OK with token', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -29,15 +31,14 @@ describe('/buttonwood', function() {
         })
         .expect('Content-Type', 'application/json')
         .end(function(err, res) {
-          assert(res.body.response_type);
-          assert(res.body.attachments);
+          assert(res);
           done();
         });
     });
 
     it('responds 404 without text', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -49,7 +50,7 @@ describe('/buttonwood', function() {
 
     it('responds 200 with malformed text', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -61,7 +62,7 @@ describe('/buttonwood', function() {
 
     it('responds 404 without token', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({ text: 'AAPL' })
@@ -74,6 +75,8 @@ describe('/buttonwood', function() {
 
   before(function(done) {
     this.timeout(3000);
+
+    require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
@@ -89,10 +92,22 @@ describe('/buttonwood', function() {
   });
 
   describe('POST commands/quote', function(){
-    shouldRespondToQuotes();
+    shouldRespondToQuoteRequest();
   });
 
   describe('POST commands/quote_detailed', function(){
-    shouldRespondToQuotes(true);
+    shouldRespondToQuoteRequest('detailed');
+  });
+
+  describe('POST commands/quote_add', function(){
+    shouldRespondToQuoteRequest('add');
+  });
+
+  describe('POST commands/quote_remove', function(){
+    shouldRespondToQuoteRequest('remove');
+  });
+
+  describe('POST commands/quote_list', function(){
+    shouldRespondToQuoteRequest('list');
   });
 });
