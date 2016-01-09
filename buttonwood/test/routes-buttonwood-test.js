@@ -12,12 +12,14 @@ var request = require('supertest');
 describe('/buttonwood', function() {
   /**
    * Shared behavior for quote commands
-   * @param  {Boolean} isDetailed  Test for either detailed or basic quotes
+   * @param  {String} command  Test for either detailed or basic quotes
    */
-  function shouldRespondToQuotes(isDetailed) {
+  function shouldRespondToQuoteRequest(command) {
+    command = command ? '_' + command : '';
+
     it('responds with OK with token', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -28,16 +30,16 @@ describe('/buttonwood', function() {
           user_id: faker.random.uuid()
         })
         .expect('Content-Type', 'application/json')
+        .expect(200)
         .end(function(err, res) {
-          assert(res.body.response_type);
-          assert(res.body.attachments);
+          assert(res);
           done();
         });
     });
 
     it('responds 404 without text', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -49,7 +51,7 @@ describe('/buttonwood', function() {
 
     it('responds 200 with malformed text', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({
@@ -58,10 +60,13 @@ describe('/buttonwood', function() {
         })
         .expect(200, /valid/, done);
     });
+  }
 
+  function shouldNotBeFoundWithoutToken(command) {
+    command = command ? '_' + command : '';
     it('responds 404 without token', function(done){
       request(app)
-        .post('/buttonwood/commands/quote' + (isDetailed ? '_detailed' : ''))
+        .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
         .type('form')
         .send({ text: 'AAPL' })
@@ -74,6 +79,8 @@ describe('/buttonwood', function() {
 
   before(function(done) {
     this.timeout(3000);
+
+    require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
@@ -89,10 +96,75 @@ describe('/buttonwood', function() {
   });
 
   describe('POST commands/quote', function(){
-    shouldRespondToQuotes();
+    shouldRespondToQuoteRequest();
+    shouldNotBeFoundWithoutToken();
   });
 
   describe('POST commands/quote_detailed', function(){
-    shouldRespondToQuotes(true);
+    shouldRespondToQuoteRequest('detailed');
+    shouldNotBeFoundWithoutToken('detailed');
+  });
+
+  describe('POST commands/quote_add', function(){
+    shouldRespondToQuoteRequest('add');
+    shouldNotBeFoundWithoutToken('add');
+  });
+
+  describe('POST commands/quote_remove', function(){
+    shouldRespondToQuoteRequest('remove');
+    shouldNotBeFoundWithoutToken('remove');
+  });
+
+  describe('POST commands/quote_list', function(){
+    it('responds with OK with token and no saved quotes', function(done){
+      request(app)
+        .post('/buttonwood/commands/quote_list')
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
+        .expect(200, /quote_add/, done);
+    });
+
+    it('responds with OK with token and saved quotes', function(done){
+      var userId = faker.random.uuid();
+
+      request(app)
+        .post('/buttonwood/commands/quote_add')
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'AAPL',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: userId
+        })
+        .expect('Content-Type', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+          request(app)
+            .post('/buttonwood/commands/quote_list')
+            .set('Accept', 'application/json')
+            .type('form')
+            .send({
+              token: commandToken,
+              team_id: faker.random.uuid(),
+              channel_id: faker.random.uuid(),
+              user_id: userId
+            })
+            .expect(200)
+            .end(function(err, res) {
+              assert(res.body.attachments);
+              done();
+            });
+        });
+    });
+
+    shouldNotBeFoundWithoutToken('list');
   });
 });

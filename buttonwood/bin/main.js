@@ -2,9 +2,18 @@ var app = require('../app.js');
 var http = require('http');
 var listener = require('../listener.js');
 var logger = require('@the-brain-trust/logger');
+var rds = require('@the-brain-trust/rds');
+require('../rds/registry'); // Load app specific models
 
 const platformName = 'slack';
 const applicationName = 'buttonwood';
+
+/**
+ * This is just a little dangerous since multiple applications are able to sync.
+ * If we truly implement microservices, there will be multiple datastores
+ * but due to time and budget constraints, there is one shared RDS.
+ */
+rds.sync();
 
 listener.init(platformName, applicationName);
 
