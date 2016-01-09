@@ -2,7 +2,7 @@ var rds = require('@the-brain-trust/rds');
 var Sequelize = require('sequelize');
 
 /**
- * The relation between a platform and an application
+ * Saves the portfolio for a given platform entity
  * @type {Model}
  */
 var Portfolio = rds.define('Portfolio', {
