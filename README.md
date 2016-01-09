@@ -35,6 +35,18 @@ running.
 Also we use [reflow](https://github.com/reenhanced/gitreflow) for creating and
 merging branches.
 
+### Ports
+Since the project is largely made up of microservices, there are a number of
+ports that have been called for:
+
+3000: web
+3001: buttonwood
+
+4000: fake-oauth
+
+A proper service discovery solution ought to be implemented, however please
+list any ports used by a test server here so that we may avoid collisions.
+
 ## Style Guide
 
 For Javascript, we generally follow the

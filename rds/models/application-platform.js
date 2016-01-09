@@ -13,6 +13,10 @@ var ApplicationPlatform = sequelize.define('ApplicationPlatform', {
   clientId: {
     type: Sequelize.STRING,
     field: 'client_id'
+  },
+  commandToken: {
+    type: Sequelize.STRING,
+    field: 'command_token'
   }
 });
 

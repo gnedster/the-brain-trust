@@ -1,15 +1,33 @@
-var finalhandler = require('finalhandler');
-var Router = require('router');
+var bodyParser = require('body-parser');
+var express = require('express');
 
-var router = Router();
+var app = express();
+var index = require('./routes/index');
+var buttonwood = require('./routes/buttonwood');
 
-router.get('/health', function (req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({
-    status: 'ok'
-  }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+app.use('/', index);
+app.use('/buttonwood', buttonwood);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('not found');
+  err.status = 404;
+  next(err);
 });
 
-module.exports = function(req, res) {
-  router(req, res, finalhandler(req, res));
-};
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  var errorCode = err.status || 500;
+  res.status(errorCode);
+  res.json({
+    message: err.message,
+    error: { status: err.status }
+  });
+});
+
+module.exports = app;

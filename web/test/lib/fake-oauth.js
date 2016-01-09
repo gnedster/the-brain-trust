@@ -77,8 +77,6 @@ function handleRequest(request, response){
         response.end(JSON.stringify(responseBody));
       });
 
-
-
       break;
     default:
       response.writeHead(404);

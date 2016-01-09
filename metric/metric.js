@@ -18,7 +18,7 @@ var rds = require('@the-brain-trust/rds');
 function write(event) {
   return rds.models.Event.create(event)
     .then(function(instance){
-      logger.debug(instance);
+      logger.debug('metric written');
       return instance;
     }).catch(function(err){
       logger.error('failed to write event', err);
