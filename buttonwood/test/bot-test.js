@@ -2,13 +2,13 @@
  * Tests for the bot module
  */
 var assert = require('assert');
-var ButtonwoodBot = require('../bot/buttonwood');
+var BotButtonwood = require('../bot/buttonwood');
 
-describe('ButtonwoodBot', function(){
+describe('BotButtonwood', function(){
   it('should initialize buttonwood bot', function(done){
     var token = 'xoxb-16835262720-13214213213';
 
-    assert(new ButtonwoodBot(token));
+    assert(new BotButtonwood(token));
     done();
   });
 });

@@ -43,42 +43,40 @@ function init() {
  * @return  {Promise}     A promise containing the bots created
  */
 function create(applicationPlatformEntities) {
-  return new Promise(function(resolve, reject) {
-    try {
-      return Promise.all(
-        _.map(applicationPlatformEntities, function(applicationPlatformEntity) {
-          var id = applicationPlatformEntity.id,
-              bot;
-          if (bots.has(id) === false) {
-            // Lazy retrieval of bot classes
-            return applicationPlatformEntity.getApplication()
-              .then(function(application) {
-                if (_.isUndefined(registry[application.name])) {
-                  logger.warn('could not find bot class', application.name);
-                }
-                // Dynamic initialization
-                var applicationClass = registry[application.name] || Bot;
-                bot = Object.create(applicationClass.prototype);
-                applicationClass.apply(bot, [applicationPlatformEntity]);
-                bots.set(id, bot);
-                bot.start();
-
-                return bot;
-              });
-            } else {
-              return Promise.resolve(bots.get(id));
-            }
-          }));
-    } catch (err) {
-      reject(err);
-    }
-  });
+  try {
+    return Promise.all(
+      _.map(applicationPlatformEntities, function(applicationPlatformEntity) {
+        var id = applicationPlatformEntity.id,
+            bot;
+        if (bots.has(id) === false) {
+          // Lazy retrieval of bot classes
+          return applicationPlatformEntity.getApplication()
+            .then(function(application) {
+              if (_.isUndefined(registry[application.name])) {
+                logger.warn('could not find bot class', application.name);
+              }
+              // Dynamic initialization
+              var applicationClass = registry[application.name] || Bot;
+              bot = Object.create(applicationClass.prototype);
+              applicationClass.apply(bot, [applicationPlatformEntity]);
+              bots.set(id, bot);
+              bot.start();
+              return Promise.resolve(bot);
+            });
+          } else {
+            return Promise.resolve(bots.get(id));
+          }
+        }));
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 /**
  * Get statuses for a subset or entire collection of bots
  * @param {ApplicationPlatformEntity[]} [applicationPlatformEntities]
  *        A collection of ApplicationPlatformEntity for initialization
+ * @return {Map}  Map containing id of bots and status
  */
 function status(applicationPlatformEntities) {
   var result = new Map();
@@ -89,10 +87,12 @@ function status(applicationPlatformEntities) {
       result.set(applicationPlatformEntity.id, status);
     });
   } else {
-    this.bots.forEach(function(bot) {
+    bots.forEach(function(bot) {
       result.set(bot.getId(), bot.getStatus());
     });
   }
+
+  return result;
 }
 
 module.exports = {

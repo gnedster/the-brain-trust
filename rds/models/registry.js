@@ -22,6 +22,14 @@ Platform.hasMany(ApplicationPlatformEntity, {
   foreignKey: 'platform_id'
 });
 
+ApplicationPlatformEntity.belongsTo(Application, {
+  foreignKey: 'application_id'
+});
+
+ApplicationPlatformEntity.belongsTo(Platform, {
+  foreignKey: 'platform_id'
+});
+
 PlatformEntity.belongsTo(Platform, {
   foreign_key: 'platform_id',
   allowNull: false

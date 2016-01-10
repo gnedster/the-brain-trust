@@ -47,6 +47,14 @@ Bot.prototype.getStatus = function() {
 };
 
 /**
+ * Getter for Bot status
+ * @return {String[]} Collection of errors for a given bot
+ */
+Bot.prototype.getErrors = function() {
+  return this.errors;
+};
+
+/**
  * Bot should start listening
  */
 Bot.prototype.start = function (){
