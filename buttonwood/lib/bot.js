@@ -91,7 +91,7 @@ Bot.prototype.startRtm = function() {
       }
       setTimeout(_.bind(self.startRtm, self), rtmInterval);
     } else {
-      if (this.listeners.length === 0) {
+      if (self.listeners.length === 0) {
         self.status = 'partial'; // No extra listeners configured, a dumb bot.
       } else {
         self.status = 'active';
