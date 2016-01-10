@@ -6,7 +6,7 @@
  * Check whether or not the process is running in development
  * @return {Boolean}
  */
-function envIsDevelopment() {
+function isDevelopment() {
   return typeof process.env.NODE_ENV === 'undefined' ||
     process.env.NODE_ENV === 'development';
 }
@@ -15,7 +15,7 @@ function envIsDevelopment() {
  * Check whether or not the process is running in test (on Codeship)
  * @return {Boolean}
  */
-function envIsTest() {
+function isTest() {
   return process.env.NODE_ENV === 'test';
 }
 
@@ -24,13 +24,28 @@ function envIsTest() {
  * production-like).
  * @return {Boolean}
  */
-function envIsProduction() {
+function isProduction() {
   return process.env.NODE_ENV === 'production' ||
     process.env.NODE_ENV === 'staging';
 }
 
+/**
+ * Transform Map to Object.
+ * @param  {Map} map  Map to convert to object
+ * @return {Object}   Transform
+ */
+function mapToObject(map) {
+  var result = {};
+  for (var kv of map.entries()) {
+    result[kv[0]] = kv[1];
+  }
+
+  return result;
+}
+
 module.exports = {
-  envIsDevelopment: envIsDevelopment,
-  envIsTest: envIsTest,
-  envIsProduction: envIsProduction
+  isDevelopment: isDevelopment,
+  isTest: isTest,
+  isProduction: isProduction,
+  mapToObject: mapToObject
 };

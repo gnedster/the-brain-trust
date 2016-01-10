@@ -20,7 +20,7 @@
     "@the-brain-trust/metric": "0.0.4",
     "@the-brain-trust/rds": "0.5.5",
     "@the-brain-trust/sqs": "0.0.4",
-    "@the-brain-trust/utility": "0.0.1",
+    "@the-brain-trust/utility": "0.0.3",
     "accounting": "^0.4.1",
     "body-parser": "^1.14.2",
     "botkit": "^0.0.5",

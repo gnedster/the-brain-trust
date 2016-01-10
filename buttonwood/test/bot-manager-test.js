@@ -34,6 +34,7 @@ describe('BotButtonwood', function(){
       .then(function(bots) {
         assert(bots);
 
+        assert(botManager.status().get(applicationPlatformEntity.id));
         assert.equal(
           botManager.status().get(applicationPlatformEntity.id),
           botManager.status([applicationPlatformEntity])

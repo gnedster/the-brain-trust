@@ -16,6 +16,14 @@ describe('utility', function(){
     done();
   });
 
+  it('should convert map to object', function() {
+    var map = new Map();
+
+    map.set('a', 1);
+
+    assert.equal(utility.mapToObject(map)['a'], 1);
+  });
+
   after(function(){
     delete process.env.NODE_ENV;
   });
