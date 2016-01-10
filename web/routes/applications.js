@@ -26,7 +26,8 @@ router.all('/:name*', function(req, res, next) {
         }
       })
       .then(function(application){
-        if (application instanceof rds.models.Application.Instance) {
+        if (application instanceof rds.models.Application.Instance &&
+          (req.isAuthenticated() || application.public)) {
           res.locals.metaDescription = application.shortDescription;
           req.application = application;
           next();

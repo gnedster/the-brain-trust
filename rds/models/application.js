@@ -54,9 +54,9 @@ var Application = sequelize.define('Application', {
     field: 'page_views',
     defaultValue: 0
   },
-  enabled: {
+  public: {
     type: Sequelize.BOOLEAN,
-    defaultValue: true
+    defaultValue: false
   }
 });
 

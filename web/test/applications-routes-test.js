@@ -44,6 +44,38 @@ describe('/applications', function() {
         .expect('Content-Type', /html/)
         .expect(404, done);
     });
+
+    it('responds with 404 for a non-public application', function(done){
+      factory.create('application', {
+        name: faker.internet.domainWord(),
+        public: false
+      }).then(function(application) {
+        var testSession = session(app);
+
+        testSession
+          .get('/applications/' + application.name)
+          .set('Accept', 'text/html')
+          .set('Content-Type', 'text/html; charset=utf8')
+          .expect('Content-Type', /html/)
+          .expect(404)
+          .end(function() {
+            testSession.post('/login')
+              .type('form')
+              .send({ email: 'admin@test.com' })
+              .send({ password: 'password' })
+              .expect(302)
+              .expect('Location', '/admin')
+              .end(function(err, res) {
+                testSession
+                  .get('/applications/' + application.name)
+                  .set('Accept', 'text/html')
+                  .set('Content-Type', 'text/html; charset=utf8')
+                  .expect('Content-Type', /html/)
+                  .expect(200, new RegExp(application.name), done);
+              });
+          });
+      });
+    });
   });
 
   describe('GET /applications/:name/edit`', function(){
