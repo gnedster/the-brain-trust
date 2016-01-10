@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Bot = require('./bot');
-var ButtonwoodBot = require('../bot/buttonwood');
+var registry = require('../bot/registry');
+var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 
 // Contains all created bot instances, key is applicationPlatformEntity id
@@ -16,7 +17,14 @@ function init() {
       where: {
         name: platformName
       },
-      include: [rds.models.ApplicationPlatformEntity]
+      include: [
+        {
+          model: rds.models.ApplicationPlatformEntity,
+          include: [
+            rds.models.Application
+          ]
+        }
+      ]
     })
     .then(function(platform) {
       if (platform instanceof rds.models.Platform.Instance) {
@@ -37,22 +45,30 @@ function init() {
 function create(applicationPlatformEntities) {
   return new Promise(function(resolve, reject) {
     try {
-      var createdBots =
+      return Promise.all(
         _.map(applicationPlatformEntities, function(applicationPlatformEntity) {
           var id = applicationPlatformEntity.id,
               bot;
           if (bots.has(id) === false) {
             // Lazy retrieval of bot classes
-            bot = new ButtonwoodBot(applicationPlatformEntity);
-            bots.set(id, bot);
-            bot.start();
-          } else {
-            bot = bots.get(id);
-          }
+            return applicationPlatformEntity.getApplication()
+              .then(function(application) {
+                if (_.isUndefined(registry[application.name])) {
+                  logger.warn('could not find bot class', application.name);
+                }
+                // Dynamic initialization
+                var applicationClass = registry[application.name] || Bot;
+                bot = Object.create(applicationClass.prototype);
+                applicationClass.apply(bot, [applicationPlatformEntity]);
+                bots.set(id, bot);
+                bot.start();
 
-          return bot;
-        });
-      resolve(createdBots);
+                return bot;
+              });
+            } else {
+              return Promise.resolve(bots.get(id));
+            }
+          }));
     } catch (err) {
       reject(err);
     }
