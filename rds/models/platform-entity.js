@@ -15,9 +15,11 @@ var PlatformEntity = sequelize.define('PlatformEntity', {
     type: Sequelize.STRING
   },
   kind: {
-    //team, channel, user
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      isIn: [['team', 'channel', 'user']]
+    }
   }
 });
 
