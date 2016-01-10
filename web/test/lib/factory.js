@@ -17,7 +17,8 @@ factory.define('application', rds.models.Application, {
   description: faker.lorem.paragraphs(),
   shortDescription: faker.lorem.sentence(),
   changelog: faker.lorem.paragraphs(),
-  contact: faker.internet.email()
+  contact: faker.internet.email(),
+  public: true
 });
 
 factory.define('application-permission', rds.models.ApplicationPlatform, {

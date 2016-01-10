@@ -10,33 +10,41 @@ block content
         &nbsp;&gt;&nbsp;
         edit
 
-  form(name='exit', action='edit', method='post', accept-charset='utf-8')
-    .form-group
-      label(for='name') name
-      input.form-control(type='text', name='name', value=application.name, required='')
-    .form-group
-      label(for='shortDescription') short description
-      input.form-control(type='text', name='shortDescription', value=application.shortDescription, required='')
-    .form-group
-      label(for='author') author
-      input.form-control(type='text', name='author', value=application.author, required='')
-    .form-group
-      label(for='contact') contact
-      input.form-control(type='email', name='contact', value=application.contact, required='')
-    .form-group
-      label(for='lastPublishedAt') last published
-      input.form-control(type='datetime-local', name='lastPublishedAt', value=application.lastPublishedAt.toISOString().slice(0,-1), required='')
-    .form-group
-      label(for='description') description (use markdown syntax)
-      textarea.form-control(type='text',name='description', rows=20, required='').
-        #{application.description}
-    .form-group
-      label(for='changelog') changelog (use markdown syntax)
-      textarea.form-control(type='text', name='changelog', rows=20, required='').
-        #{application.changelog}
-    .form-group.pull-right
-      button(type='reset' class='btn btn-default') reset
-      &nbsp;
-      button(type='submit' class='btn btn-primary') save
+  .application-edit
+    form(name='edit', action='edit', method='post', accept-charset='utf-8')
+      .form-group
+        label(for='name') name
+        input.form-control(type='text', name='name', value=application.name, required='')
+      .form-group
+        label(for='public') public
+        p.help-block.
+          Enable public access for the application-specific pages.
+          Disabling the option will not affect listener operations.
+        input.hidden(type='checkbox', name='public', value='false')
+        input.checkbox(type='checkbox', name='public', value='true', checked=application.public)
+      .form-group
+        label(for='shortDescription') short description
+        input.form-control(type='text', name='shortDescription', value=application.shortDescription, required='')
+      .form-group
+        label(for='author') author
+        input.form-control(type='text', name='author', value=application.author, required='')
+      .form-group
+        label(for='contact') contact
+        input.form-control(type='email', name='contact', value=application.contact, required='')
+      .form-group
+        label(for='lastPublishedAt') last published
+        input.form-control(type='datetime-local', name='lastPublishedAt', value=application.lastPublishedAt.toISOString().slice(0,-1), required='')
+      .form-group
+        label(for='description') description (use markdown syntax)
+        textarea.form-control(type='text',name='description', rows=20, required='').
+          #{application.description}
+      .form-group
+        label(for='changelog') changelog (use markdown syntax)
+        textarea.form-control(type='text', name='changelog', rows=20, required='').
+          #{application.changelog}
+      .form-group.pull-right
+        button(type='reset' class='btn btn-default') reset
+        &nbsp;
+        button(type='submit' class='btn btn-primary') save
 
 
