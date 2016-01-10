@@ -1,6 +1,6 @@
 {
   "rds": {
-    "database": "test",
+    "database": "circle_test",
     "options": {
       "host": "localhost",
       "dialect" : "postgres",
