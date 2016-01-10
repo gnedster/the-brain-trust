@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/utility",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "provides a suite of common utility functions and helpers",
   "main": "utility.js",
   "scripts": {

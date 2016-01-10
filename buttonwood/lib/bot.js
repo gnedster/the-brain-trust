@@ -9,17 +9,19 @@ const rtmInterval = 5000;
 /**
  * Generic wrapper for Botkit's Bot class
  * @class
- * @param {String} token Token for use against Slack's APIs
+ * @param {ApplicationPlatformEntity} applicationPlatformEntity
  */
-function Bot(token) {
-  if (token.startsWith('xoxb') === false) {
-    logger.warn('invalid Slack token');
-    return;
-  }
-
+function Bot(applicationPlatformEntity) {
+  this.status = 'new';
+  this.applicationPlatformEntity = applicationPlatformEntity;
   this.listeners = [];
+  this.errors = [];
   this.pingTimeout = null;
   this.timeToLiveTimeout = null;
+
+  // TODO: hardcoded for Slack
+  var token = _.get(applicationPlatformEntity,
+    'credentials.bot.bot_access_token');
 
   this.controller = Botkit.slackbot({
     debug: util.isProduction() ? false : true
@@ -29,16 +31,42 @@ function Bot(token) {
 }
 
 /**
+ * Getter for Bot Id
+ * @return {Integer} Id of the current bot
+ */
+Bot.prototype.getId = function() {
+  return this.applicationPlatformEntity.id;
+};
+
+/**
+ * Getter for Bot status
+ * @return {String} Current status of the bot
+ */
+Bot.prototype.getStatus = function() {
+  return this.status;
+};
+
+/**
+ * Getter for Bot status
+ * @return {String[]} Collection of errors for a given bot
+ */
+Bot.prototype.getErrors = function() {
+  return this.errors;
+};
+
+/**
  * Bot should start listening
  */
-Bot.prototype.listen = function (){
+Bot.prototype.start = function (){
   var self = this;
+  this.status = 'starting';
   this.startRtm();
 
   if (this.listeners.length === 0) {
     logger.warn('no listeners configured');
   }
 
+  // init listeners
   _.each(this.listeners.concat([this.hearsPong]), function(listener){
     listener.call(self, self.controller);
   });
@@ -55,12 +83,19 @@ Bot.prototype.startRtm = function() {
 
   this.bot.startRTM(function(err, resp){
     if (err) {
+      self.status = 'error';
+      self.errors.push(err);
       logger.error(err);
-      if (err === 'invalid_auth') {
+      if (err === 'invalid_auth' || err === 'not_authed') {
         return;
       }
       setTimeout(_.bind(self.startRtm, self), rtmInterval);
     } else {
+      if (this.listeners.length === 0) {
+        self.status = 'partial'; // No extra listeners configured, a dumb bot.
+      } else {
+        self.status = 'active';
+      }
       self.ping();
     }
   });
@@ -68,6 +103,7 @@ Bot.prototype.startRtm = function() {
 
 /**
  * @private
+ * @param {Slackbot} controller  An instance of Slackbot
  * Handle pong message
  */
 Bot.prototype.hearsPong = function(controller) {

@@ -80,15 +80,15 @@ function hearsSymbol(controller) {
 /**
  * @class
  * Defines the behavior for the buttonwood bot
- * @param {String} token  Slack token
+ * @param {ApplicationPlatformEntity} applicationPlatformEntity  Slack token
  */
-function ButtonwoodBot(token) {
-  Bot.call(this, token);
+function BotButtonwood(applicationPlatformEntity) {
+  Bot.call(this, applicationPlatformEntity);
 
   this.listeners = [hearsHello, hearsSymbol];
 }
 
-ButtonwoodBot.prototype = Object.create(Bot.prototype);
-ButtonwoodBot.prototype.constructor = Bot;
+BotButtonwood.prototype = Object.create(Bot.prototype);
+BotButtonwood.prototype.constructor = Bot;
 
-module.exports = ButtonwoodBot;
+module.exports = BotButtonwood;
