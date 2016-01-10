@@ -18,14 +18,15 @@ block content
         th enabled
       tbody
         each application in applications
-          td #[a(href="/applications/#{application.name}") #{application.name}]
-          td #[a(href="/applications/#{application.name}/edit") edit]
-          td= application.author
-          td= application.contact
-          td= application.lastPublishedAt
-          td= application.pageViews
-          td n/a
-          td= application.messagesSent
-          td= application.messagesReceived
-          td= application.enabled
+          tr
+            td #[a(href="/applications/#{application.name}") #{application.name}]
+            td #[a(href="/applications/#{application.name}/edit") edit]
+            td= application.author
+            td= application.contact
+            td= application.lastPublishedAt
+            td= application.pageViews
+            td n/a
+            td= application.messagesSent
+            td= application.messagesReceived
+            td= application.enabled
 
