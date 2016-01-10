@@ -82,17 +82,29 @@ router.post('/commands/quote_detailed', function (req, res, next) {
 });
 
 router.post('/commands/quote*', function(req, res, next) {
-  rds.models.SlackUser.findOrCreate({
+  rds.models.Platform.findOne({
       where: {
-        id: _.get(req, 'body.user_id')
+        name: 'slack'
+      }
+    }).then(function(platform) {
+      if (platform instanceof rds.models.Platform.Instance) {
+        return rds.models.PlatformEntity.findOrCreate({
+          where: {
+            entity_id: _.get(req, 'body.user_id'),
+            platform_id: platform.id,
+            kind: 'user'
+          }
+        });
+      } else {
+        return Promise.reject('platform not found');
       }
     })
     .then(function(tuple) {
-      var instance = tuple[0];
+      var platform_entity = tuple[0];
 
       return rds.models.Portfolio.findOrCreate({
         where: {
-          slack_user_id: instance.id
+          platform_entity_id: platform_entity.id
         }
       });
     })
