@@ -78,7 +78,7 @@ function create(applicationPlatformEntities) {
  *        A collection of ApplicationPlatformEntity for initialization
  * @return {Map}  Map containing id of bots and status
  */
-function status(applicationPlatformEntities) {
+function getStatus(applicationPlatformEntities) {
   var result = new Map();
   if (applicationPlatformEntities) {
     _.each(applicationPlatformEntities, function(applicationPlatformEntity) {
@@ -98,5 +98,5 @@ function status(applicationPlatformEntities) {
 module.exports = {
   init: init,
   create: create,
-  status: status
+  getStatus: getStatus
 };

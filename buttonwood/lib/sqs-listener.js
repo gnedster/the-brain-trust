@@ -5,6 +5,8 @@ var sqs = require('@the-brain-trust/sqs');
 
 const queueName = 'application';
 
+var status = 'new';
+
 /**
  * Initialize th function to listen for SQS messages. This function
  * recursively calls itself indefinitely.
@@ -12,6 +14,7 @@ const queueName = 'application';
  * @return {Promise}
  */
 function init() {
+  status = 'active';
   return sqs.pollForMessages(queueName, true)
     .then(function(data){
       // TODO: Use data provided by queue instead of attempting to
@@ -30,10 +33,20 @@ function init() {
       return Promise.resolve();
     })
     .catch(function(err) {
+      status = 'error';
       logger.error(err);
     });
 }
 
+/**
+ * Get the status of the SQS listener
+ * @return {String}  Status
+ */
+function getStatus() {
+  return status;
+}
+
 module.exports = {
-  init: init
+  init: init,
+  getStatus: getStatus
 };
