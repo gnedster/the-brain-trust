@@ -43,33 +43,35 @@ function init() {
  * @return  {Promise}     A promise containing the bots created
  */
 function create(applicationPlatformEntities) {
-  try {
-    return Promise.all(
-      _.map(applicationPlatformEntities, function(applicationPlatformEntity) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var result = _.map(applicationPlatformEntities,
+        function(applicationPlatformEntity) {
         var id = applicationPlatformEntity.id,
-            bot;
+            application, bot;
         if (bots.has(id) === false) {
           // Lazy retrieval of bot classes
-          return applicationPlatformEntity.getApplication()
-            .then(function(application) {
-              if (_.isUndefined(registry[application.name])) {
-                logger.warn('could not find bot class', application.name);
-              }
-              // Dynamic initialization
-              var applicationClass = registry[application.name] || Bot;
-              bot = Object.create(applicationClass.prototype);
-              applicationClass.apply(bot, [applicationPlatformEntity]);
-              bots.set(id, bot);
-              bot.start();
-              return Promise.resolve(bot);
-            });
-          } else {
-            return Promise.resolve(bots.get(id));
+          application = applicationPlatformEntity.Application;
+          if (_.isUndefined(registry[application.name])) {
+            logger.warn('could not find bot class', application.name);
           }
-        }));
-  } catch (err) {
-    return Promise.reject(err);
-  }
+          // Dynamic initialization
+          var applicationClass = registry[application.name] || Bot;
+          bot = Object.create(applicationClass.prototype);
+          applicationClass.apply(bot, [applicationPlatformEntity]);
+          bots.set(id, bot);
+          bot.start();
+          return bot;
+        } else {
+          return bots.get(id);
+        }
+      });
+
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  });
 }
 
 /**
