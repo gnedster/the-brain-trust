@@ -19,9 +19,7 @@ router.get('/privacy-policy', function(req, res, next) {
 
 /* GET login. */
 router.get('/login', function(req, res, next) {
-  res.render('login', {
-    error: req.flash('error')
-  });
+  res.render('login');
 });
 
 /* GET logout. */

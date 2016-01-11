@@ -1,0 +1,33 @@
+.form-group
+  label(for='name') name
+  input.form-control(type='text', name='name', pattern='^[a-z]+$', value=application.name, required='')
+  p.help-block Must be globally unique with lower-cased letters.
+.form-group
+  label(for='public') public
+  input.hidden(type='checkbox', name='public', value='false')
+  input.checkbox(type='checkbox', name='public', value='true', checked=application.public)
+  p.help-block.
+    Enable public access for the application-specific pages. Disabling the
+    option will not affect listener operations.
+.form-group
+  label(for='shortDescription') short description
+  input.form-control(type='text', name='shortDescription', value=application.shortDescription, required='')
+.form-group
+  label(for='author') author
+  input.form-control(type='text', name='author', value=application.author, required='')
+.form-group
+  label(for='contact') contact
+  input.form-control(type='email', name='contact', value=application.contact, required='')
+  p.help-block E-mail address for users to contact you.
+.form-group
+  label(for='description') description (use markdown syntax)
+  textarea.form-control(type='text',name='description', rows=20, required='').
+    #{application.description}
+.form-group
+  label(for='changelog') changelog (use markdown syntax)
+  textarea.form-control(type='text', name='changelog', rows=20, required='').
+    #{application.changelog}
+.form-group.pull-right
+  button(type='reset' class='btn btn-default') reset
+  &nbsp;
+  button(type='submit' class='btn btn-primary') save

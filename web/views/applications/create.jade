@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  .row
+    .col-sm-12
+      h2.
+        #[a(href="/applications/") applications]
+        &nbsp;&gt;&nbsp;
+        create
+
+  .application-create
+    form(name='create', action='create', method='post', accept-charset='utf-8')
+      include ./_form.jade

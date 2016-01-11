@@ -17,6 +17,35 @@ router.get('/', function(req, res, next) {
   }
 });
 
+/**
+ * GET applications/create
+ */
+router.get('/create', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.render('applications/create', {
+      application: rds.models.Application.build()
+    });
+  } else {
+    next();
+  }
+});
+
+/**
+ * POST applications/create
+ */
+router.post('/create', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.Application.create(req.body)
+      .then(function(instance){
+        req.flash('success', 'application \'%s\' created!', instance.name);
+        res.redirect(`/applications/${instance.name}`);
+      })
+      .catch(next);
+  } else {
+    next();
+  }
+});
+
 /* Attempt to discover the application. */
 router.all('/:name*', function(req, res, next) {
   if (req.params.name) {
@@ -95,18 +124,7 @@ router.post('/:name/edit', function(req, res, next) {
   }
 });
 
-/**
- * GET applications/:name/permissions
- */
-router.get('/:name/perimssions', function(req, res, next) {
-  if (req.isAuthenticated()) {
-    res.render('applications/permissions', {
-      application: req.getApplicationPemirrions
-    });
-  } else {
-    next();
-  }
-});
+
 
 /**
  * GET applications/:name/changelog
