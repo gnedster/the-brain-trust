@@ -37,7 +37,7 @@ router.post('/create', function(req, res, next) {
   if (req.isAuthenticated()) {
     rds.models.Application.create(req.body)
       .then(function(instance){
-        req.flash('success', 'application \'%s\' created!', instance.name);
+        req.flash('success', 'application "%s" created!', instance.name);
         res.redirect(`/applications/${instance.name}`);
       })
       .catch(next);
@@ -95,9 +95,9 @@ router.get('/:name', function(req, res, next) {
 });
 
 /**
- * GET applications/:name/permissions
+ * GET applications/:name/platforms
  */
-router.get('/:name/permissions', function(req, res, next) {
+router.get('/:name/platforms', function(req, res, next) {
   if (req.isAuthenticated()) {
     rds.models.ApplicationPlatform.findAll({
       where: {
@@ -109,7 +109,7 @@ router.get('/:name/permissions', function(req, res, next) {
         }
       ]
     }).then(function(applicationPlatforms) {
-      res.render('applications/permissions', {
+      res.render('applications/platforms', {
         application: req.application,
         applicationPlatforms: applicationPlatforms
       });
@@ -117,6 +117,36 @@ router.get('/:name/permissions', function(req, res, next) {
       next(err);
     });
 
+  } else {
+    next();
+  }
+});
+
+/**
+ * POST applications/:name/platforms/:id
+ */
+router.post('/:name/platforms/:id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.ApplicationPlatform.findById(req.params.id, {
+        include: [
+          {
+            model: rds.models.Platform
+          }
+        ]
+      })
+      .then(function(applicationPlatform){
+        if (applicationPlatform instanceof
+          rds.models.ApplicationPlatform.Instance) {
+          return applicationPlatform.update(req.body);
+        } else {
+          return Promise.reject(`applicationPlatform not found.`);
+        }
+      })
+      .then(function(applicationPlatform) {
+        req.flash('success', 'Successfully updated platform credentials.');
+        res.redirect(`/applications/${req.application.name}/platforms`);
+      })
+      .catch(next);
   } else {
     next();
   }
