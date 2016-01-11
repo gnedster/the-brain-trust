@@ -23,10 +23,12 @@ block content
           form(name=applicationPlatform.Platform.name, action='platforms/#{applicationPlatform.id}', method='post', accept-charset='utf-8')
             .form-group
               label(for='token') token
-              input.form-control(type='text', name='token', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.token, required='')
+              input.form-control(type='password', name='token', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.token, required='')
+              p.help-block Authentication token provided by the chat platform.
             .form-group
               label(for='clientId') client id
               input.form-control(type='text', name='clientId', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.clientId)
+              p.help-block Client id provided by the chat platform.
             .form-group
               label(for='commandToken') command token
               input.form-control(type='text', name='commandToken', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.commandToken)

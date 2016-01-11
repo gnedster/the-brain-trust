@@ -26,5 +26,8 @@ block content
             td n/a
             td= application.messagesSent
             td= application.messagesReceived
-            td= application.public
+            if application.public
+              td yes
+            else
+              td no
 
