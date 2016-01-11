@@ -60,6 +60,12 @@ var Application = sequelize.define('Application', {
   public: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
+  },
+  logoExtension: {
+    type: Sequelize.STRING,
+    validate: {
+      is: /^.[a-z]+$/
+    }
   }
 });
 
