@@ -9,7 +9,10 @@ var Application = sequelize.define('Application', {
   name: {
     type: Sequelize.STRING,
     allowNull : false,
-    unique: true
+    unique: true,
+    validate: {
+      is: /^[a-z]+$/
+    }
   },
   author: {
     type: Sequelize.STRING,
@@ -57,6 +60,12 @@ var Application = sequelize.define('Application', {
   public: {
     type: Sequelize.BOOLEAN,
     defaultValue: false
+  },
+  logoExtension: {
+    type: Sequelize.STRING,
+    validate: {
+      is: /^.[a-z]+$/
+    }
   }
 });
 

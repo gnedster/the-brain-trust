@@ -12,6 +12,38 @@ var request = require('supertest');
 var session = require('supertest-session');
 
 describe('/applications', function() {
+  /**
+   * Helper function to get a logged in session
+   * @param  {String} email    Email to login with
+   * @param  {String} password Password to login with
+   * @return {Promise}         Promise containing supertest-session
+   */
+  function getAuthorizedSession(email, password) {
+    var testSession = session(app);
+    email = email || 'admin@test.com';
+    password = password || 'password';
+
+    return new Promise(function(resolve, reject) {
+      testSession
+        .post('/login')
+        .type('form')
+        .send({
+          email: email,
+          password: password
+        })
+        .expect(302)
+        .expect('Location', '/admin')
+        .end(function(err, res) {
+          if (err) {
+            reject();
+          } else {
+            resolve(testSession);
+          }
+        });
+    });
+  }
+
+
   before(function(done) {
     this.timeout(3000);
 
@@ -49,23 +81,17 @@ describe('/applications', function() {
       factory.create('application', {
         name: faker.internet.domainWord(),
         public: false
-      }).then(function(application) {
-        var testSession = session(app);
-
-        testSession
+      })
+      .then(function(application) {
+        request(app)
           .get('/applications/' + application.name)
           .set('Accept', 'text/html')
           .set('Content-Type', 'text/html; charset=utf8')
           .expect('Content-Type', /html/)
           .expect(404)
-          .end(function() {
-            testSession.post('/login')
-              .type('form')
-              .send({ email: 'admin@test.com' })
-              .send({ password: 'password' })
-              .expect(302)
-              .expect('Location', '/admin')
-              .end(function(err, res) {
+          .then(function() {
+            getAuthorizedSession()
+              .then(function(testSession) {
                 testSession
                   .get('/applications/' + application.name)
                   .set('Accept', 'text/html')
@@ -74,12 +100,41 @@ describe('/applications', function() {
                   .expect(200, new RegExp(application.name), done);
               });
           });
+        });
+    });
+  });
+
+  describe('GET /applications/create', function(){
+    it('responds with 404 on unauthorized account for create', function(done){
+      request(app)
+        .get('/applications/create')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect('Content-Type', /html/)
+        .expect(404)
+        .end(done);
+    });
+
+    it('creates an application successfully', function(done) {
+      factory.build('application', {
+        name: faker.internet.domainWord(),
+        public: false
+      })
+      .then(function(application) {
+        getAuthorizedSession().then(function(testSession) {
+          testSession
+            .post('/applications/create')
+            .type('form')
+            .send(application.dataValues)
+            .expect(302)
+            .expect('Location', `/applications/${application.name}`, done);
+        });
       });
     });
   });
 
   describe('GET /applications/:name/edit`', function(){
-    it('responds with 302 on unauthorized account', function(done){
+    it('responds with 404 on unauthorized account', function(done){
       request(app)
         .get('/applications/buttonwood/edit')
         .set('Accept', 'text/html')
@@ -90,29 +145,21 @@ describe('/applications', function() {
     });
 
     it('responds with 200 on authorized account', function(done){
-      var testSession = session(app);
-
-      testSession
-        .post('/login')
-          .type('form')
-          .send({ email: 'admin@test.com' })
-          .send({ password: 'password' })
-          .expect(302)
-          .expect('Location', '/admin')
-          .end(function(err, res) {
-            testSession
-              .get('/applications/buttonwood/edit')
-              .set('Accept', 'text/html')
-              .set('Content-Type', 'text/html; charset=utf8')
-              .expect(200, /logout/)
-              .end(function(err, res) {
-                testSession
-                  .post('/applications/buttonwood/edit')
-                  .type('form')
-                  .send({ contact: 'info@test.com' })
-                  .expect(200, /edit/, done);
-              });
-          });
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .get('/applications/buttonwood/edit')
+            .set('Accept', 'text/html')
+            .set('Content-Type', 'text/html; charset=utf8')
+            .expect(200, /logout/)
+            .end(function(err, res) {
+              testSession
+                .post('/applications/buttonwood/edit')
+                .type('form')
+                .send({ contact: 'info@test.com' })
+                .expect(200, /edit/, done);
+            });
+        });
     });
   });
 
@@ -193,10 +240,9 @@ describe('/applications', function() {
           // Grab the state from the html page (not ideal)
           var state = res.text.match(/state=(\w+)/)[1];
 
-          logger.debug(state);
-
           testSession
-            .get('/applications/buttonwood/slack/authorize?code=1&state=' + state)
+            .get('/applications/buttonwood/slack/authorize?code=1&state=' +
+              state)
             .set('Accept', 'text/html')
             .set('Content-Type', 'text/html; charset=utf8')
             .end(function(err, res) {
@@ -204,7 +250,8 @@ describe('/applications', function() {
 
               // oAuthState should not be reused
               testSession
-                .get('/applications/buttonwood/slack/authorize?code=1&state=' + state)
+                .get('/applications/buttonwood/slack/authorize?code=1&state=' +
+                  state)
                 .set('Accept', 'text/html')
                 .set('Content-Type', 'text/html; charset=utf8')
                 .expect(500, done);

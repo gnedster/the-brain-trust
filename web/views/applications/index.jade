@@ -3,6 +3,8 @@ extends ../layout
 block content
   h2 applications
 
+  p #[a(href="/applications/create") create a new application]
+
   .table-responsive.models
     table.table
       thead
@@ -10,12 +12,11 @@ block content
         th edit
         th author
         th contact
-        th last published
         th page views
         th permissions granted
         th messages sent
         th messages received
-        th enabled
+        th public
       tbody
         each application in applications
           tr
@@ -23,10 +24,9 @@ block content
             td #[a(href="/applications/#{application.name}/edit") edit]
             td= application.author
             td= application.contact
-            td= application.lastPublishedAt
             td= application.pageViews
             td n/a
             td= application.messagesSent
             td= application.messagesReceived
-            td= application.enabled
+            td= application.public
 

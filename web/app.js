@@ -48,11 +48,19 @@ app.use(session({
   saveUninitialized: true
 }));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 // add isAuthenticated to every view
 app.use('*', function(req, res, next){
+  res.locals.flash = {
+    info: req.flash('info'),
+    success: req.flash('success'),
+    warning: req.flash('warning'),
+    error: req.flash('error')
+  };
+
   res.locals.isAuthenticated = req.isAuthenticated();
   res.locals.user = req.user;
   res.locals.marked = marked;

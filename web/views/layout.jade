@@ -22,10 +22,24 @@ html
   body
     if process.env.NODE_ENV == 'production'
       google-analytics(code='UA-71658652-1')
-    if error && error.length > 0
+
+    if flash.info && flash.info.length > 0
+      .flash.alert-info(role='alert')
+        span.glyphicon.glyphicon-info-sign(aria-hidden="true") &nbsp;
+        span #{flash.info}
+    if flash.success && flash.success.length > 0
+      .flash.alert-success(role='alert')
+        span.glyphicon.glyphicon-ok-sign(aria-hidden="true") &nbsp;
+        span #{flash.success}
+    if flash.warning && flash.warning.length > 0
+      .flash.alert-warning(role='alert')
+        span.glyphicon.glyphicon-warning-sign(aria-hidden="true") &nbsp;
+        span #{flash.warning}
+    if flash.error && flash.error.length > 0
       .flash.alert-danger(role='alert')
         span.glyphicon.glyphicon-exclamation-sign(aria-hidden="true") &nbsp;
-        span #{error}
+        span #{flash.error}
+
     .container
       .row.header
         .col-xs-7
