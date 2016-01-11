@@ -28,7 +28,7 @@ function init() {
     })
     .then(function(platform) {
       if (platform instanceof rds.models.Platform.Instance) {
-        return platform.getApplicationPlatformEntities();
+        return platform.ApplicationPlatformEntities;
       }
 
       return Promise.reject('platform not found');
