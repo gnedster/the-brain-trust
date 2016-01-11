@@ -121,8 +121,7 @@ describe('/applications', function() {
         public: false
       })
       .then(function(application) {
-        getAuthorizedSession()
-        .then(function(testSession) {
+        getAuthorizedSession().then(function(testSession) {
           testSession
             .post('/applications/create')
             .type('form')
