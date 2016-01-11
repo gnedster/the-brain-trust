@@ -6,7 +6,8 @@ require('factory-girl-sequelize')();
 
 factory.define('platform', rds.models.Platform, {
   name: 'slack',
-  website: 'https://slack.com',
+  description: faker.lorem.sentence(),
+  website: faker.internet.domainName(),
   baseSite: 'http://localhost:4000/',
   authorizePath: 'oauth/authorize',
   accessTokenPath: 'api/oauth.access'
