@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "0.5.11",
+    "@the-brain-trust/rds": "0.5.12",
     "@the-brain-trust/sqs": "0.0.4",
     "@the-brain-trust/utility": "0.0.1",
     "aws-sdk": "^2.2.26",

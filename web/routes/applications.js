@@ -95,6 +95,34 @@ router.get('/:name', function(req, res, next) {
 });
 
 /**
+ * GET applications/:name/permissions
+ */
+router.get('/:name/permissions', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.ApplicationPlatform.findAll({
+      where: {
+        application_id: req.application.id
+      },
+      include: [
+        {
+          model: rds.models.Platform
+        }
+      ]
+    }).then(function(applicationPlatforms) {
+      res.render('applications/permissions', {
+        application: req.application,
+        applicationPlatforms: applicationPlatforms
+      });
+    }).catch(function(err){
+      next(err);
+    });
+
+  } else {
+    next();
+  }
+});
+
+/**
  * GET applications/:name/edit
  */
 router.get('/:name/edit', function(req, res, next) {

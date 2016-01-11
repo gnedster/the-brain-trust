@@ -1,0 +1,26 @@
+extends ../layout
+
+block content
+  h2.
+    #[a(href="/applications/") applications]
+    &nbsp;&gt;&nbsp;
+    #[a(href="/applications/#{application.name}") #{application.name}]
+    &nbsp;&gt;&nbsp;
+    permissions
+
+  .application-permissions
+    .table-responsive.models
+      table.table
+        thead
+          th platform
+          th token
+          th client id
+          th command token
+        tbody
+          each applicationPlatform in applicationPlatforms
+            tr
+              td= applicationPlatform.Platform.name
+              td= applicationPlatform.token
+              td= applicationPlatform.clientId
+              td= applicationPlatform.commandToken
+
