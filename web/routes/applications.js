@@ -199,15 +199,14 @@ router.get('/:name/edit', function(req, res, next) {
 });
 
 /**
- * POST applications/:name/edit
+ * POST applications/:name
  */
-router.post('/:name/edit', function(req, res, next) {
+router.post('/:name', function(req, res, next) {
   if (req.isAuthenticated()) {
     req.application.update(req.body)
       .then(function(promise){
-        res.render('applications/edit', {
-          application: this
-        });
+        req.flash('success', 'Successfully updated application.');
+        res.redirect(`/applications/${req.application.name}/edit`);
       })
       .catch(next);
   } else {

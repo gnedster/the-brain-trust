@@ -266,7 +266,7 @@ describe('/applications', function() {
             .expect(200, /logout/)
             .end(function(err, res) {
               testSession
-                .post('/applications/buttonwood/edit')
+                .post('/applications/buttonwood')
                 .type('form')
                 .send({ contact: 'info@test.com' })
                 .expect(200, /edit/, done);
