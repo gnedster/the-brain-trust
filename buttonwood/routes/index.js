@@ -9,7 +9,7 @@ router.get('/health', function (req, res, next) {
     status: {
       web: 'ok',
       bots: util.mapToObject(botManager.getStatus()),
-      sqs: sqsListener.getStatus()
+      listener: sqsListener.getStatus()
     }
   });
 });
