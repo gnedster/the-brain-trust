@@ -55,8 +55,10 @@ OAuthClient.prototype.getClient = function(){
       // Sequelize's APIs don't work too nice here, so we
       // manually search directly on the foreign keys
       rds.models.ApplicationPlatform.findOne({
-        application_id: self.application.id,
-        platform_id: self.platform_id
+        where: {
+          application_id: self.application.id,
+          platform_id: self.platform.id
+        }
       }).then(function(instance) {
         if (instance instanceof rds.models.ApplicationPlatform.Instance &&
             instance.clientId && instance.token) {

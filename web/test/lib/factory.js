@@ -6,6 +6,8 @@ require('factory-girl-sequelize')();
 
 factory.define('platform', rds.models.Platform, {
   name: 'slack',
+  description: faker.lorem.sentence(),
+  website: faker.internet.domainName(),
   baseSite: 'http://localhost:4000/',
   authorizePath: 'oauth/authorize',
   accessTokenPath: 'api/oauth.access'
@@ -21,7 +23,7 @@ factory.define('application', rds.models.Application, {
   public: true
 });
 
-factory.define('application-permission', rds.models.ApplicationPlatform, {
+factory.define('application-platform', rds.models.ApplicationPlatform, {
   application_id: factory.assoc('application', 'id'),
   platform_id: factory.assoc('platform', 'id'),
   token: faker.random.uuid(),

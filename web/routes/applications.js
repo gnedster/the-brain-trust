@@ -37,7 +37,7 @@ router.post('/create', function(req, res, next) {
   if (req.isAuthenticated()) {
     rds.models.Application.create(req.body)
       .then(function(instance){
-        req.flash('success', 'application \'%s\' created!', instance.name);
+        req.flash('success', 'application "%s" created!', instance.name);
         res.redirect(`/applications/${instance.name}`);
       })
       .catch(next);
@@ -92,6 +92,97 @@ router.get('/:name', function(req, res, next) {
         })
         .catch(next);
     }).catch(next);
+});
+
+/**
+ * GET applications/:name/platforms
+ */
+router.get('/:name/platforms', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.Platform.findAll({
+      include: [
+        {
+          model: rds.models.ApplicationPlatform,
+          required: false,
+          where: {
+            application_id: req.application.id
+          }
+        }
+      ]
+    }).then(function(platforms) {
+      platforms = _.map(platforms, function(platform) {
+        // There should only be one
+        if (!(platform.ApplicationPlatforms[0] instanceof
+          rds.models.ApplicationPlatform.Instance)) {
+          platform.ApplicationPlatforms[0] = rds.models.ApplicationPlatform.build({
+            application_id: req.application.id
+          });
+        }
+        return platform;
+      });
+
+      res.render('applications/platforms', {
+        application: req.application,
+        platforms: platforms
+      });
+    }).catch(function(err){
+      next(err);
+    });
+
+  } else {
+    next();
+  }
+});
+
+/**
+ * POST applications/:name/platforms/:id
+ */
+router.post('/:name/platforms/:id', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.ApplicationPlatform.findById(req.params.id, {
+        where: {
+          application_id: req.application.id
+        },
+        include: [
+          {
+            model: rds.models.Platform
+          }
+        ]
+      })
+      .then(function(applicationPlatform){
+        if (applicationPlatform instanceof
+          rds.models.ApplicationPlatform.Instance) {
+          return applicationPlatform.update(req.body);
+        } else {
+          return Promise.reject(`applicationPlatform not found.`);
+        }
+      })
+      .then(function(applicationPlatform) {
+        req.flash('success', 'Successfully updated platform credentials.');
+        res.redirect(`/applications/${req.application.name}/platforms`);
+      })
+      .catch(next);
+  } else {
+    next();
+  }
+});
+
+/**
+ * POST applications/:name/platforms
+ */
+router.post('/:name/platforms', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.ApplicationPlatform.create(_.merge(req.body, {
+        application_id: req.application.id
+      }))
+      .then(function(instance){
+        req.flash('success', 'Successfully created platform credentials.');
+        res.redirect(`/applications/${req.application.name}/platforms`);
+      })
+      .catch(next);
+  } else {
+    next();
+  }
 });
 
 /**

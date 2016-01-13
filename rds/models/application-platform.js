@@ -18,6 +18,13 @@ var ApplicationPlatform = sequelize.define('ApplicationPlatform', {
     type: Sequelize.STRING,
     field: 'command_token'
   }
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['application_id', 'platform_id']
+    }
+  ]
 });
 
 module.exports = ApplicationPlatform;
