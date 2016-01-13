@@ -20,7 +20,6 @@ var ApplicationPlatform = sequelize.define('ApplicationPlatform', {
   }
 }, {
   indexes: [
-    // Create a unique index on email
     {
       unique: true,
       fields: ['application_id', 'platform_id']

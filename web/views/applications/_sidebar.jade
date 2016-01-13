@@ -2,7 +2,7 @@
   if application.logoExtension
     img.application-icon(src='https://s3-us-west-2.amazonaws.com/the-brain-trust/applications/#{application.name}/icon#{application.logoExtension}')
   else
-    .application-icon.application-icon--default
+    .application-icon.application-icon--default.icon--chat
   .application-menu
     ul.list-unstyled
       li #[a(href="/applications/#{application.name}/changelog") changelog]
