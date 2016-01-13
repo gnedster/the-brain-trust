@@ -1,11 +1,14 @@
 var _ = require('lodash');
 var botManager = require('./bot-manager');
 var logger = require('@the-brain-trust/logger');
+var moment = require('moment');
 var sqs = require('@the-brain-trust/sqs');
+
 
 const queueName = 'application';
 
 var status = 'new';
+var lastStatusChangeAt = moment.now();
 
 /**
  * Initialize th function to listen for SQS messages. This function
@@ -39,14 +42,24 @@ function init() {
 }
 
 /**
+ * Set the status to be a bot
+ * @param {String} status  Status to set
+ */
+function setStatus(status) {
+  status = status;
+  this.lastStatusChangeAt = moment.now();
+}
+
+/**
  * Get the status of the SQS listener
  * @return {String}  Status
  */
 function getStatus() {
-  return status;
+  return `${status}:${moment(lastStatusChangeAt).fromNow()}`;
 }
 
 module.exports = {
   init: init,
-  getStatus: getStatus
+  getStatus: getStatus,
+  setStatus: setStatus
 };

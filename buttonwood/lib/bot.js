@@ -13,6 +13,7 @@ const rtmInterval = 5000;
  */
 function Bot(applicationPlatformEntity) {
   this.status = 'new';
+  this.lastStatusChangeAt = moment.now();
   this.applicationPlatformEntity = applicationPlatformEntity;
   this.listeners = [];
   this.errors = [];
@@ -43,7 +44,16 @@ Bot.prototype.getId = function() {
  * @return {String} Current status of the bot
  */
 Bot.prototype.getStatus = function() {
-  return this.status;
+  return `${this.status}:${moment(this.lastStatusChangeAt).fromNow()}`;
+};
+
+/**
+ * Set the status for the Bot, while setting the last status change
+ * @param {String} status  Status to set
+ */
+Bot.prototype.setStatus = function(status) {
+  this.status = status;
+  this.lastStatusChangeAt = moment.now();
 };
 
 /**
@@ -59,7 +69,7 @@ Bot.prototype.getErrors = function() {
  */
 Bot.prototype.start = function (){
   var self = this;
-  this.status = 'starting';
+  this.setStatus('starting');
   this.startRtm();
 
   if (this.listeners.length === 0) {
@@ -83,7 +93,7 @@ Bot.prototype.startRtm = function() {
 
   this.bot.startRTM(function(err, resp){
     if (err) {
-      self.status = 'error';
+      self.setStatus('error');
       self.errors.push(err);
       logger.error(err);
       if (err === 'invalid_auth' || err === 'not_authed') {
@@ -92,9 +102,9 @@ Bot.prototype.startRtm = function() {
       setTimeout(_.bind(self.startRtm, self), rtmInterval);
     } else {
       if (self.listeners.length === 0) {
-        self.status = 'partial'; // No extra listeners configured, a dumb bot.
+        self.setStatus('partial'); // No extra listeners configured, a dumb bot.
       } else {
-        self.status = 'active';
+        self.setStatus('active');
       }
       self.ping();
     }
