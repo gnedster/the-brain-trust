@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var Botkit = require('botkit');
+var Botkit = require('@the-brain-trust/botkit');
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
