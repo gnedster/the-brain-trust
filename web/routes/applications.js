@@ -99,19 +99,31 @@ router.get('/:name', function(req, res, next) {
  */
 router.get('/:name/platforms', function(req, res, next) {
   if (req.isAuthenticated()) {
-    rds.models.ApplicationPlatform.findAll({
-      where: {
-        application_id: req.application.id
-      },
+    rds.models.Platform.findAll({
       include: [
         {
-          model: rds.models.Platform
+          model: rds.models.ApplicationPlatform,
+          required: false,
+          where: {
+            application_id: req.application.id
+          }
         }
       ]
-    }).then(function(applicationPlatforms) {
+    }).then(function(platforms) {
+      platforms = _.map(platforms, function(platform) {
+        // There should only be one
+        if (!(platform.ApplicationPlatforms[0] instanceof
+          rds.models.ApplicationPlatform.Instance)) {
+          platform.ApplicationPlatforms[0] = rds.models.ApplicationPlatform.build({
+            application_id: req.application.id
+          });
+        }
+        return platform;
+      });
+
       res.render('applications/platforms', {
         application: req.application,
-        applicationPlatforms: applicationPlatforms
+        platforms: platforms
       });
     }).catch(function(err){
       next(err);
@@ -128,6 +140,9 @@ router.get('/:name/platforms', function(req, res, next) {
 router.post('/:name/platforms/:id', function(req, res, next) {
   if (req.isAuthenticated()) {
     rds.models.ApplicationPlatform.findById(req.params.id, {
+        where: {
+          application_id: req.application.id
+        },
         include: [
           {
             model: rds.models.Platform
@@ -144,6 +159,24 @@ router.post('/:name/platforms/:id', function(req, res, next) {
       })
       .then(function(applicationPlatform) {
         req.flash('success', 'Successfully updated platform credentials.');
+        res.redirect(`/applications/${req.application.name}/platforms`);
+      })
+      .catch(next);
+  } else {
+    next();
+  }
+});
+
+/**
+ * POST applications/:name/platforms
+ */
+router.post('/:name/platforms', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    rds.models.ApplicationPlatform.create(_.merge(req.body, {
+        application_id: req.application.id
+      }))
+      .then(function(instance){
+        req.flash('success', 'Successfully created platform credentials.');
         res.redirect(`/applications/${req.application.name}/platforms`);
       })
       .catch(next);

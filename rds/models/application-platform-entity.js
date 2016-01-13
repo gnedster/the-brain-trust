@@ -10,6 +10,13 @@ var ApplicationPlatformEntity = sequelize.define('ApplicationPlatformEntity', {
     type: Sequelize.JSON,
     allowNull : false
   }
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['application_id', 'platform_entity_id']
+    }
+  ]
 });
 
 module.exports = ApplicationPlatformEntity;

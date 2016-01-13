@@ -9,29 +9,34 @@ block content
     platforms
 
   .application-permissions
-    each applicationPlatform in applicationPlatforms
+    each platform in platforms
+      - var action = 'platforms'
+      if platform.ApplicationPlatforms[0]
+        - action = action + '/' + platform.ApplicationPlatforms[0].id
+
       .row
         .col-md-12
-          h3= applicationPlatform.Platform.name
-          p= applicationPlatform.Platform.description
+          h3= platform.name
+          p= platform.description
       .row
         .col-md-3
-          div(class='platform-icon platform-icon--#{applicationPlatform.Platform.name}')
+          div(class='platform-icon platform-icon--#{platform.name}')
           ul.list-unstyled
-            li #[a(href='#{applicationPlatform.Platform.website}') website]
+            li #[a(href='#{platform.website}') website]
         .col-md-9
-          form(name=applicationPlatform.Platform.name, action='platforms/#{applicationPlatform.id}', method='post', accept-charset='utf-8')
+          form(name=platform.name, action=action, method='post', accept-charset='utf-8')
+            input(type='hidden', name='platform_id', value=platform.id, required='')
             .form-group
               label(for='token') token
-              input.form-control(type='password', name='token', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.token, required='')
+              input.form-control(type='password', name='token', pattern='^[a-zA-Z0-9-]+$', value=platform.ApplicationPlatforms[0].token, required='')
               p.help-block Authentication token provided by the chat platform.
             .form-group
               label(for='clientId') client id
-              input.form-control(type='text', name='clientId', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.clientId)
+              input.form-control(type='text', name='clientId', pattern='^[a-zA-Z0-9-]+$', value=platform.ApplicationPlatforms[0].clientId)
               p.help-block Client id provided by the chat platform.
             .form-group
               label(for='commandToken') command token
-              input.form-control(type='text', name='commandToken', pattern='^[a-zA-Z0-9-]+$', value=applicationPlatform.commandToken)
+              input.form-control(type='text', name='commandToken', pattern='^[a-zA-Z0-9-]+$', value=platform.ApplicationPlatforms[0].commandToken)
               p.help-block Slack-specific token to authenticate slash command requests.
             .form-group.pull-right
               button(type='reset' class='btn btn-default') reset
