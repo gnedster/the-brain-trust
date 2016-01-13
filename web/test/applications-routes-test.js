@@ -256,7 +256,7 @@ describe('/applications', function() {
         .end(done);
     });
 
-    it('responds with 200 on authorized account', function(done){
+    it('responds with 302 on authorized account', function(done){
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
@@ -266,10 +266,11 @@ describe('/applications', function() {
             .expect(200, /logout/)
             .end(function(err, res) {
               testSession
-                .post('/applications/buttonwood/edit')
+                .post('/applications/buttonwood')
                 .type('form')
                 .send({ contact: 'info@test.com' })
-                .expect(200, /edit/, done);
+                .expect(302)
+                .expect('Location', '/applications/buttonwood/edit', done);
             });
         });
     });
