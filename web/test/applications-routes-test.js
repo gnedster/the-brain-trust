@@ -12,6 +12,7 @@ var request = require('supertest');
 var session = require('supertest-session');
 
 describe('/applications', function() {
+  var applicationPlatform, platform;
   /**
    * Helper function to get a logged in session
    * @param  {String} email    Email to login with
@@ -49,8 +50,15 @@ describe('/applications', function() {
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {require('../models/registry');})
-      .then(function() {return factory.create('application-permission');})
-      .then(function() {return factory.create('user');})
+      .then(function() {return factory.create('application-platform');})
+      .then(function(instance) {
+        applicationPlatform = instance;
+        return applicationPlatform.getPlatform()
+          .then(function(instance){
+            platform = instance;
+            return factory.create('user');
+          });
+      })
       .then(function() {done();})
       .catch(function (err) {
         logger.error(err);
@@ -115,7 +123,7 @@ describe('/applications', function() {
         .end(done);
     });
 
-    it('creates an application successfully', function(done) {
+    it('responds with 302 Application create', function(done) {
       factory.build('application', {
         name: faker.internet.domainWord(),
         public: false
@@ -130,6 +138,110 @@ describe('/applications', function() {
             .expect('Location', `/applications/${application.name}`, done);
         });
       });
+    });
+  });
+
+  describe('GET /applications/:name/platforms`', function(){
+    it('responds with 404 on unauthorized account', function(done){
+      request(app)
+        .get('/applications/buttonwood/platforms')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect('Content-Type', /html/)
+        .expect(404)
+        .end(done);
+    });
+
+    it('responds with 200 on authorized account', function(done){
+      getAuthorizedSession().then(function(testSession) {
+        testSession
+          .get('/applications/buttonwood/platforms')
+          .set('Accept', 'text/html')
+          .set('Content-Type', 'text/html; charset=utf8')
+          .expect(200, /logout/, done);
+      });
+    });
+  });
+
+  describe('POST /applications/:name/platforms', function(){
+    it('responds with 404 on unauthorized account', function(done){
+      request(app)
+        .post('/applications/buttonwood/platforms')
+        .expect(404)
+        .end(done);
+    });
+
+    it('responds with 500 on duplicate ApplicationPlatform', function(done){
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .post('/applications/buttonwood/platforms')
+            .type('form')
+            .send({
+              platform_id: platform.id,
+              token: faker.random.uuid()
+            })
+            .expect(500, done);
+        });
+    });
+
+    it('responds with 302 ApplicationPlatform create', function(done) {
+      factory.create('application', {
+        name: faker.internet.domainWord(),
+        public: true
+      })
+      .then(function(application) {
+        getAuthorizedSession()
+          .then(function(testSession) {
+            testSession
+              .post(`/applications/${application.name}/platforms`)
+              .type('form')
+              .send({
+                platform_id: platform.id,
+                token: faker.random.uuid()
+              })
+              .expect(302)
+              .expect('Location', `/applications/${application.name}/platforms`, done);
+          });
+      });
+    });
+
+  });
+
+  describe('POST /applications/:name/platforms/:id', function(){
+    it('responds with 404 on unauthorized account', function(done){
+      request(app)
+        .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+        .expect(404)
+        .end(done);
+    });
+
+    it('responds with 302 on applicationPlatform update', function(done){
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+            .type('form')
+            .send({
+              platform_id: platform.id,
+              token: faker.random.uuid()
+            })
+            .expect(302, done);
+        });
+    });
+
+    it('responds with 404 on applicationPlatform update with unassociated application', function(done){
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatform.id}`)
+            .type('form')
+            .send({
+              platform_id: platform.id,
+              token: faker.random.uuid()
+            })
+            .expect(404, done);
+        });
     });
   });
 

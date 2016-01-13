@@ -11,7 +11,7 @@ block content
   .application-permissions
     each platform in platforms
       - var action = 'platforms'
-      if platform.ApplicationPlatforms[0]
+      if platform.ApplicationPlatforms[0].id
         - action = action + '/' + platform.ApplicationPlatforms[0].id
 
       .row

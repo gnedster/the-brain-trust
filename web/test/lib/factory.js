@@ -23,7 +23,7 @@ factory.define('application', rds.models.Application, {
   public: true
 });
 
-factory.define('application-permission', rds.models.ApplicationPlatform, {
+factory.define('application-platform', rds.models.ApplicationPlatform, {
   application_id: factory.assoc('application', 'id'),
   platform_id: factory.assoc('platform', 'id'),
   token: faker.random.uuid(),
