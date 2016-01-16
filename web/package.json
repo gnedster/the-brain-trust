@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "0.5.15",
+    "@the-brain-trust/rds": "0.5.16",
     "@the-brain-trust/sqs": "0.0.4",
     "@the-brain-trust/utility": "0.0.1",
     "aws-sdk": "^2.2.26",
@@ -45,6 +45,7 @@
     "grunt-forever": "^0.4.7",
     "grunt-mocha-test": "^0.12.7",
     "mocha": "^2.3.4",
+    "nodemailer": "^2.0.0",
     "q": "^1.4.1",
     "supertest": "^1.1.0",
     "supertest-session": "^2.0.0"
