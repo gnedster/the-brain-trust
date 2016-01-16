@@ -12,7 +12,7 @@ var request = require('supertest');
 var session = require('supertest-session');
 
 describe('/applications', function() {
-  var applicationPlatform, platform;
+  var applicationPlatformId, platformId;
   /**
    * Helper function to get a logged in session
    * @param  {String} email    Email to login with
@@ -52,12 +52,11 @@ describe('/applications', function() {
       .then(function() {require('../models/registry');})
       .then(function() {return factory.create('application-platform');})
       .then(function(instance) {
-        applicationPlatform = instance;
-        return applicationPlatform.getPlatform()
-          .then(function(instance){
-            platform = instance;
-            return factory.create('user');
-          });
+        applicationPlatformId = instance.id;
+        platformId = instance.platform_id;
+        return factory.create('application-user', {
+          application_id: instance.application_id
+        });
       })
       .then(function() {done();})
       .catch(function (err) {
@@ -178,7 +177,7 @@ describe('/applications', function() {
             .post('/applications/buttonwood/platforms')
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(500, done);
@@ -197,7 +196,7 @@ describe('/applications', function() {
               .post(`/applications/${application.name}/platforms`)
               .type('form')
               .send({
-                platform_id: platform.id,
+                platform_id: platformId,
                 token: faker.random.uuid()
               })
               .expect(302)
@@ -211,7 +210,7 @@ describe('/applications', function() {
   describe('POST /applications/:name/platforms/:id', function(){
     it('responds with 404 on unauthorized account', function(done){
       request(app)
-        .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+        .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
         .expect(404)
         .end(done);
     });
@@ -220,10 +219,10 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+            .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(302, done);
@@ -234,10 +233,10 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatform.id}`)
+            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatformId}`)
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(404, done);

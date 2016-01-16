@@ -11,14 +11,24 @@ var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 
 describe('/', function() {
+  var user;
+
   before(function(done) {
-    rds.sync({logging: logger.stream.write})
+    rds.sync({
+      force: true,
+      logging: logger.stream.write
+    })
       .then(function() {
         // Install project-specific hooks
         require('../models/registry');
       })
-      .then(function() {factory.create('user');})
-      .then(function() {done();})
+      .then(function() {
+        return factory.create('user', {email: faker.internet.email()});
+      })
+      .then(function(instance) {
+        user = instance;
+        done();
+      })
       .catch(function (err) {
         logger.error(err);
         done();
@@ -80,7 +90,7 @@ describe('/', function() {
       request(app)
         .post('/login')
         .type('form')
-        .send({ email: 'admin@test.com' })
+        .send({ email: user.email })
         .send({ password: 'password' })
         .expect(302)
         .expect('Location', '/admin')

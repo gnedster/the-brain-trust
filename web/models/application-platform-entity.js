@@ -10,26 +10,24 @@ rds.models.ApplicationPlatformEntity
       'application-platform-entity created',
       applicationPlatformEntity);
 
-    sqs.models.Application.findAll({
-      where: {
-        id: applicationPlatformEntity.application_id
-      },
+    rds.models.Application.findById(applicationPlatformEntity.application_id, {
       include: [
         {
-          model: sqs.models.ApplicationUser,
+          model: rds.models.ApplicationUser,
           include: [{
-            model: sqs.models.User
+            model: rds.models.User
           }]
         }
       ]
     }).then(function(application) {
-      var to = _.map(application.ApplicationUsers, function(applicationUser) {
+      var toAddresses = _.map(application.ApplicationUsers,
+        function(applicationUser) {
         return applicationUser.User.email;
       });
 
       mailer.sendEmail({
         Destination: {
-          ToAddresses: to
+          ToAddresses: toAddresses
         },
         Message: {
           Body: {
