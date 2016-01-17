@@ -96,10 +96,15 @@ Bot.prototype.startRtm = function() {
       self.setStatus('error');
       self.errors.push(err);
       logger.error(err);
-      if (err === 'invalid_auth' || err === 'not_authed') {
-        return;
+
+      switch(err) {
+        case 'invalid_auth':
+        case 'not_authed':
+        case 'account_inactive':
+          return;
+        default:
+          setTimeout(_.bind(self.startRtm, self), rtmInterval);
       }
-      setTimeout(_.bind(self.startRtm, self), rtmInterval);
     } else {
       if (self.listeners.length === 0) {
         self.setStatus('partial'); // No extra listeners configured, a dumb bot.
