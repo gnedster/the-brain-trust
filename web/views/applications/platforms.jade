@@ -22,7 +22,7 @@ block content
         .col-md-3
           div(class='platform-icon icon--#{platform.name}')
           ul.list-unstyled
-            li #[a(href='#{platform.website}') website]
+            li #[a(href='#{platform.website}', target='_blank') website (external link)]
         .col-md-9
           form(name=platform.name, action=action, method='post', accept-charset='utf-8')
             input(type='hidden', name='platform_id', value=platform.id, required='')
