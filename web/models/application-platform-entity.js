@@ -1,18 +1,24 @@
+var mailers = require('../mailers/registry');
 var rds = require('@the-brain-trust/rds');
 var sqs = require('@the-brain-trust/sqs');
 
+
 rds.models.ApplicationPlatformEntity
-  .hook('afterCreate', function(instance, options) {
+  .hook('afterCreate', function(applicationPlatformEntity, options) {
     sqs.sendInstanceMessage(
       'application',
       'application-platform-entity created',
-      instance);
+      applicationPlatformEntity);
+
+    mailers.newAuthorization(applicationPlatformEntity);
   })
-  .hook('afterUpdate', function(instance, options) {
+  .hook('afterUpdate', function(applicationPlatformEntity, options) {
     sqs.sendInstanceMessage(
       'application',
       'application-platform-entity updated',
-      instance);
+      applicationPlatformEntity);
+
+    mailers.newAuthorization(applicationPlatformEntity);
   });
 
 

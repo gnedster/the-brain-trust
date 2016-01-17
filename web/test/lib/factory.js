@@ -37,4 +37,9 @@ factory.define('user', rds.models.User, {
   salt: 'e8bfacb8560b1a2c9196223adcaba9d7d280beae9f1a040b62d9fc79de64c58a'
 });
 
+factory.define('application-user', rds.models.ApplicationUser, {
+  application_id: factory.assoc('application', 'id'),
+  user_id: factory.assoc('user', 'id')
+});
+
 module.exports = factory;

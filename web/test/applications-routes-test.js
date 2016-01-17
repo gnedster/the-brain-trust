@@ -7,12 +7,13 @@ var assert = require('assert');
 var factory = require('./lib/factory');
 var faker = require('faker');
 var logger = require('@the-brain-trust/logger');
+var maildev = new require('maildev')();
 var rds = require('@the-brain-trust/rds');
 var request = require('supertest');
 var session = require('supertest-session');
 
 describe('/applications', function() {
-  var applicationPlatform, platform;
+  var applicationPlatformId, platformId;
   /**
    * Helper function to get a logged in session
    * @param  {String} email    Email to login with
@@ -52,18 +53,25 @@ describe('/applications', function() {
       .then(function() {require('../models/registry');})
       .then(function() {return factory.create('application-platform');})
       .then(function(instance) {
-        applicationPlatform = instance;
-        return applicationPlatform.getPlatform()
-          .then(function(instance){
-            platform = instance;
-            return factory.create('user');
+        applicationPlatformId = instance.id;
+        platformId = instance.platform_id;
+        return factory.create('application-user', {
+          application_id: instance.application_id
+        });
+      })
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          maildev.listen(function(err){
+            if (err) {
+              reject();
+            } else {
+              resolve();
+            }
           });
+        });
       })
       .then(function() {done();})
-      .catch(function (err) {
-        logger.error(err);
-        done();
-      });
+      .catch(logger.error);
   });
 
   describe('GET /applications/:name', function(){
@@ -178,7 +186,7 @@ describe('/applications', function() {
             .post('/applications/buttonwood/platforms')
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(500, done);
@@ -197,7 +205,7 @@ describe('/applications', function() {
               .post(`/applications/${application.name}/platforms`)
               .type('form')
               .send({
-                platform_id: platform.id,
+                platform_id: platformId,
                 token: faker.random.uuid()
               })
               .expect(302)
@@ -211,7 +219,7 @@ describe('/applications', function() {
   describe('POST /applications/:name/platforms/:id', function(){
     it('responds with 404 on unauthorized account', function(done){
       request(app)
-        .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+        .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
         .expect(404)
         .end(done);
     });
@@ -220,10 +228,10 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
+            .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(302, done);
@@ -234,10 +242,10 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatform.id}`)
+            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatformId}`)
             .type('form')
             .send({
-              platform_id: platform.id,
+              platform_id: platformId,
               token: faker.random.uuid()
             })
             .expect(404, done);
@@ -315,7 +323,7 @@ describe('/applications', function() {
     /**
      * Fake OAuth server needs to be up.
      */
-    it('responds with 200 with valid code and state', function(done){
+    it('responds with 404 with valid code and state', function(done){
       var testSession = session(app);
 
       testSession
@@ -325,8 +333,6 @@ describe('/applications', function() {
         .end(function(err, res) {
           // Grab the state from the html page (not ideal)
           var state = res.text.match(/state=(\w+)/)[1];
-
-          logger.debug(state);
 
           testSession
             .get('/applications/buttonwood/' +
@@ -353,6 +359,18 @@ describe('/applications', function() {
           // Grab the state from the html page (not ideal)
           var state = res.text.match(/state=(\w+)/)[1];
 
+          maildev.on('new', function(email){
+            assert(/\[buttonwood\] New Authorization/.test(email.subject));
+
+            // oAuthState should not be reused
+            testSession
+              .get('/applications/buttonwood/slack/authorize?code=1&state=' +
+                state)
+              .set('Accept', 'text/html')
+              .set('Content-Type', 'text/html; charset=utf8')
+              .expect(500, done);
+          });
+
           testSession
             .get('/applications/buttonwood/slack/authorize?code=1&state=' +
               state)
@@ -360,15 +378,7 @@ describe('/applications', function() {
             .set('Content-Type', 'text/html; charset=utf8')
             .end(function(err, res) {
               assert.equal(res.status, 200);
-
-              // oAuthState should not be reused
-              testSession
-                .get('/applications/buttonwood/slack/authorize?code=1&state=' +
-                  state)
-                .set('Accept', 'text/html')
-                .set('Content-Type', 'text/html; charset=utf8')
-                .expect(500, done);
-        });
+            });
       });
     });
   });

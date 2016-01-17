@@ -1,6 +1,7 @@
 var Application = require('./application');
 var ApplicationPlatform = require('./application-platform');
 var ApplicationPlatformEntity = require('./application-platform-entity');
+var ApplicationUser = require('./application-user');
 var Event = require('./event');
 var Platform = require('./platform');
 var PlatformEntity = require('./platform-entity');
@@ -38,6 +39,10 @@ ApplicationPlatformEntity.belongsTo(Platform, {
   foreignKey: 'platform_id'
 });
 
+ApplicationPlatformEntity.belongsTo(PlatformEntity, {
+  foreignKey: 'platform_entity_id'
+});
+
 PlatformEntity.belongsTo(Platform, {
   foreign_key: 'platform_id',
   allowNull: false
@@ -51,10 +56,27 @@ PlatformEntity.hasMany(ApplicationPlatformEntity, {
   foreign_key: 'platform_entity_id'
 });
 
+Application.hasMany(ApplicationUser, {
+  foreignKey: 'application_id'
+});
+
+User.hasMany(ApplicationUser, {
+  foreignKey: 'user_id'
+});
+
+ApplicationUser.belongsTo(Application, {
+  foreign_key: 'application_id'
+});
+
+ApplicationUser.belongsTo(User, {
+  foreign_key: 'user_id'
+});
+
 module.exports = {
   Application: Application,
   ApplicationPlatform: ApplicationPlatform,
   ApplicationPlatformEntity: ApplicationPlatformEntity,
+  ApplicationUser: ApplicationUser,
   Event: Event,
   PlatformEntity: PlatformEntity,
   Platform: Platform,
