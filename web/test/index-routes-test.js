@@ -15,7 +15,6 @@ describe('/', function() {
 
   before(function(done) {
     rds.sync({
-      force: true,
       logging: logger.stream.write
     })
       .then(function() {

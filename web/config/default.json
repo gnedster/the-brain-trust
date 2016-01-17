@@ -7,6 +7,6 @@
     "secret": "uPs^gCsNUC3MabihEUg-e8"
   },
   "ses" : {
-    "source" : "no-reply@the-brain-trust.com"
+    "source" : "the brain trust <no-reply@the-brain-trust.com>"
   }
 }

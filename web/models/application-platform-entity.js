@@ -1,6 +1,13 @@
 var _ = require('lodash');
 var rds = require('@the-brain-trust/rds');
 var sqs = require('@the-brain-trust/sqs');
+var logger = require('@the-brain-trust/logger');
+
+
+var path = require('path');
+var templateDir   = path.join(__dirname, '..', 'templates', 'authorization');
+var EmailTemplate = require('email-templates').EmailTemplate;
+var template = new EmailTemplate(templateDir);
 var mailer = require('../lib/mailer');
 
 rds.models.ApplicationPlatformEntity
@@ -9,21 +16,41 @@ rds.models.ApplicationPlatformEntity
       'applicationPlatformEntity',
       'application-platform-entity created',
       applicationPlatformEntity);
+  })
+  .hook('afterUpdate', function(applicationPlatformEntity, options) {
+    sqs.sendInstanceMessage(
+      'applicationPlatformEntity',
+      'application-platform-entity updated',
+      applicationPlatformEntity);
 
-    rds.models.Application.findById(applicationPlatformEntity.application_id, {
-      include: [
-        {
-          model: rds.models.ApplicationUser,
-          include: [{
-            model: rds.models.User
-          }]
-        }
-      ]
-    }).then(function(application) {
-      var toAddresses = _.map(application.ApplicationUsers,
+    mailAuthorization(applicationPlatformEntity);
+  });
+
+function mailAuthorization(applicationPlatformEntity) {
+  rds.models.ApplicationPlatformEntity.findById(applicationPlatformEntity.id, {
+    include: [{
+      model: rds.models.Application,
+      include: [{
+        model: rds.models.ApplicationUser,
+        include: [{
+          model: rds.models.User
+        }]
+      }]
+    }, {
+      model: rds.models.PlatformEntity
+    }]
+  }).then(function(applicationPlatformEntity) {
+    template.render({
+      platformEntity: applicationPlatformEntity.PlatformEntity,
+      application: applicationPlatformEntity.Application
+    }, function (err, results) {
+      if (err) {
+        logger.error(err);
+      }
+      var toAddresses = _.map(applicationPlatformEntity.Application.ApplicationUsers,
         function(applicationUser) {
-        return applicationUser.User.email;
-      });
+          return applicationUser.User.email;
+        });
 
       mailer.sendEmail({
         Destination: {
@@ -32,27 +59,21 @@ rds.models.ApplicationPlatformEntity
         Message: {
           Body: {
             Html: {
-              Data: 'Testing'
+              Data: results.html
             },
             Text: {
-              Data: 'Testing'
+              Data: results.text
             }
           },
           Subject: {
-            Data: `${application.name}: New Platform Entity`
+            Data: `[${applicationPlatformEntity.Application.name}] New Authorization`
           }
         }
       });
     });
 
-
-  })
-  .hook('afterUpdate', function(instance, options) {
-    sqs.sendInstanceMessage(
-      'applicationPlatformEntity',
-      'application-platform-entity updated',
-      instance);
   });
+}
 
 
 module.exports = {

@@ -39,6 +39,10 @@ ApplicationPlatformEntity.belongsTo(Platform, {
   foreignKey: 'platform_id'
 });
 
+ApplicationPlatformEntity.belongsTo(PlatformEntity, {
+  foreignKey: 'platform_entity_id'
+});
+
 PlatformEntity.belongsTo(Platform, {
   foreign_key: 'platform_id',
   allowNull: false

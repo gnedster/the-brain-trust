@@ -67,6 +67,12 @@ var Application = sequelize.define('Application', {
       is: /^.[a-z]+$/
     }
   }
+}, {
+  instanceMethods: {
+    getPath: function() {
+      return `/applications/${this.name}`;
+    }
+  }
 });
 
 module.exports = Application;
