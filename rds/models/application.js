@@ -52,6 +52,10 @@ var Application = sequelize.define('Application', {
     field: 'messages_sent',
     defaultValue: 0
   },
+  authorizations: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
+  },
   pageViews: {
     type: Sequelize.INTEGER,
     field: 'page_views',
