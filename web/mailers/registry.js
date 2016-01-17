@@ -59,7 +59,7 @@ function newAuthorization(applicationPlatformEntity) {
             }
           },
           Subject: {
-            Data: `[${applicationPlatformEntity.Application.name}] New Authorization`
+            Data: `[${applicationPlatformEntity.Application.name}] new authorization`
           }
         }
       });
