@@ -6,7 +6,7 @@ var sqs = require('@the-brain-trust/sqs');
 rds.models.ApplicationPlatformEntity
   .hook('afterCreate', function(applicationPlatformEntity, options) {
     sqs.sendInstanceMessage(
-      'applicationPlatformEntity',
+      'application',
       'application-platform-entity created',
       applicationPlatformEntity);
 
@@ -14,7 +14,7 @@ rds.models.ApplicationPlatformEntity
   })
   .hook('afterUpdate', function(applicationPlatformEntity, options) {
     sqs.sendInstanceMessage(
-      'applicationPlatformEntity',
+      'application',
       'application-platform-entity updated',
       applicationPlatformEntity);
 
