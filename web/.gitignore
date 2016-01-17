@@ -5,7 +5,7 @@
 !.elasticbeanstalk/*.global.yml
 
 # Bower
-bower_components/*
+bower_components/
 
-# Node
-node_modules/*
+# Node Modules
+node_modules/
