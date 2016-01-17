@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var config = require('config');
 var logger = require('@the-brain-trust/logger');
 var mailer = require('../lib/mailer');
 var path = require('path');
@@ -30,6 +31,7 @@ function newAuthorization(applicationPlatformEntity) {
     }]
   }).then(function(applicationPlatformEntity) {
     template.render({
+      site: config.get('mailer.site'),
       platformEntity: applicationPlatformEntity.PlatformEntity,
       application: applicationPlatformEntity.Application
     }, function (err, results) {
