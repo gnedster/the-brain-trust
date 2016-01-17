@@ -4,8 +4,5 @@
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Bower
-bower_components/
-
 # Node Modules
 node_modules/
