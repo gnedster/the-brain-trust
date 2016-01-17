@@ -1,4 +1,3 @@
-# http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-configuration.html#eb-cli3-ebignore
 # Test files
 test/
 
