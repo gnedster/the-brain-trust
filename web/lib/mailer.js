@@ -65,15 +65,21 @@ function sendEmail(params) {
       }
     }
 
-    params = _.assign(params, {
-      Source: config.get('ses.source')
-    });
+    try {
+      params = _.assign(params, {
+        Source: config.get('ses.source')
+      });
 
-    if (util.isProduction() === false) {
-      params = sesToNodemailer(params);
+      if (util.isProduction() === false) {
+        params = sesToNodemailer(params);
+        getMailer().sendMail(params, callback);
+      } else {
+        getMailer().sendEmail(params, callback);
+      }
+    } catch(err) {
+      logger.error(err);
+      reject(err);
     }
-
-    getMailer().sendMail(params, callback);
   });
 }
 
