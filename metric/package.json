@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/metric",
-  "version": "0.0.4",
+  "version": "0.0.8",
   "description": "library to record application metrics",
   "main": "metric.js",
   "scripts": {
@@ -17,9 +17,15 @@
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "^0.4.4"
+    "@the-brain-trust/rds": "^0.5.20",
+    "lodash": "^4.0.0"
   },
   "devDependencies": {
-    "mocha": "^2.3.4"
+    "factory-girl": "^2.2.1",
+    "factory-girl-sequelize": "^1.0.0",
+    "faker": "^3.0.1",
+    "mocha": "^2.3.4",
+    "moment": "^2.11.1",
+    "q": "^1.4.1"
   }
 }

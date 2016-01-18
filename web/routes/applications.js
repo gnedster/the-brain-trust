@@ -1,6 +1,8 @@
 var _ = require('lodash');
 var express = require('express');
 var logger = require('@the-brain-trust/logger');
+var metric = require('@the-brain-trust/metric');
+var moment = require('moment');
 var rds = require('@the-brain-trust/rds');
 var router = express.Router();
 var OAuthClient = require('../lib/oauth-client');
@@ -87,6 +89,13 @@ router.get('/:name', function(req, res, next) {
             oAuthState: state.oAuthState,
             platforms: _.indexBy(promise[0], 'name')
           };
+
+          metric.write({
+            initiator: 'client x user',
+            timestamp: moment.now(),
+            name: `web:${req.application.name}:*:page:show:view`,
+            details: {}
+          });
 
           res.render('applications/show', params);
         })

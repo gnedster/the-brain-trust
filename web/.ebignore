@@ -1,14 +1,10 @@
-# http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-configuration.html#eb-cli3-ebignore
 # Test files
-./test/*
+test/
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Bower
-bower_components/*
-
-# Node
-node_modules/*
+# Node Modules
+node_modules/

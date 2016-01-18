@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 
@@ -25,6 +26,82 @@ function write(event) {
     });
 }
 
+/**
+ * Aggregate events for course-grained analytics. Not the most performant,
+ * but typically run on an infrequent basis (hourly or daily).
+ * @return {Promise} Promise returning the result of Application updates.
+ */
+function aggregate() {
+  return Promise.all([
+    rds.models.Application.findAll({
+      include: [{
+        model: rds.models.ApplicationPlatformEntity,
+        required: false,
+        paranoid: false
+      }]
+    }),
+    rds.models.Event.findAll()])
+    .then(function(result) {
+      var applications = _.keyBy(_.map(result[0], function(application) {
+        // Reset metric counts
+        _.assign(application, {
+          messagesReceived: 0,
+          messagesSent: 0,
+          pageViews: 0,
+          authorizations: application.ApplicationPlatformEntities.length
+        });
+
+        return application;
+      }), 'name');
+      var events = result[1];
+
+      _.each(events, function(event) {
+        var parts = event.name.split(':');
+        var client = parts[0];
+        var applicationName = parts[1];
+        // var platform = parts[2];
+        var component = parts[3];
+        // var element = parts[4];
+        var action = parts[5];
+
+        if (_.isUndefined(applications[applicationName])) {
+          logger.warn(`could not find application (${applicationName})`);
+          return;
+        }
+
+        switch(client) {
+          case 'chat':
+            switch(action) {
+              case 'command':
+              case 'message':
+                applications[applicationName].messagesReceived++;
+                break;
+              case 'reply':
+                applications[applicationName].messagesSent++;
+                break;
+            }
+            break;
+          case 'web':
+            switch(component) {
+              case 'page':
+                switch(action) {
+                  case 'view':
+                    applications[applicationName].pageViews++;
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+      });
+
+      return Promise.all(_.map(_.values(applications), function(application) {
+        return application.save();
+      }));
+    });
+}
+
 module.exports = {
-  write: write
+  write: write,
+  aggregate: aggregate
 };

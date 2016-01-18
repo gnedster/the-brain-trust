@@ -8,18 +8,15 @@ var sequelize = require('../sequelize');
 var Event = sequelize.define('Event', {
   teamId: {
     type: Sequelize.STRING,
-    field: 'team_id',
-    allowNull : false
+    field: 'team_id'
   },
   channelId: {
     type: Sequelize.STRING,
-    field: 'channel_id',
-    allowNull : false
+    field: 'channel_id'
   },
   userId: {
     type: Sequelize.STRING,
-    field: 'user_id',
-    allowNull : false
+    field: 'user_id'
   },
   initiator: {
     type: Sequelize.STRING,

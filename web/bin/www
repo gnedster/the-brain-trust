@@ -8,7 +8,9 @@ var _ = require('lodash');
 var app = require('../app');
 var http = require('http');
 var logger = require('@the-brain-trust/logger');
+var metric = require('@the-brain-trust/metric');
 var rds = require('@the-brain-trust/rds');
+var schedule = require('node-schedule');
 
 /**
  * Set up connection to database, initialize models, and run
@@ -19,6 +21,12 @@ rds.sync(_.merge({
   }))
   .then(function(){
     require('../models/registry'); // Install project-specific hooks
+
+    // Aggregate metrics every hour
+    schedule.scheduleJob('* 0 * * * *', function(){
+      logger.info('aggregating metrics');
+      metric.aggregate().catch(logger.error);
+    });
 
     logger.info('db initialized.');
   })

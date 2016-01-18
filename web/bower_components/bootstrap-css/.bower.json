@@ -1,6 +1,6 @@
 {
   "name": "bootstrap-css",
-  "version": "3.3.4",
+  "version": "3.3.6",
   "keywords": [
     "css",
     "js",
@@ -27,11 +27,11 @@
     "url": "git://github.com/jozefizso/bower-bootstrap-css.git"
   },
   "license": "MIT",
-  "_release": "3.3.4",
+  "_release": "3.3.6",
   "_resolution": {
     "type": "version",
-    "tag": "3.3.4",
-    "commit": "01808188487a0806a8d68d2b5eaa346dca6f2ad7"
+    "tag": "v3.3.6",
+    "commit": "ef51118f6360259082a2e5f21ea6c5e5f552a09f"
   },
   "_source": "git://github.com/jozefizso/bower-bootstrap-css.git",
   "_target": "~3.3.4",
