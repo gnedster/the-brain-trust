@@ -28,19 +28,25 @@ function write(event) {
 
 /**
  * Aggregate events for course-grained analytics. Not the most performant,
- * but typically run once a day.
+ * but typically run on an infrequent basis (hourly or daily).
  * @return {Promise} Promise returning the result of Application updates.
  */
 function aggregate() {
   return Promise.all([
-    rds.models.Application.findAll(),
+    rds.models.Application.findAll({
+      include: [rds.models.ApplicationPlatformEntity],
+      paranoid: false
+    }),
     rds.models.Event.findAll()])
     .then(function(result) {
       var applications = _.keyBy(_.map(result[0], function(application) {
-        // Reset metrics
-        application.messagesReceived = 0;
-        application.messagesSent = 0;
-        application.pageView = 0;
+        // Reset metric counts
+        _.assign(application, {
+          messagesReceived: 0,
+          messagesSent: 0,
+          pageViews: 0,
+          authorizations: application.ApplicationPlatformEntities.length
+        });
 
         return application;
       }), 'name');
