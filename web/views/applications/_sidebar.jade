@@ -4,6 +4,8 @@
   else
     .application-icon.application-icon--default.icon--chat
   .application-menu
+    i.fa.fa-users &nbsp;
+    span #{application.authorizations}
     .addthis_sharing_toolbox
     ul.list-unstyled
       li #[a(href="/applications/#{application.name}/changelog") changelog]
