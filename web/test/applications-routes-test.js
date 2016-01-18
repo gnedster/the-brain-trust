@@ -295,6 +295,52 @@ describe('/applications', function() {
     });
   });
 
+  describe('GET /applications/:name/:platform_name/oauth', function(){
+    it('responds with 404 without state', function(done){
+      request(app)
+        .get('/applications/buttonwood/slack/oauth')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 404 without platform', function(done){
+      request(app)
+        .get(`/applications/buttonwood/${faker.internet.domainWord()}/oauth?state=${faker.random.number()}`)
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 404 without platform', function(done){
+      request(app)
+        .get(`/applications/buttonwood/${faker.internet.domainWord()}/oauth?state=${faker.random.number()}`)
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 302 with valid code and state', function(done){
+      var testSession = session(app);
+
+      testSession
+        .get('/applications/buttonwood')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .end(function(err, res) {
+          // Grab the state from the html page (not ideal)
+          var state = res.text.match(/state=(\w+)/)[1];
+
+          testSession
+            .get(`/applications/buttonwood/slack/add?state=${state}`)
+            .set('Accept', 'text/html')
+            .set('Content-Type', 'text/html; charset=utf8')
+            .expect('Location', new RegExp(state))
+            .expect(302, done);
+        });
+      });
+  });
+
   describe('GET /applications/:name/:platform_name/authorize', function(){
     it('responds with 404 without valid params', function(done){
       request(app)

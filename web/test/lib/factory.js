@@ -26,6 +26,7 @@ factory.define('application', rds.models.Application, {
 factory.define('application-platform', rds.models.ApplicationPlatform, {
   application_id: factory.assoc('application', 'id'),
   platform_id: factory.assoc('platform', 'id'),
+  scope: 'bot,commands',
   token: faker.random.uuid(),
   clientId: faker.random.uuid()
 });

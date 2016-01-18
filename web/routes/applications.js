@@ -234,6 +234,55 @@ router.get('/:name/changelog', function(req, res, next) {
   });
 });
 
+router.get('/:name/:platform_name/*', function(req, res, next) {
+  rds.models.Platform.findOne({
+    where: {
+      name: req.params.platform_name
+    },
+    include: {
+      model: rds.models.ApplicationPlatform,
+      required: true,
+      where: {
+        application_id: req.application.id
+      }
+    }
+  }).then(function(platform) {
+    if (platform instanceof rds.models.Platform.Instance) {
+      req.platform = platform;
+    }
+
+    next();
+  }).catch(next);
+});
+
+/*
+ * GET applications/:name/:platform_name/add.
+ * Should be the OAuth redirect uri and must contain a code and state
+ */
+router.get('/:name/:platform_name/add', function(req, res, next) {
+  var applicationPlatform;
+  var platform = req.platform;
+
+  if (platform instanceof rds.models.Platform.Instance &&
+    _.isString(req.query.state)) {
+
+    applicationPlatform = req.platform.ApplicationPlatforms[0];
+
+    metric.write({
+      initiator: 'client x user',
+      timestamp: moment.now(),
+      name: `web:${req.application.name}:show:add_platform:button:click`,
+      details: {
+        platform: platform.name
+      }
+    });
+
+    res.redirect(`${platform.baseSite}${platform.authorizePath}?scope=${applicationPlatform.scope}&client_id=${applicationPlatform.clientId}&state=${req.query.state}`);
+  } else {
+    next();
+  }
+});
+
 /*
  * GET applications/:name/:platform_name/authorize.
  * Should be the OAuth redirect uri and must contain a code and state
@@ -241,54 +290,48 @@ router.get('/:name/changelog', function(req, res, next) {
 router.get('/:name/:platform_name/authorize', function(req, res, next) {
   if ('state' in req.query) {
     var application = req.application;
+    var platform = req.platform;
 
-    rds.models.Platform.findOne({
-        where: {
-          name: req.params.platform_name
-        }
-      })
-      .then(function(platform) {
-        var err;
-        if (platform instanceof rds.models.Platform.Instance) {
-          try {
-            var oAuthClient = new OAuthClient(application, platform);
+    if (platform instanceof rds.models.Platform.Instance) {
+      try {
+        var oAuthClient = new OAuthClient(application, platform);
 
-            oAuthClient.getOAuthAccessToken(req)
-              .then(function() {
-                res.render('applications/authorized', {
-                  application: application
-                });
-              })
-            .catch(function(error) {
-              var page, status;
-              logger.error(error);
+        oAuthClient.getOAuthAccessToken(req)
+          .then(function() {
+            application.authorizations++;
+            application.save();
 
-              switch(error.message) {
-                case 'access_denied':
-                  status = 403;
-                  page = 'unauthorized';
-                  break;
-                default:
-                  status = 500;
-                  page = 'error';
-                  break;
-              }
-              res.status(status)
-                .render('applications/' + page, {
-                  application: application
-                });
+            res.render('applications/authorized', {
+              application: application
             });
-          } catch (error) {
-            logger.error(error);
-            error.status = 500;
-            next(error);
+          })
+        .catch(function(error) {
+          var page, status;
+          logger.error(error);
+
+          switch(error.message) {
+            case 'access_denied':
+              status = 403;
+              page = 'unauthorized';
+              break;
+            default:
+              status = 500;
+              page = 'error';
+              break;
           }
-        } else {
-          err = new Error('not found');
-          err.status = 404;
-          next(err);
-        }
-      });
+          res.status(status)
+            .render('applications/' + page, {
+              application: application
+            });
+        });
+      } catch (error) {
+        logger.error(error);
+        error.status = 500;
+        next(error);
+      }
+    } else {
+      next();
+    }
   } else {
     next();
   }
