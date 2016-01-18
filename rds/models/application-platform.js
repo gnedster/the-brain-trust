@@ -15,7 +15,10 @@ var ApplicationPlatform = sequelize.define('ApplicationPlatform', {
     field: 'client_id'
   },
   scope: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    validate: {
+      is: /^[a-z,]+$/i
+    }
   },
   commandToken: {
     type: Sequelize.STRING,
