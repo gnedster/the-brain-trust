@@ -2,6 +2,7 @@
  * Add tests for the utility module
  */
 var assert = require('assert');
+var faker = require('faker');
 var utility = require('../utility');
 
 describe('utility', function(){
@@ -22,6 +23,12 @@ describe('utility', function(){
     map.set('a', 1);
 
     assert.equal(utility.mapToObject(map)['a'], 1);
+  });
+
+  it('should convert uri appropriately', function(){
+    var uri = faker.internet.domainWord();
+    assert(utility.getRedirectUri(uri),
+      `http://localhost:3000/redirect?s=${uri}`);
   });
 
   after(function(){

@@ -43,9 +43,23 @@ function mapToObject(map) {
   return result;
 }
 
+/**
+ * Transform uri into one served through our site.
+ * @param  {String} uri  Map to convert to object
+ * @return {String}      Transform
+ */
+function getRedirectUri(uri) {
+  var baseUri = isProduction() === true ?
+    'https://the-brain-trust.com' :
+    'http://localhost:3000';
+
+  return `${baseUri}/redirect?s=${uri}`;
+}
+
 module.exports = {
   isDevelopment: isDevelopment,
   isTest: isTest,
   isProduction: isProduction,
+  getRedirectUri: getRedirectUri,
   mapToObject: mapToObject
 };

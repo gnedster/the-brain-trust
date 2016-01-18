@@ -40,7 +40,8 @@
     "passport-local": "^1.0.0",
     "passport-local-sequelize": "^0.6.0",
     "path": "^0.12.7",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "valid-url": "^1.0.9"
   },
   "devDependencies": {
     "chai-as-promised": "^5.2.0",

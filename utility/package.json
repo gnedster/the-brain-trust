@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/utility",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "provides a suite of common utility functions and helpers",
   "main": "utility.js",
   "scripts": {
@@ -16,6 +16,7 @@
   },
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "devDependencies": {
+    "faker": "^3.0.1",
     "mocha": "^2.3.4"
   }
 }
