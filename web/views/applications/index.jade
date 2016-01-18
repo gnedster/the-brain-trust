@@ -23,7 +23,7 @@ block content
             td #[a(href="/applications/#{application.name}/edit") edit]
             td= application.shortDescription
             td= application.pageViews
-            td n/a
+            td= application.authorizations
             td= application.messagesSent
             td= application.messagesReceived
             if application.public

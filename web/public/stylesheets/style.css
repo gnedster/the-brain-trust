@@ -32,6 +32,9 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+.application-menu .addthis_sharing_toolbox {
+  height: 39px;
+}
 .flash {
   display: block;
   padding: 7px 10px;
