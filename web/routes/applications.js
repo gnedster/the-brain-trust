@@ -298,9 +298,6 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
 
         oAuthClient.getOAuthAccessToken(req)
           .then(function() {
-            application.authorizations++;
-            application.save();
-
             res.render('applications/authorized', {
               application: application
             });
