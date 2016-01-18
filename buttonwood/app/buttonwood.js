@@ -6,6 +6,7 @@ var accounting = require('accounting');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
+var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
 /**
@@ -100,7 +101,7 @@ function messageQuote(symbols, isDetailed) {
             fallback: priceTpl(data),
             color: number.color(data.changeInPercent),
             title: _.template('<%= symbol %> (<%= name %>)')(data),
-            title_link: `https://finance.yahoo.com/q?s=${data.symbol}`,
+            title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
             text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
             fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
             mrkdwn_in : ['title', 'text']
