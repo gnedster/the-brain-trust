@@ -34,8 +34,11 @@ function write(event) {
 function aggregate() {
   return Promise.all([
     rds.models.Application.findAll({
-      include: [rds.models.ApplicationPlatformEntity],
-      paranoid: false
+      include: [{
+        model: rds.models.ApplicationPlatformEntity,
+        required: false,
+        paranoid: false
+      }]
     }),
     rds.models.Event.findAll()])
     .then(function(result) {
