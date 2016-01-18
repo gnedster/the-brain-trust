@@ -13,7 +13,7 @@ var request = require('supertest');
 var session = require('supertest-session');
 
 describe('/applications', function() {
-  var applicationPlatformId, platformId;
+  var applicationPlatform, platformId;
   /**
    * Helper function to get a logged in session
    * @param  {String} email    Email to login with
@@ -53,7 +53,7 @@ describe('/applications', function() {
       .then(function() {require('../models/registry');})
       .then(function() {return factory.create('application-platform');})
       .then(function(instance) {
-        applicationPlatformId = instance.id;
+        applicationPlatform = instance;
         platformId = instance.platform_id;
         return factory.create('application-user', {
           application_id: instance.application_id
@@ -219,7 +219,7 @@ describe('/applications', function() {
   describe('POST /applications/:name/platforms/:id', function(){
     it('responds with 404 on unauthorized account', function(done){
       request(app)
-        .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
+        .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
         .expect(404)
         .end(done);
     });
@@ -228,7 +228,7 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/buttonwood/platforms/${applicationPlatformId}`)
+            .post(`/applications/buttonwood/platforms/${applicationPlatform.id}`)
             .type('form')
             .send({
               platform_id: platformId,
@@ -242,7 +242,7 @@ describe('/applications', function() {
       getAuthorizedSession()
         .then(function(testSession) {
           testSession
-            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatformId}`)
+            .post(`/applications/${faker.internet.domainWord()}/platforms/${applicationPlatform.id}`)
             .type('form')
             .send({
               platform_id: platformId,
@@ -293,6 +293,53 @@ describe('/applications', function() {
         .expect('Content-Type', /html/)
         .expect(200, /changelog/, done);
     });
+  });
+
+  describe('GET /applications/:name/:platform_name/oauth', function(){
+    it('responds with 404 without state', function(done){
+      request(app)
+        .get('/applications/buttonwood/slack/oauth')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 404 without platform', function(done){
+      request(app)
+        .get(`/applications/buttonwood/${faker.internet.domainWord()}/oauth?state=${faker.random.number()}`)
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 404 without platform', function(done){
+      request(app)
+        .get(`/applications/buttonwood/${faker.internet.domainWord()}/oauth?state=${faker.random.number()}`)
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect(404, done);
+    });
+
+    it('responds with 302 with valid code and state', function(done){
+      var testSession = session(app);
+
+      testSession
+        .get('/applications/buttonwood')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .end(function(err, res) {
+          // Grab the state from the html page (not ideal)
+          var state = res.text.match(/state=(\w+)/)[1];
+
+          testSession
+            .get(`/applications/buttonwood/slack/add?state=${state}`)
+            .set('Accept', 'text/html')
+            .set('Content-Type', 'text/html; charset=utf8')
+            .expect('Location', new RegExp(state))
+            .expect('Location', new RegExp(applicationPlatform.scope))
+            .expect(302, done);
+        });
+      });
   });
 
   describe('GET /applications/:name/:platform_name/authorize', function(){

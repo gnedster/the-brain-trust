@@ -187,6 +187,12 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           })
           .then(function(tuple) {
             var applicationPlatformEntity = tuple[0];
+            var created = tuple[1];
+
+            if (created) {
+              self.application.authorizations++;
+              self.application.save();
+            }
 
             applicationPlatformEntity.credentials = results;
             return applicationPlatformEntity.save();
