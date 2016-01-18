@@ -187,6 +187,14 @@ OAuthClient.prototype.processGetAuthAccessRequest =
           })
           .then(function(tuple) {
             var applicationPlatformEntity = tuple[0];
+            var created = tuple[1];
+
+            // We don't have to confirm that the application updates
+            // because a cron job exists to update this field.
+            if (created) {
+              self.application.authorizations++;
+              self.application.save();
+            }
 
             applicationPlatformEntity.credentials = results;
             return applicationPlatformEntity.save();
