@@ -18,6 +18,7 @@ var util = require('@the-brain-trust/utility');
 var index = require('./routes/index');
 var applications = require('./routes/applications');
 var admin = require('./routes/admin');
+var redirect = require('./routes/redirect');
 
 var app = express();
 
@@ -69,6 +70,7 @@ app.use('*', function(req, res, next){
 app.use('/', index);
 app.use('/applications', applications);
 app.use('/admin', admin);
+app.use('/redirect', redirect);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

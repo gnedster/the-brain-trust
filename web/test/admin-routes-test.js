@@ -7,7 +7,7 @@ var request = require('supertest');
 
 describe('/admin', function() {
   describe('GET /admin', function(){
-    it('respond with 404 on unauthorized', function(done){
+    it('responds with 404 on unauthorized', function(done){
       request(app)
         .get('/admin')
         .set('Accept', 'application/html')
