@@ -35,7 +35,7 @@ var Event = sequelize.define('Event', {
     allowNull: false
   }
 }, {
-  updatedAt: false,
+  timestamps: false,
   paranoid: false
 });
 
