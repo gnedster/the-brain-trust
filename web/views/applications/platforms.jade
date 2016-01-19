@@ -35,6 +35,10 @@ block content
               input.form-control(type='text', name='clientId', pattern='^[a-zA-Z0-9-]+$', value=platform.ApplicationPlatforms[0].clientId)
               p.help-block Client id provided by the chat platform.
             .form-group
+              label(for='scope') scope
+              input.form-control(type='text', name='scope', pattern='^[a-zA-Z0-9-,]+$', value=platform.ApplicationPlatforms[0].scope)
+              p.help-block Scope to request
+            .form-group
               label(for='commandToken') command token
               input.form-control(type='text', name='commandToken', pattern='^[a-zA-Z0-9-]+$', value=platform.ApplicationPlatforms[0].commandToken)
               p.help-block Slack-specific token to authenticate slash command requests.

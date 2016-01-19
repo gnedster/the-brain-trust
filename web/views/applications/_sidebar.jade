@@ -1,14 +1,15 @@
 .application-sidebar
-  if application.logoExtension
-    img.application-icon(src='https://s3-us-west-2.amazonaws.com/the-brain-trust/applications/#{application.name}/icon#{application.logoExtension}')
-  else
-    .application-icon.application-icon--default.icon--chat
+  a(href=application.getPath(), title=application.name)
+    if application.logoExtension
+      img.application-icon(src='https://s3-us-west-2.amazonaws.com/the-brain-trust/applications/#{application.name}/icon#{application.logoExtension}')
+    else
+      .application-icon.application-icon--default.icon--chat
   .application-menu
     i.fa.fa-users &nbsp;
     span #{application.authorizations}
     ul.list-unstyled
-      li #[a(href="/applications/#{application.name}/changelog") changelog]
+      li #[a(href="#{application.getPath()}/changelog") changelog]
       li #[a(href="mailto:#{application.contact}") contact]
       if isAuthenticated
-        li #[a(href="/applications/#{application.name}/edit") edit]
-        li #[a(href="/applications/#{application.name}/platforms") platforms]
+        li #[a(href="#{application.getPath()}/edit") edit]
+        li #[a(href="#{application.getPath()}/platforms") platforms]
