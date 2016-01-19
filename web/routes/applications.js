@@ -37,12 +37,31 @@ router.get('/create', function(req, res, next) {
  */
 router.post('/create', function(req, res, next) {
   if (req.isAuthenticated()) {
-    rds.models.Application.create(req.body)
-      .then(function(instance){
-        req.flash('success', 'application "%s" created!', instance.name);
-        res.redirect(`/applications/${instance.name}`);
-      })
-      .catch(next);
+    rds.models.Role.findOne({
+      where: {
+        name: 'owner'
+      }
+    }).then(function(role){
+      if (role instanceof rds.models.Role.Instance) {
+        return rds.models.Application.create(_.assign(req.body, {
+          ApplicationUsers: [{
+            user_id: req.user.id,
+            role_id: role.id
+          }]
+        }), {
+          include: [rds.models.ApplicationUser]
+        });
+      } else {
+        return Promise.reject('owner role not found.');
+      }
+    }).then(function(application){
+      req.flash(
+        'success',
+        'application "%s" created!',
+        application.name
+        );
+      res.redirect(`/applications/${application.name}`);
+    }).catch(next);
   } else {
     next();
   }

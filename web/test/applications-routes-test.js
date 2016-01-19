@@ -47,7 +47,7 @@ describe('/applications', function() {
 
 
   before(function(done) {
-    this.timeout(3000);
+    this.timeout(4000);
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {require('../models/registry');})
@@ -59,6 +59,7 @@ describe('/applications', function() {
           application_id: instance.application_id
         });
       })
+      .then(function() {return factory.create('role-owner');})
       .then(function() {
         return new Promise(function(resolve, reject) {
           maildev.listen(function(err){

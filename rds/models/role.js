@@ -8,6 +8,7 @@ var sequelize = require('../sequelize');
 var Role = sequelize.define('Role', {
   name: {
     type: Sequelize.STRING,
+    unique: true,
     allowNull: false
   }
 });
