@@ -223,8 +223,6 @@ router.post('/:name', function(req, res, next) {
   }
 });
 
-
-
 /**
  * GET applications/:name/changelog
  */

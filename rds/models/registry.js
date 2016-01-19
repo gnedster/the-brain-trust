@@ -74,6 +74,11 @@ ApplicationUser.belongsTo(User, {
 });
 
 ApplicationUser.belongsTo(Role, {
+  foreign_key: 'role_id',
+  allowNull: false
+});
+
+Role.hasMany(ApplicationUser, {
   foreign_key: 'role_id'
 });
 
