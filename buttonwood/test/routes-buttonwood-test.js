@@ -56,7 +56,10 @@ describe('/buttonwood', function() {
         .type('form')
         .send({
           token: commandToken,
-          text: '4131'
+          text: '$!@$@!',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
         })
         .expect(200, /valid/, done);
     });
