@@ -19,7 +19,6 @@
     "tests"
   ],
   "dependencies": {
-    "google-analytics": "~0.1.0",
     "jquery": "~2.1.4",
     "bootstrap": "~3.3.6",
     "bower-sticky-footer": "sticky-footer#~0.1.4",

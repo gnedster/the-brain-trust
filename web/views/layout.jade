@@ -5,16 +5,20 @@ html
       title= title
     else
       title= 'the brain trust'
+    if process.env.NODE_ENV == 'production'
+      script.
+        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+        ga('create', 'UA-71658652-1', 'auto');
+        ga('send', 'pageview');
+      script(async='', src='//www.google-analytics.com/analytics.js')
     script(type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js')
     script(type='text/javascript' src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
-    script(type='text/javascript' src='/bower_components/webcomponentsjs/webcomponents-lite.min.js')
     script(type='text/javascript' src='/javascripts/index.js')
     block scripts
     link(rel="stylesheet" href='/bower_components/font-awesome/css/font-awesome.min.css')
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
     link(rel='stylesheet', href='/bower_components/bower-sticky-footer/dist/css/sticky-footer.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='import', href='/bower_components/google-analytics/google-analytics.html')
     meta(name='viewport' content='width=device-width, initial-scale=1')
     if metaDescription
       meta(name='description' content=metaDescription)
@@ -22,9 +26,6 @@ html
       meta(name='description' content='Makers of buttonwood, the financial markets Slack app.')
 
   body
-    if process.env.NODE_ENV == 'production'
-      google-analytics(code='UA-71658652-1')
-
     if flash.info && flash.info.length > 0
       .flash.alert-info(role='alert')
         span.glyphicon.glyphicon-info-sign(aria-hidden="true") &nbsp;
