@@ -31,6 +31,14 @@ factory.define('application-platform', rds.models.ApplicationPlatform, {
   clientId: faker.random.uuid()
 });
 
+factory.define('role-admin', rds.models.Role, {
+  name: 'admin'
+});
+
+factory.define('role-owner', rds.models.Role, {
+  name: 'owner'
+});
+
 factory.define('user', rds.models.User, {
   email: 'admin@test.com',
   // Corresponds to 'password'
@@ -40,7 +48,8 @@ factory.define('user', rds.models.User, {
 
 factory.define('application-user', rds.models.ApplicationUser, {
   application_id: factory.assoc('application', 'id'),
-  user_id: factory.assoc('user', 'id')
+  user_id: factory.assoc('user', 'id'),
+  role_id: factory.assoc('role-admin', 'id')
 });
 
 module.exports = factory;

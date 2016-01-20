@@ -5,6 +5,7 @@ var ApplicationUser = require('./application-user');
 var Event = require('./event');
 var Platform = require('./platform');
 var PlatformEntity = require('./platform-entity');
+var Role = require('./role');
 var User = require('./user');
 
 Application.hasMany(ApplicationPlatform, {
@@ -70,6 +71,15 @@ ApplicationUser.belongsTo(Application, {
 
 ApplicationUser.belongsTo(User, {
   foreign_key: 'user_id'
+});
+
+ApplicationUser.belongsTo(Role, {
+  foreign_key: 'role_id',
+  allowNull: false
+});
+
+Role.hasMany(ApplicationUser, {
+  foreign_key: 'role_id'
 });
 
 module.exports = {
