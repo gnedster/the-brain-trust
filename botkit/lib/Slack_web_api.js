@@ -5,7 +5,7 @@ module.exports = function(bot,config) {
 
   // create a nice wrapper for the Slack API
   var slack_api = {
-      api_url: util.isTest() ? 'http://localhost': 'https://slack.com/api/',
+      api_url: util.isTest() ? 'http://localhost:3000/': 'https://slack.com/api/',
       // this is a simple function used to call the slack web API
       callAPI: function(command,options,cb) {
         bot.log('** API CALL: ' + slack_api.api_url+command);

@@ -25,7 +25,7 @@ module.exports = function(botkit,config) {
 
     return bot;
 
-  }
+  };
 
   bot.sendWebhook = function(options,cb) {
     if (!bot.config.incoming_webhook || !bot.config.incoming_webhook.url) {
@@ -42,18 +42,18 @@ module.exports = function(botkit,config) {
           }
       }).form({payload: JSON.stringify(options)});
     }
-  }
+  };
 
   bot.configureRTM = function(config) {
     bot.config.token = config.token;
     return bot;
-  }
+  };
 
   bot.closeRTM = function() {
     if (bot.rtm) {
       bot.rtm.close();
     }
-  }
+  };
 
   bot.startRTM = function(cb) {
 
@@ -108,10 +108,10 @@ module.exports = function(botkit,config) {
             cb(null,bot,res);
           }
 
-        })
+        });
 
          bot.rtm.on('error',function(err) {
-           botkit.log('RTM websocket error!',err)
+           botkit.log('RTM websocket error!',err);
            botkit.trigger('rtm_close',[bot,err]);
          });
 
@@ -123,7 +123,7 @@ module.exports = function(botkit,config) {
      });
 
      return bot;
-  }
+  };
 
   bot.identifyBot = function(cb) {
     if (bot.identity) {
@@ -136,7 +136,7 @@ module.exports = function(botkit,config) {
       // bot.api.auth.test on a given token?
       cb('Identity Unknown: Not using RTM api');
     }
-  }
+  };
 
   bot.identifyTeam = function(cb) {
 
@@ -148,7 +148,7 @@ module.exports = function(botkit,config) {
       // bot.api.auth.test on a given token?
       cb('Uknown Team!!');
     }
-  }
+  };
 
   // convenience method for creating a DM convo
   bot.startPrivateConversation = function(message,cb) {
@@ -156,13 +156,13 @@ module.exports = function(botkit,config) {
       bot._startDM(task,message.user,function(err,dm) {
         convo.stop();
         cb(err,dm);
-      })
-    })
-  }
+      });
+    });
+  };
 
   bot.startConversation = function(message,cb) {
     botkit.startConversation(this,message,cb);
-  }
+  };
 
   // convenience method for creating a DM convo
   bot._startDM = function(task,user_id,cb) {
@@ -174,7 +174,7 @@ module.exports = function(botkit,config) {
         cb(null,task.startConversation({channel:channel.channel.id, user: user_id}));
       }
     });
-  }
+  };
 
   bot.say = function(message,cb) {
     botkit.debug('SAY ',message);
@@ -194,7 +194,7 @@ module.exports = function(botkit,config) {
       unfurl_media: message.unfurl_media||null,
       icon_url: message.icon_url||null,
       icon_emoji: message.icon_emoji||null
-    }
+    };
 
     if (message.icon_url || message.icon_emoji || message.username ){
       slack_message.as_user = false;
@@ -207,7 +207,7 @@ module.exports = function(botkit,config) {
     if (message.attachments || message.icon_emoji || message.username || message.icon_url) {
 
       if (!bot.config.token) {
-        throw new Error('Cannot use web API to send messages.')
+        throw new Error('Cannot use web API to send messages.');
       }
 
       bot.api.chat.postMessage(slack_message,function(err,res) {
@@ -221,7 +221,7 @@ module.exports = function(botkit,config) {
 
     } else {
       if (!bot.rtm) {
-        throw new Error('Cannot use the RTM API to send messages.')
+        throw new Error('Cannot use the RTM API to send messages.');
       }
 
       try {
@@ -240,7 +240,7 @@ module.exports = function(botkit,config) {
         if (cb) { cb(err); }
       }
     }
-  }
+  };
 
   bot.replyPublic = function(src,resp,cb) {
 
@@ -260,10 +260,10 @@ module.exports = function(botkit,config) {
 
       msg.response_type='in_channel';
       bot.res.json(msg);
-      if (cb) { cb(null) }
+      if (cb) { cb(null); }
     }
 
-  }
+  };
 
   bot.replyPublicDelayed = function(src,resp,cb) {
     if (!src.response_url) {
@@ -292,7 +292,7 @@ module.exports = function(botkit,config) {
       }).form(JSON.stringify(msg));
     }
 
-  }
+  };
 
   bot.replyPrivate = function(src,resp,cb) {
 
@@ -312,10 +312,10 @@ module.exports = function(botkit,config) {
 
       msg.response_type='ephemeral';
       bot.res.json(msg);
-      if (cb) { cb(null) }
+      if (cb) { cb(null); }
     }
 
-  }
+  };
 
   bot.replyPrivateDelayed = function(src,resp,cb) {
 
@@ -338,9 +338,9 @@ module.exports = function(botkit,config) {
         // do something?
         if (err) {
           botkit.log('Error sending slash command response:',err);
-          if (cb) { cb(err) }
+          if (cb) { cb(err); }
         } else {
-          if (cb) { cb(null) }
+          if (cb) { cb(null); }
         }
       }).form(JSON.stringify(msg));
     }

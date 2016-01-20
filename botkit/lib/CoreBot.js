@@ -1,6 +1,7 @@
 /* This is a module that makes a bot */
 /* It expects to receive messages via the botkit.receiveMessage function */
 /* These messages are expected to match Slack's message format. */
+var logger = require('@the-brain-trust/logger');
 var mustache = require('mustache');
 var simple_storage = require(__dirname+'/storage/simple_storage.js');
 
@@ -621,7 +622,7 @@ function Botkit(configuration) {
       for (var k = 0; k < arguments.length; k++) {
         args.push(arguments[k]);
       }
-      //TODO TMsg console.log.apply(null,args);
+      logger.debug(null,args);
     }
   }
 
@@ -631,7 +632,7 @@ function Botkit(configuration) {
       for (var k = 0; k < arguments.length; k++) {
         args.push(arguments[k]);
       }
-      // TODO TMsg console.log.apply(null,args);
+      logger.info(args);
     }
   };
 

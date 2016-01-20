@@ -36,7 +36,7 @@ function Slackbot(configuration) {
 
     return slack_botkit;
 
-  }
+  };
 
   // set up a web route that is a landing page
   slack_botkit.createHomepageEndpoint = function(webserver) {
@@ -53,7 +53,7 @@ function Slackbot(configuration) {
 
     return slack_botkit;
 
-  }
+  };
 
   // set up a web route for receiving outgoing webhooks and/or slash commands
   slack_botkit.createWebhookEndpoints = function(webserver) {
@@ -140,16 +140,16 @@ function Slackbot(configuration) {
 
       }
 
-    })
+    });
 
     return slack_botkit;
-  }
+  };
 
   slack_botkit.saveTeam = function(team,cb) {
 
     slack_botkit.storage.teams.save(team,cb);
 
-  }
+  };
 
   // look up a team's memory and configuration and return it, or
   // return an error!
@@ -157,7 +157,7 @@ function Slackbot(configuration) {
 
     slack_botkit.storage.teams.get(id,cb);
 
-  }
+  };
 
   slack_botkit.setupWebserver = function(port,cb) {
 
@@ -182,14 +182,14 @@ function Slackbot(configuration) {
 
     return slack_botkit;
 
-  }
+  };
 
   // get a team url to redirect the user through oauth process
   slack_botkit.getAuthorizeURL = function(team_id) {
 
     var url = 'https://slack.com/oauth/authorize';
     var scopes = slack_botkit.config.scopes;
-    url = url + '?client_id=' + slack_botkit.config.clientId + '&scope=' + scopes.join(',') + '&state=botkit'
+    url = url + '?client_id=' + slack_botkit.config.clientId + '&scope=' + scopes.join(',') + '&state=botkit';
 
     if (team_id) {
       url = url + '&team=' + team_id;
@@ -200,7 +200,7 @@ function Slackbot(configuration) {
 
     return url;
 
-  }
+  };
 
   // set up a web route for redirecting users
   // and collecting authentication details
@@ -235,20 +235,20 @@ function Slackbot(configuration) {
            if (cb) cb(error);
          }
         }).form(options);
-      }
+      };
 
 
     var oauth_access=function(options,cb) {
       call_api('oauth.access',options,cb);
-    }
+    };
 
     var auth_test=function(options,cb) {
       call_api('auth.test',options,cb);
-    }
+    };
 
     webserver.get('/login',function(req,res) {
 
-        res.redirect(slack_botkit.getAuthorizeURL())
+        res.redirect(slack_botkit.getAuthorizeURL());
 
     });
 
@@ -325,7 +325,7 @@ function Slackbot(configuration) {
                       createdBy: identity.user_id,
                       url: identity.url,
                       name: identity.team
-                    }
+                    };
                   }
 
                   var bot = slack_botkit.spawn(team);
@@ -343,7 +343,7 @@ function Slackbot(configuration) {
                       token: auth.bot.bot_access_token,
                       user_id: auth.bot.bot_user_id,
                       createdBy: identity.user_id
-                    }
+                    };
                     bot.configureRTM(team.bot);
                     slack_botkit.trigger('create_bot',[bot,team.bot]);
                   }
@@ -374,7 +374,7 @@ function Slackbot(configuration) {
                             scopes: scopes,
                             team_id: identity.team_id,
                             user: identity.user
-                          }
+                          };
                         }
                         slack_botkit.storage.users.save(user,function(err,id) {
 
@@ -414,7 +414,7 @@ function Slackbot(configuration) {
 
     return slack_botkit;
 
-  }
+  };
 
   slack_botkit.handleSlackEvents = function() {
     var direct_mention;
