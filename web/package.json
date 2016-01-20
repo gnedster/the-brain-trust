@@ -19,6 +19,7 @@
     "@the-brain-trust/utility": "0.0.1",
     "aws-sdk": "^2.2.26",
     "body-parser": "~1.13.2",
+    "compression": "^1.6.1",
     "config": "^1.17.1",
     "connect-flash": "^0.1.1",
     "connect-session-sequelize": "^3.0.0",

@@ -1,4 +1,5 @@
 var bodyParser = require('body-parser');
+var compression = require('compression');
 var config = require('config');
 var express = require('express');
 var favicon = require('serve-favicon');
@@ -23,6 +24,7 @@ var redirect = require('./routes/redirect');
 var app = express();
 
 if (util.isProduction() === true) {
+  app.use(compression());
   app.use(httpsRedirect);
 }
 
