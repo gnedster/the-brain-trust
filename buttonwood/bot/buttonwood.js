@@ -26,9 +26,9 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears([buttonwood.getStockRegex()],
+  controller.hears(['',buttonwood.getStockRegex()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var matches = buttonwood.parseStockQuote(message.text.match);
+    var matches = buttonwood.parseStockQuote(message.text);
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();

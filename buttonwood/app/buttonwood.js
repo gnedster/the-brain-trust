@@ -9,8 +9,8 @@ var number = require('../lib/number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '(\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,4}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?)';
-var stockRegex = /\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,4}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
+var stockRegexString = '(\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?)';
+var stockRegex = /\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
 
 /**
  * Return formatted message
