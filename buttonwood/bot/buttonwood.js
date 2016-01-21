@@ -25,9 +25,9 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears(['(\$[0-9a-z\.\^]*)'],
+  controller.hears(['(\$[A-z]*)'],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var matches = message.text.match(/\$([0-9a-z\.\^]*)/ig);
+    var matches = message.text.match(/\$([A-z\.]*)/ig);
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();
