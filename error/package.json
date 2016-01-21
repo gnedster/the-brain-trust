@@ -24,6 +24,7 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "faker": "^3.0.1",
     "maildev": "^0.12.1",
     "mocha": "^2.3.4",
     "nodemailer": "^2.0.0"
