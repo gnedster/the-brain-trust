@@ -409,15 +409,17 @@ describe('/applications', function() {
 
           maildev.removeAllListeners();
           maildev.on('new', function(email){
-            assert(/\[buttonwood\] new authorization/.test(email.subject));
+            if (/\[buttonwood\] new authorization/.test(email.subject)) {
+              // oAuthState should not be reused
+              testSession
+                .get('/applications/buttonwood/slack/authorize?code=1&state=' +
+                  state)
+                .set('Accept', 'text/html')
+                .set('Content-Type', 'text/html; charset=utf8')
+                .expect(500, done);
+            }
 
-            // oAuthState should not be reused
-            testSession
-              .get('/applications/buttonwood/slack/authorize?code=1&state=' +
-                state)
-              .set('Accept', 'text/html')
-              .set('Content-Type', 'text/html; charset=utf8')
-              .expect(500, done);
+
           });
 
           testSession
