@@ -26,7 +26,9 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   var errorCode = err.status || 500;
   logger.error(err);
-  error.notify('buttonwood', err);
+  if (errorCode === 500) {
+    error.notify('buttonwood', err);
+  }
   res.status(errorCode);
   res.json({
     message: err.message,
