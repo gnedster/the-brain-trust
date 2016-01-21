@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var config = require('config');
 var logger = require('@the-brain-trust/logger');
-var mailer = require('../lib/mailer');
+var mailer = require('@the-brain-trust/mailer');
 var path = require('path');
 var rds = require('@the-brain-trust/rds');
 

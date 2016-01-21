@@ -1,0 +1,31 @@
+{
+  "name": "@the-brain-trust/error",
+  "version": "0.0.2",
+  "description": "error reporting",
+  "main": "error.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
+    "@the-brain-trust/mailer": "0.0.2",
+    "email-templates": "^2.0.1",
+    "jade": "^1.11.0",
+    "node-sass": "^3.4.2",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "maildev": "^0.12.1",
+    "mocha": "^2.3.4",
+    "nodemailer": "^2.0.0"
+  }
+}

@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Bot = require('../lib/bot');
 var buttonwood = require('../app/buttonwood');
+var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 
@@ -73,6 +74,7 @@ function hearsSymbol(controller) {
         });
       }).catch(function(err){
         bot.reply(message, 'something went horribly wrong');
+        error.notify('buttonwood', err); // Should be higher up the stack
         logger.error(err);
       });
   });

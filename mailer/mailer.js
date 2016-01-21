@@ -1,6 +1,10 @@
+var path = require('path');
+var env = process.env.NODE_ENV || 'development';
+
 var _ = require('lodash');
 var AWS = require('aws-sdk');
-var config = require('config');
+var config = require('config.json')
+  (path.join(__dirname, 'config', env + '.json'));
 var logger = require('@the-brain-trust/logger');
 var util = require('@the-brain-trust/utility');
 
@@ -67,7 +71,7 @@ function sendEmail(params) {
 
     try {
       params = _.assign(params, {
-        Source: config.get('ses.source')
+        Source: config.mailer.source
       });
 
       if (util.isProduction() === false) {

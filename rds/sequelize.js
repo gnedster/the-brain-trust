@@ -8,10 +8,18 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('config.json')
   (path.join(__dirname, 'config', env + '.json'));
 var logger = require('@the-brain-trust/logger');
+var error = require('@the-brain-trust/error');
 var Sequelize = require('sequelize');
 var util = require('@the-brain-trust/utility');
 
 var rdsConfig = config.rds;
+var originalQuery = Sequelize.prototype.query;
+
+Sequelize.prototype.query = function () {
+  return originalQuery.apply(this, arguments).catch(function (err) {
+    error.notify('rds', err);
+  });
+};
 
 if (util.isProduction() === true || util.isTest() === true) {
   rdsConfig.username = process.env.RDS_USERNAME;
