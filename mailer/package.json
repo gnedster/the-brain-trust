@@ -1,0 +1,31 @@
+{
+  "name": "@the-brain-trust/mailer",
+  "version": "0.0.1",
+  "description": "send mails",
+  "main": "mailer.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gnedster/the-brain-trust.git"
+  },
+  "author": "the brain trust",
+  "bugs": {
+    "url": "https://github.com/gnedster/the-brain-trust/issues"
+  },
+  "homepage": "https://github.com/gnedster/the-brain-trust#readme",
+  "dependencies": {
+    "@the-brain-trust/logger": "0.0.1",
+    "@the-brain-trust/utility": "0.0.4",
+    "aws-sdk": "^2.2.31",
+    "config.json": "0.0.4",
+    "lodash": "^4.0.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "faker": "^3.0.1",
+    "maildev": "^0.12.1",
+    "nodemailer": "^2.0.0"
+  }
+}
