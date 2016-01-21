@@ -16,6 +16,7 @@
     "url": "https://github.com/gnedster/the-brain-trust"
   },
   "dependencies": {
+    "@the-brain-trust/error": "0.0.2",
     "@the-brain-trust/logger": "0.0.1",
     "@the-brain-trust/metric": "0.0.9",
     "@the-brain-trust/rds": "0.6.1",
