@@ -1,5 +1,5 @@
 /**
- * Add tests for the logger module
+ * Add tests for the number lib
  */
 var assert = require('assert');
 var number = require('../lib/number');
