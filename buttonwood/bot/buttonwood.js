@@ -4,6 +4,8 @@ var buttonwood = require('../app/buttonwood');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 
+var stock_regex = /\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,4}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
+
 /**
  * Return usage information.
  * @param  {CoreController}
@@ -24,9 +26,9 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears(['(\$[0-9a-z\.\^]*)'],
+  controller.hears(['(\$(?<PreXChangeCode>[a-z]{2,4}:(?![a-z\d]+\.))?(?<Stock>[a-z]{1,4}|\d{1,3}(?=\.[a-z]{2}))(?<PostXChangeCode>\.[a-z]{2})?)'],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var matches = message.text.match(/\$([0-9a-z\.\^]*)/ig);
+    var matches = message.text.match(stock_regex);
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();
