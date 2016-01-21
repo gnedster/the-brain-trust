@@ -19,7 +19,7 @@ describe('mailer', function(){
   it('should initialize', function(done){
     var subject = faker.lorem.sentence();
     maildev.on('new', function(email){
-      assert(subject, email.subject);
+      assert.equal(subject, email.subject);
       done();
     });
 
