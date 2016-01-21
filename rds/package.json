@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "grunt": "^0.4.5",
+    "maildev": "^0.12.1",
     "mocha": "^2.3.4"
   }
 }
