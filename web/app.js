@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var config = require('config');
+var error = require('@the-brain-trust/error');
 var express = require('express');
 var favicon = require('serve-favicon');
 var flash = require('connect-flash');
@@ -100,6 +101,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   logger.error(err);
+  error.notify('web', err);
   var errorCode = err.status || 500;
   res.status(errorCode);
   res.render('error', {

@@ -1,9 +1,9 @@
-var bodyParser = require('body-parser');
-var express = require('express');
-
 var app = express();
-var index = require('./routes/index');
+var bodyParser = require('body-parser');
 var buttonwood = require('./routes/buttonwood');
+var error = require('@the-brain-trust/error');
+var express = require('express');
+var index = require('./routes/index');
 var logger = require('@the-brain-trust/logger');
 
 app.use(bodyParser.urlencoded({
@@ -25,6 +25,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   var errorCode = err.status || 500;
   logger.error(err);
+  error.notify('buttonwood', err);
   res.status(errorCode);
   res.json({
     message: err.message,

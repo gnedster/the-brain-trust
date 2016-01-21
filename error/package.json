@@ -1,8 +1,8 @@
 {
-  "name": "@the-brain-trust/mailer",
+  "name": "@the-brain-trust/error",
   "version": "0.0.2",
-  "description": "send mails",
-  "main": "mailer.js",
+  "description": "error reporting",
+  "main": "error.js",
   "scripts": {
     "test": "mocha"
   },
@@ -17,14 +17,13 @@
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/utility": "0.0.4",
-    "aws-sdk": "^2.2.31",
-    "config.json": "0.0.4",
-    "lodash": "^4.0.0",
+    "@the-brain-trust/mailer": "0.0.2",
+    "email-templates": "^2.0.1",
+    "jade": "^1.11.0",
+    "node-sass": "^3.4.2",
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "faker": "^3.0.1",
     "maildev": "^0.12.1",
     "nodemailer": "^2.0.0"
   }
