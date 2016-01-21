@@ -1,10 +1,11 @@
-var app = express();
 var bodyParser = require('body-parser');
 var buttonwood = require('./routes/buttonwood');
 var error = require('@the-brain-trust/error');
 var express = require('express');
 var index = require('./routes/index');
 var logger = require('@the-brain-trust/logger');
+
+var app = express();
 
 app.use(bodyParser.urlencoded({
   extended: true
