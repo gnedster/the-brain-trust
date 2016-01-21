@@ -1,5 +1,5 @@
-require('./lib/fake_slack_site.js'); //Fake slack server
-require('./lib/fake_slack_wss.js'); //Fake slack Websocket
+require('./lib/fake-slack-site.js'); //Fake slack server
+require('./lib/fake-slack-wss.js'); //Fake slack Websocket
 var Botkit = require('../lib/Botkit.js');
 var assert = require('assert');
 
@@ -10,7 +10,7 @@ describe('Botkit', function() {
 
     controller.spawn({token:token}).startRTM(function (err, bot, payload) {
       if (err) {
-        assert(false);
+        assert(err);
         done();
       } else {
         bot.closeRTM();
@@ -24,12 +24,10 @@ describe('Botkit', function() {
     var controller = Botkit.slackbot({debug:false});
 
     controller.spawn({token:token}).startRTM(function (err, bot, payload) {
-      if (err) {
-        done();
-      } else {
+      assert(err);
+      done();
+      if (bot) {
         bot.closeRTM();
-        assert(false);
-        done();
       }
     });
   });

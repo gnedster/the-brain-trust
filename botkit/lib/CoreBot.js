@@ -622,7 +622,7 @@ function Botkit(configuration) {
       for (var k = 0; k < arguments.length; k++) {
         args.push(arguments[k]);
       }
-      logger.debug(null,args);
+      logger.debug(args);
     }
   }
 
