@@ -407,8 +407,9 @@ describe('/applications', function() {
           // Grab the state from the html page (not ideal)
           var state = res.text.match(/state=(\w+)/)[1];
 
+          maildev.removeAllListeners();
           maildev.on('new', function(email){
-            assert(email);
+            assert(/\[buttonwood\] new authorization/.test(email.subject));
 
             // oAuthState should not be reused
             testSession
