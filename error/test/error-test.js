@@ -2,7 +2,6 @@
  * Add tests for the rds module.
  */
 var assert = require('assert');
-var faker = require('faker');
 var error = require('../error');
 var maildev = require('maildev')();
 
@@ -17,9 +16,8 @@ describe('mailer', function(){
   });
 
   it('should initialize', function(done){
-    var subject = faker.lorem.sentence();
     maildev.on('new', function(email){
-      assert(subject, '[error] an error has occurred');
+      assert.equal(email.subject, '[error] an error has occurred');
       done();
     });
 
