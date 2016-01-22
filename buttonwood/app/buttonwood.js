@@ -9,9 +9,9 @@ var number = require('../lib/number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegex = /\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
-var stockCmdRegex = /([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
-var stockListenRegex = '(\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?)';
+var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?([a-z]{1,6}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{2})?';
+var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
+var stockCmdRegex = new RegExp(stockRegexString,'gi');
 
 /**
  * Return formatted message
@@ -121,7 +121,8 @@ function messageQuote(symbols, isDetailed) {
 
 /**
  * Return array with with stock strings
- * @param  {String}
+ * @param  {String} to be parsed
+ * @return {Array} of stock strings
  */
 function parseStockQuote(str) {
   return str.match(stockRegex);
@@ -129,6 +130,7 @@ function parseStockQuote(str) {
 
 /**
  * Return stock regex
+ * @return {RegExp} to parse valid stock input
  */
 function getStockCmdRegex() {
   return stockCmdRegex;
@@ -136,9 +138,10 @@ function getStockCmdRegex() {
 
 /**
  * Return stock regex string
+ * @return {String} to be used by botkit listener
  */
 function getStockListenRegex() {
-  return stockListenRegex;
+  return '(\\$' + stockRegexString + ')';
 }
 
 module.exports = {
