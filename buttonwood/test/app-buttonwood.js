@@ -4,7 +4,13 @@ var assert = require('assert');
 describe('buttonwood', function(){
   it('should return valid symbols from string', function(done){
     var str = '$FB $12.12 $NYSE:GOOGL $123.by $1.0 $J12ELK90#$ $12345';
-    assert.equal(buttonwood.parseStockQuote(str).length, 4);
+    var expectedResult = ['$FB','$NYSE:GOOGL','$123.by','$J'];
+    var result = buttonwood.parseStockQuote(str);
+
+    assert.equal(result.length, expectedResult.length);
+    for (var i = 0; i < result.length; i++) {
+      assert.equal(result[i], expectedResult[i]);
+    }
     done();
   });
 
