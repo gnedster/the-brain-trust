@@ -46,7 +46,8 @@ router.post('/commands/quote*', function(req, res, next) {
   } else {
     var symbols = _.uniq(_.compact(_.map((_.get(req, 'body.text') || '').split(' '),
       function(symbol) {
-        return symbol.replace(buttonwood.getStockRegex(), '').toUpperCase();
+        var arr = symbol.match(buttonwood.getStockCmdRegex());
+        return arr? arr.join('').toUpperCase() : '';
       }
     )));
 

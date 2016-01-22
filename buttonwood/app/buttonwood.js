@@ -9,8 +9,9 @@ var number = require('../lib/number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '(\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?)';
 var stockRegex = /\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?/gi;
+var stockCmdRegex = /(?:[a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(?:\.[a-z]{2})?/gi;
+var stockListenRegex = '(\$([a-z]{2,4}:(?![a-z\d]+\.))?([a-z]{1,6}|\d{1,3}(?=\.[a-z]{2}))(\.[a-z]{2})?)';
 
 /**
  * Return formatted message
@@ -129,20 +130,20 @@ function parseStockQuote(str) {
 /**
  * Return stock regex
  */
-function getStockRegex() {
-  return stockRegex;
+function getStockCmdRegex() {
+  return stockCmdRegex;
 }
 
 /**
  * Return stock regex string
  */
-function getStockRegexString() {
-  return stockRegexString;
+function getStockListenRegex() {
+  return stockListenRegex;
 }
 
 module.exports = {
   messageQuote: messageQuote,
   parseStockQuote: parseStockQuote,
-  getStockRegex: getStockRegex,
-  getStockRegexString: getStockRegexString
+  getStockCmdRegex: getStockCmdRegex,
+  getStockListenRegex: getStockListenRegex
 };
