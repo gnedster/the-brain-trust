@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/error",
-  "version": "0.0.2",
+  "version": "0.0.7",
   "description": "error reporting",
   "main": "error.js",
   "scripts": {

@@ -101,8 +101,10 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   logger.error(err);
-  error.notify('web', err);
   var errorCode = err.status || 500;
+  if (errorCode === 500) {
+    error.notify('web', err);
+  }
   res.status(errorCode);
   res.render('error', {
     message: config.get('error.' + errorCode) || err.message,

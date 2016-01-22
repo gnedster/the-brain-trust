@@ -127,14 +127,22 @@ function parseStockQuote(str) {
 }
 
 /**
- * Return regex string
+ * Return stock regex
  */
 function getStockRegex() {
+  return stockRegex;
+}
+
+/**
+ * Return stock regex string
+ */
+function getStockRegexString() {
   return stockRegexString;
 }
 
 module.exports = {
   messageQuote: messageQuote,
   parseStockQuote: parseStockQuote,
-  getStockRegex: getStockRegex
+  getStockRegex: getStockRegex,
+  getStockRegexString: getStockRegexString
 };

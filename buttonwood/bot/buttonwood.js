@@ -26,7 +26,7 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears(['',buttonwood.getStockRegex()],
+  controller.hears(['',buttonwood.getStockRegexString()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
     var matches = buttonwood.parseStockQuote(message.text);
     var isDetailed = /detail/ig.test(message.text);
