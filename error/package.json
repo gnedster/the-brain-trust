@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/error",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "error reporting",
   "main": "error.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "@the-brain-trust/mailer": "0.0.2",
     "email-templates": "^2.0.1",
     "jade": "^1.11.0",
-    "node-sass": "^3.4.2",
+    "less": "^2.5.3",
     "path": "^0.12.7"
   },
   "devDependencies": {
