@@ -8,7 +8,7 @@ describe('buttonwood', function(){
     var result = buttonwood.parseStockQuote(str);
 
     assert.equal(result.length, expectedResult.length);
-    for (var i = 0; i < result.length; i++) {
+    for (var i = 0, ii = result.length; i < ii; i++) {
       assert.equal(result[i], expectedResult[i]);
     }
     done();
