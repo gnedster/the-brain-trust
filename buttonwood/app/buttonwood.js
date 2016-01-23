@@ -9,7 +9,7 @@ var number = require('../lib/number');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?(\\^?[a-z]{1,7}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{2})?';
+var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?(\\^?[a-z]{1,7}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{1,4})?';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 var stockCmdRegex = new RegExp(stockRegexString,'gi');
 
