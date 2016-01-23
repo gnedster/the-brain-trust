@@ -5,6 +5,6 @@ block content
 
   p.
     Looks like something went wrong in authorizing
-    #[a(href="#{application.getPath()}") #{application.name}].
-    If trying again doesn't work, e-mail us at
-    #[a(href="mailto:support@the-brain-trust.com") support@the-brain-trust.com].
+    #[a(href='#{application.getPath()}') #{application.name}].
+    Click #[a(href='#{application.getAuthorizePath("slack", oAuthState)}') here]
+    to try that again.
