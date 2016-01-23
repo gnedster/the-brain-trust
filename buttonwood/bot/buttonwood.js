@@ -5,6 +5,7 @@ var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 
+
 /**
  * Return usage information.
  * @param  {CoreController}
@@ -25,9 +26,9 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears(['(\$[a-z\.\^]*)'],
+  controller.hears(['',buttonwood.getStockListenRegex()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var matches = message.text.match(/\$([a-z\.\^]*)/ig);
+    var matches = buttonwood.parseStockQuote(message.text);
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();

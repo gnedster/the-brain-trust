@@ -170,4 +170,51 @@ describe('/buttonwood', function() {
 
     shouldNotBeFoundWithoutToken('list');
   });
+
+  describe('POST commands/quote with 2 invalid symbols', function(){
+    it('expecting not to find either invalid stocks', function(done){
+      request(app)
+        .post(`/buttonwood/commands/quote`)
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'QQQAAA QQQAAT',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
+        .expect('Content-Type', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+          assert(res);
+          assert(res.text.match(/QQQAAA/));
+          assert(res.text.match(/QQQAAT/));
+          assert.equal(null, res.text.match(/QQQAAAQQQAAT/));
+          done();
+        });
+    });
+
+    it('expecting not to find either first stock and drop garbage character', function(done){
+      request(app)
+        .post(`/buttonwood/commands/quote`)
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'QQQAAA $!@$@!',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
+        .expect('Content-Type', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+          assert(res);
+          assert(res.text.match(/QQQAAA/));
+          assert.equal(null, res.text.match(/$!@$@!/));
+          done();
+        });
+    });
+  });
 });
