@@ -48,7 +48,7 @@ router.post('/commands/quote*', function(req, res, next) {
       function(symbol) {
         var arr = symbol.match(buttonwood.getStockCmdRegex());
         if (arr) {
-          return arr.join('').toUpperCase()
+          return arr.join('').toUpperCase();
         } else {
           return '';
         }
