@@ -5,4 +5,8 @@ block content
 
   p.
     Looks like you're all set up for
-    #[a(href="/applications/#{application.name}") #{application.name}].
+    #[a(href="#{application.getPath()}") #{application.name}]! To make use of
+    all the features, make sure to invite #{application.name} to the
+    relevant channels.
+
+  img(src="/images/bot_help.png" alt="bot help" )
