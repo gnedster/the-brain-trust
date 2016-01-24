@@ -101,7 +101,7 @@ router.get('/:name', function(req, res, next) {
       // Save oAuthState to cookie session
       req.session.oAuthState = state.oAuthState;
 
-      rds.models.Platform.findAll()
+      return rds.models.Platform.findAll()
         .then(function(promise) {
           var params = {
             application: req.application,
@@ -117,8 +117,7 @@ router.get('/:name', function(req, res, next) {
           });
 
           res.render('applications/show', params);
-        })
-        .catch(next);
+        });
     }).catch(next);
 });
 
@@ -333,9 +332,17 @@ router.get('/:name/:platform_name/authorize', function(req, res, next) {
               page = 'error';
               break;
           }
-          res.status(status)
-            .render('applications/' + page, {
-              application: application
+
+          OAuthClient.getState()
+            .then(function(state) {
+              // Save oAuthState to cookie session
+              req.session.oAuthState = state.oAuthState;
+
+              res.status(status)
+                .render('applications/' + page, {
+                  application: application,
+                  oAuthState: state.oAuthState
+                });
             });
         });
       } catch (error) {

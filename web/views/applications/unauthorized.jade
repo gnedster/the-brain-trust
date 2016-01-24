@@ -4,7 +4,7 @@ block content
   h2 whoa
 
   p.
-    We're sorry to see you go, but how about giving another shot at using
-    #[a(href="/applications/#{application.name}") #{application.name}].
-    Otherwise we'd love for you to tell us how we're doing at
-    #[a(href="mailto:feedback@the-brain-trust.com") feedback@the-brain-trust.com].
+    Looks like you didn't authorize
+    #[a(href='/applications/#{application.name}') #{application.name}].
+    Click #[a(href='#{application.getAuthorizePath("slack", oAuthState)}') here]
+    to try that again.

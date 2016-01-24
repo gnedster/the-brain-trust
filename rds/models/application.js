@@ -73,8 +73,19 @@ var Application = sequelize.define('Application', {
   }
 }, {
   instanceMethods: {
+    /**
+     * Get the default show path for the application
+     * @return {String} Absolute path to show application
+     */
     getPath: function() {
       return `/applications/${this.name}`;
+    },
+    /**
+     * Get the authorize path for users to begin OAuth 2 process
+     * @return {String} Absolute path for authorization
+     */
+    getAuthorizePath: function(platformName, state) {
+      return `${this.getPath()}/${platformName}/add?state=${state}`;
     }
   }
 });
