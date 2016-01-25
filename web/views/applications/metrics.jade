@@ -1,0 +1,18 @@
+extends ../layout
+block scripts
+  script(type='text/javascript', src='/bower_components/highcharts/highstock.js')
+  script(type='text/javascript', src='/javascripts/metrics.js')
+
+block content
+  .row
+    .col-sm-12
+      h2.
+        #[a(href="/applications/") applications]
+        &nbsp;&gt;&nbsp;
+        #[a(href="/applications/#{application.name}") #{application.name}]
+        &nbsp;&gt;&nbsp;
+        metrics
+
+  .application-metrics
+    .application-metrics-controls
+    .application-metrics-chart

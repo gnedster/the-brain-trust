@@ -4,7 +4,7 @@ var buttonwood = require('../app/buttonwood');
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
-
+var moment = require('moment');
 
 /**
  * Return usage information.
@@ -43,7 +43,7 @@ function hearsSymbol(controller) {
       channelId: message.channel,
       userId: message.user,
       initiator: 'client x user',
-      timestamp: message.ts,
+      timestamp: moment.unix(message.ts),
       name: 'chat:buttonwood:slack:​*:*​:message',
       details: {
         text: message.text
@@ -64,7 +64,7 @@ function hearsSymbol(controller) {
               channelId: resp.channel,
               userId: message.user,
               initiator: 'server x app',
-              timestamp: resp.ts,
+              timestamp: moment.unix(resp.ts),
               name: 'chat:buttonwood:slack:​*:*​:reply',
               details: {
                 symbols: symbols

@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var logger = require('@the-brain-trust/logger');
+var moment = require('moment');
 var rds = require('@the-brain-trust/rds');
 
 /**
@@ -27,7 +28,7 @@ function write(event) {
 }
 
 /**
- * Aggregate events for course-grained analytics. Not the most performant,
+ * Aggregate events to update application metrics. Not the most performant,
  * but typically run on an infrequent basis (hourly or daily).
  * @return {Promise} Promise returning the result of Application updates.
  */
@@ -101,7 +102,50 @@ function aggregate() {
     });
 }
 
+
+/**
+ * Return a timeseries grouped by a given intervalhs
+ * @param {String} interval  Align metrics to a given interval
+ * @return {Promise}         Promise containing an array of interval
+ */
+function getTimeseries(interval) {
+  interval = interval || 'hour';
+  return rds.query(
+`SELECT extract(epoch from date_trunc('${interval}', timestamp)) * 1000 AS timestamp, count(*)
+ FROM events
+ GROUP BY 1
+ ORDER BY timestamp ASC`,
+    { type: rds.QueryTypes.SELECT }
+  ).then(function(intervals) {
+    var curr, end, ptr, ptrValue;
+
+    intervals = _.map(intervals, function(interval) {
+      return [interval.timestamp, Number(interval.count)];
+    });
+
+    // Zero interpolation
+    if (intervals.length > 0) {
+      ptr = 0;
+      curr = moment(_.first(_.first(intervals))).startOf('day');
+      end = moment(_.first(_.last(intervals))).endOf('day');
+
+      ptrValue = _.first(intervals[ptr]);
+      while (curr.isBefore(end)) {
+        if (curr.valueOf() !== ptrValue) {
+          intervals.splice(ptr, 0, [curr.valueOf(), 0]);
+        }
+
+        ptrValue = _.first(intervals[++ptr]);
+        curr.add(1, interval);
+      }
+    }
+
+    return intervals;
+  });
+}
+
 module.exports = {
-  write: write,
-  aggregate: aggregate
+  aggregate: aggregate,
+  getTimeseries: getTimeseries,
+  write: write
 };

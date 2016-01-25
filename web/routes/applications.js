@@ -213,6 +213,28 @@ router.post('/:name/platforms', function(req, res, next) {
 });
 
 /**
+ * GET applications/:name/metrics
+ */
+router.get('/:name/metrics.:format?', function(req, res, next) {
+  if (req.isAuthenticated()) {
+    if (req.params.format === 'json') {
+      metric.getTimeseries()
+        .then(function(timeseries){
+          res.json({
+            data: timeseries
+          });
+        }).catch(next);
+    } else {
+      res.render('applications/metrics', {
+        application: req.application
+      });
+    }
+  } else {
+    next();
+  }
+});
+
+/**
  * GET applications/:name/edit
  */
 router.get('/:name/edit', function(req, res, next) {
