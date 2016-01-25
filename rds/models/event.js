@@ -23,7 +23,7 @@ var Event = sequelize.define('Event', {
     allowNull: false
   },
   timestamp: {
-    type: Sequelize.STRING,
+    type: Sequelize.DATE,
     allowNull: false
   },
   name: {

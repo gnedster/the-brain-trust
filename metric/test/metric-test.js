@@ -24,7 +24,7 @@ describe('metric', function(){
       channelId: 'C2147483705',
       userId: 'U2147483697',
       initiator: 'client x app',
-      timestamp: '1358878749.000002',
+      timestamp: moment(),
       name: 'chat:slashdot:slack:​*:*​:message',
       details: {
         text: 'Hello'
@@ -35,7 +35,7 @@ describe('metric', function(){
     });
   });
 
-  it('should aggregate results', function(done) {
+  it('should aggregate application events', function(done) {
     var application;
     factory.create('application-platform-entity', {
         deleted_at: moment.now()
@@ -64,5 +64,22 @@ describe('metric', function(){
         assert.equal(instance.authorizations, 1);
         done();
       }).catch(logger.error);
+  });
+
+  it('should get timeseries', function(done){
+    factory.createMany('event', [{
+      timestamp: moment()
+    }, {
+      timestamp: moment().add(1, 'hour')
+    }, {
+      timestamp: moment().add(1, 'hour')
+    }, {
+      timestamp: moment().add(2, 'hour')
+    }]).then(function(){
+      return metric.getTimeseries('hour');
+    }).then(function(ts){
+      assert.equal(ts.length % 24, 0);
+      done();
+    }).catch(logger.error);
   });
 });

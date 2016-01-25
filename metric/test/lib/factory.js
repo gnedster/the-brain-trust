@@ -1,4 +1,5 @@
 var q = require('q');
+var moment = require('moment');
 var factory = require('factory-girl').promisify(q);
 var faker = require('faker');
 var rds = require('@the-brain-trust/rds');
@@ -63,7 +64,7 @@ factory.define('event', rds.models.Event, {
   channelId: 'C2147483705',
   userId: 'U2147483697',
   initiator: 'client x app',
-  timestamp: '1358878749.000002',
+  timestamp: moment(),
   name: 'chat:slashdot:slack:​*:*​:message',
   details: {
     text: faker.lorem.sentence()
