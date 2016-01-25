@@ -105,8 +105,8 @@ function aggregate() {
 
 /**
  * Return a timeseries grouped by a given intervalhs
- * @param {String} interval  Align metrics to a given interval
- * @return {Promise}         Promise containing an array of interval
+ * @param {String} interval  Align metrics to a given interval in UTC
+ * @return {Promise}         Promise containing an array of intervals in UTC
  */
 function getTimeseries(interval) {
   interval = interval || 'hour';
