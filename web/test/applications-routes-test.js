@@ -254,6 +254,39 @@ describe('/applications', function() {
     });
   });
 
+  describe('GET /applications/:name/metrics`', function(){
+    it('responds with 404 on unauthorized account', function(done){
+      request(app)
+        .get('/applications/buttonwood/metrics')
+        .set('Accept', 'text/html')
+        .set('Content-Type', 'text/html; charset=utf8')
+        .expect('Content-Type', /html/)
+        .expect(404)
+        .end(done);
+    });
+
+    it('responds with 200 on authorized account', function(done){
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .get('/applications/buttonwood/metrics')
+            .set('Accept', 'text/html')
+            .set('Content-Type', 'text/html; charset=utf8')
+            .expect(200, /metrics/);
+        });
+
+      getAuthorizedSession()
+        .then(function(testSession) {
+          testSession
+            .get('/applications/buttonwood/metrics.json')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
+        });
+
+    });
+  });
+
   describe('GET /applications/:name/edit`', function(){
     it('responds with 404 on unauthorized account', function(done){
       request(app)
@@ -418,8 +451,6 @@ describe('/applications', function() {
                 .set('Content-Type', 'text/html; charset=utf8')
                 .expect(500, done);
             }
-
-
           });
 
           testSession
