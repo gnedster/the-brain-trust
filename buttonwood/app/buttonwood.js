@@ -10,7 +10,7 @@ var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?(\\^?[a-z]{1,7}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{1,4})?';
+var stockRegexString = '(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
 const SymbolsResult = Object.create(Object.prototype, {
