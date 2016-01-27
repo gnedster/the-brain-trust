@@ -15,4 +15,3 @@ router.get('/health', function (req, res, next) {
 });
 
 module.exports = router;
-

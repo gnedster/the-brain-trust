@@ -27,6 +27,7 @@
     "botkit": "^0.0.5",
     "express": "^4.13.3",
     "finalhandler": "^0.4.1",
+    "heapdump": "^0.3.7",
     "lodash": "^3.10.1",
     "moment": "^2.11.0",
     "node-schedule": "^0.6.0",

@@ -5,6 +5,7 @@ var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
+var heapdump = require('heapdump');
 
 /**
  * Return usage information.
@@ -80,6 +81,28 @@ function hearsSymbol(controller) {
   });
 }
 
+var foobar=function() {
+ //logger.error('@@@@@@@@@@@@@@@@@@TMsg');
+ var file = '/tmp/myapp-' + process.pid + '-' + Date.now() + '.heapsnapshot';
+ heapdump.writeSnapshot(file, function(err){
+   if (err) logger.error(err);
+   else logger.error('Wrote snapshot: ' + file);
+  });
+};
+
+function hearsSecretHeapDump(controller) {
+  var headdumpComplete = 'heapdump complete';
+
+  controller.hears(['tmsgsecretheapdump','tmsghd'],
+    'direct_message,direct_mention,mention,ambient',
+    function(bot,message) {
+      logger.error('!!!!!!!!!!!!!!!!!!!!!!!!TMsg');
+      foobar();
+      bot.reply(message, headdumpComplete);
+    });
+
+}
+
 /**
  * @class
  * Defines the behavior for the buttonwood bot
@@ -88,7 +111,7 @@ function hearsSymbol(controller) {
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
 
-  this.listeners = [hearsHello, hearsSymbol];
+  this.listeners = [hearsHello, hearsSecretHeapDump, hearsSymbol];
 }
 
 BotButtonwood.prototype = Object.create(Bot.prototype);
