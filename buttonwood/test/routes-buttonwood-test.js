@@ -83,7 +83,7 @@ describe('/buttonwood', function() {
   before(function(done) {
     this.timeout(3000);
 
-    require('../models/registry');
+    require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {

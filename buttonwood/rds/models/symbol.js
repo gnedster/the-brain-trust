@@ -31,7 +31,15 @@ var Symbol = rds.define('Symbol', {
     allowNull: false
   }
 }, {
-  paranoid: false
+  paranoid: false,
+  classMethods: {
+    findSymbol: function(name) {
+      return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
+FROM symbols
+WHERE name % '${name}'
+ORDER BY similarity DESC, name;`, { type: Sequelize.QueryTypes.SELECT });
+    }
+  }
 });
 
 module.exports = Symbol;
