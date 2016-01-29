@@ -27,7 +27,7 @@ var Symbol = rds.define('Symbol', {
     allowNull: false
   },
   categoryNumber: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     allowNull: false
   }
 }, {
