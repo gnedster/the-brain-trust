@@ -48,7 +48,7 @@ describe('buttonwood', function(){
     done();
   });
 
-  it('should return a symbol using ticker lookup', function(done) {
+  it('should return a symbol using composite lookup', function(done) {
     buttonwood.matchSymbols('msft apple inc.').then(function(symbols) {
       assert.equal(symbols.valid[0], ['MSFT']);
       assert.equal(symbols.valid[1], ['AAPL']);
