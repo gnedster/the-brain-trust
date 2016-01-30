@@ -49,7 +49,7 @@ describe('buttonwood', function(){
   });
 
   it('should return a symbol using composite lookup', function(done) {
-    buttonwood.matchSymbols('msft apple inc.').then(function(symbols) {
+    buttonwood.matchSymbols('apple inc. msft').then(function(symbols) {
       assert.equal(symbols.valid[0], ['MSFT']);
       assert.equal(symbols.valid[1], ['AAPL']);
       done();
