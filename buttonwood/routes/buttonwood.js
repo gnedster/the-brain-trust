@@ -117,18 +117,28 @@ router.post('/commands/quote*', function(req, res, next) {
 
 router.post('/commands/quote_add', function(req, res, next) {
   req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
-  req.portfolio.save()
-    .then(function() {
-      res.end(`Added ${req.symbols.valid} to portfolio.`);
-    });
+
+  if (req.symbols.valid.length > 0) {
+    req.portfolio.save()
+      .then(function() {
+        res.end(`Added ${req.symbols.valid} to portfolio.`);
+      });
+  } else {
+    res.end(`${req.symbols.invalid} could not be found.`);
+  }
 });
 
 router.post('/commands/quote_remove', function(req, res, next) {
   req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols.valid);
-  req.portfolio.save()
-    .then(function() {
-      res.end(`Removed ${req.symbols.valid} from portfolio.`);
-    });
+
+  if (req.symbols.valid.length > 0) {
+    req.portfolio.save()
+      .then(function() {
+        res.end(`Removed ${req.symbols.valid} from portfolio.`);
+      });
+  } else {
+    res.end(`${req.symbols.invalid} could not be found.`);
+  }
 });
 
 router.post('/commands/quote_list', function(req, res, next) {
