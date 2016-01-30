@@ -17,7 +17,12 @@ describe('buttonwood', function(){
         });
       })
       .then(function() {
-        return factory.create('symbol');
+        return factory.createMany('symbol', [{}, {
+          ticker: 'MSFT.MX'
+        }, {
+          ticker: 'AAPL',
+          name: 'Apple Inc.'
+        }]);
       })
       .then(function() {done();})
       .catch(logger.error);
@@ -44,8 +49,9 @@ describe('buttonwood', function(){
   });
 
   it('should return a symbol using ticker lookup', function(done) {
-    buttonwood.matchSymbols('msft').then(function(symbols) {
+    buttonwood.matchSymbols('msft apple inc.').then(function(symbols) {
       assert.equal(symbols.valid[0], ['MSFT']);
+      assert.equal(symbols.valid[1], ['AAPL']);
       done();
     });
   });

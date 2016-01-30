@@ -44,18 +44,14 @@ function matchSymbols(text) {
       tokens = _.difference(tokens, result.valid);
     }
 
-    return Promise.all(_.map(tokens, function (token) {
-      return rds.models.Symbol.findSymbol(token);
-    }));
-  }).then(function(symbols){
-    _.each(symbols, function(symbol, idx) {
-      if (_.first(symbol)) {
-        result.valid.push(_.first(symbol).ticker);
-        tokens.splice(idx, 1);
-      }
-    });
+    return rds.models.Symbol.findSymbol(tokens.join(' '));
+  }).then(function(results){
+    if (_.first(results)) {
+      result.valid.push(_.first(results).ticker);
+    } else {
+      result.invalid = tokens;
+    }
 
-    result.invalid = tokens;
     return result;
   });
 }
