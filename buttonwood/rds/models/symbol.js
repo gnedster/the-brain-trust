@@ -33,6 +33,12 @@ var Symbol = rds.define('Symbol', {
 }, {
   paranoid: false,
   classMethods: {
+    /**
+     * Find closest match given a company name. Priority is given to companies
+     * listed in the United States on equal similarity. Use pg's trgrm index.
+     * @param  {String}   name  Company name
+     * @return {Symbol[]}       Collection of similar symbols
+     */
     findSymbol: function(name) {
       return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
 FROM symbols
