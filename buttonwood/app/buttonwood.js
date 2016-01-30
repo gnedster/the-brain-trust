@@ -6,12 +6,61 @@ var accounting = require('accounting');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
+var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
 var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?(\\^?[a-z]{1,7}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{1,4})?';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
-var stockCmdRegex = new RegExp(stockRegexString,'gi');
+
+const SymbolsResult = Object.create(Object.prototype, {
+  valid: [],
+  invalid: []
+});
+
+/**
+ * Find the best match for symbols given some text
+ * @param  {String}     text  String to parse
+ * @return {String[]}         List of valid symbols
+ */
+function matchSymbols(text) {
+  var tokens = _.uniq(_.map(text.split(' '), function(term) {
+    return term.toUpperCase();
+  }));
+
+  if (text.length === 0) {
+    return Promise.resolve([]);
+  }
+  var result = Object.create(SymbolsResult);
+
+  return rds.models.Symbol.findAll({
+    attributes: ['ticker'],
+    where: {
+      ticker: {
+        $in: tokens
+      }
+    }
+  }).then(function(symbols) {
+    if (symbols.length > 0) {
+      result.valid = _.pluck(symbols, 'ticker');
+      tokens = _.difference(tokens, result);
+    }
+
+    return Promise.all(_.map(tokens, function (token) {
+      return rds.models.Symbol.findSymbol(token);
+    }));
+  }).then(function(symbols){
+    _.each(symbols, function(symbol, idx) {
+      if (_.first(symbol)) {
+        result.valid.push(_.first(symbol));
+        tokens.splice(idx, 1);
+      }
+    });
+
+    result.invalid = tokens;
+    return result;
+  });
+}
 
 /**
  * Return formatted message
@@ -48,7 +97,7 @@ function messageQuote(symbols, isDetailed) {
     );
 
   return yahooFinance.snapshot({
-      symbols: symbols,
+      symbols: symbols.valid,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
       var attachments = _.map(snapshots, function(data) {
@@ -111,7 +160,13 @@ function messageQuote(symbols, isDetailed) {
             mrkdwn_in : ['title', 'text']
           };
         }
-      });
+      }).concat(_.map(symbols.invalid(function(symbol) {
+        return {
+          fallback: notFoundTpl({symbol}),
+          text: notFoundTpl({symbol}),
+          mrkdwn_in : ['text']
+        };
+      })));
 
       return {
         attachments: attachments
@@ -129,14 +184,6 @@ function parseStockQuote(str) {
 }
 
 /**
- * Return stock regex
- * @return {RegExp} to parse valid stock input
- */
-function getStockCmdRegex() {
-  return stockCmdRegex;
-}
-
-/**
  * Return stock regex string
  * @return {String} to be used by botkit listener
  */
@@ -146,7 +193,7 @@ function getStockListenRegex() {
 
 module.exports = {
   messageQuote: messageQuote,
+  matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
-  getStockCmdRegex: getStockCmdRegex,
   getStockListenRegex: getStockListenRegex
 };

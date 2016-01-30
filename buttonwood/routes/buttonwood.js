@@ -41,26 +41,21 @@ router.post('/commands/*', function(req, res, next) {
 });
 
 router.post('/commands/quote*', function(req, res, next) {
+  var text;
   if (_.contains(req.path, 'quote_list')) {
     next();
   } else {
-    var symbols = _.uniq(_.compact(_.map((_.get(req, 'body.text') || '').split(' '),
-      function(symbol) {
-        var arr = symbol.match(buttonwood.getStockCmdRegex());
-        if (arr) {
-          return arr.join(' ').toUpperCase();
-        } else {
-          return '';
-        }
-      }
-    )));
+    text = _.get(req, 'body.text') || '';
 
-    if (symbols.length > 0) {
-      req.symbols = symbols;
-      next();
-    } else {
+    if (text.length === 0) {
       res.send('please enter a valid stock ticker symbol');
     }
+
+    buttonwood.matchSymbols(_.get(req, 'body.text') || '')
+      .then(function(symbols){
+        req.symbols = symbols;
+        next();
+      });
   }
 });
 
@@ -124,24 +119,24 @@ router.post('/commands/quote*', function(req, res, next) {
 });
 
 router.post('/commands/quote_add', function(req, res, next) {
-  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols));
+  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
   req.portfolio.save()
     .then(function() {
-      res.end(`Added ${req.symbols} to portfolio.`);
+      res.end(`Added ${req.symbols.valid} to portfolio.`);
     });
 });
 
 router.post('/commands/quote_remove', function(req, res, next) {
-  req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols);
+  req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols.valid);
   req.portfolio.save()
     .then(function() {
-      res.end(`Removed ${req.symbols} from portfolio.`);
+      res.end(`Removed ${req.symbols.valid} from portfolio.`);
     });
 });
 
 router.post('/commands/quote_list', function(req, res, next) {
   if (req.portfolio.symbols.length > 0) {
-    buttonwood.messageQuote(req.portfolio.symbols, false)
+    buttonwood.messageQuote({valid: req.portfolio.symbols}, false)
       .then(function(message) {
         message.response_type = 'ephemeral';
         res.json(message);

@@ -42,8 +42,8 @@ describe('buttonwood', function(){
   });
 
   it('should return a symbol using ngram index', function(done) {
-    rds.models.Symbol.findSymbol('microsoft').then(function(symbols) {
-      assert.equal(symbols[0].ticker, 'MSFT');
+    buttonwood.matchSymbol('microsoft').then(function(symbols) {
+      assert.equal(symbols, ['MSFT']);
       done();
     });
   });
