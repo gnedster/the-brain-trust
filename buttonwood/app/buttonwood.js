@@ -39,7 +39,6 @@ function matchSymbols(text) {
       }
     }
   }).then(function(symbols) {
-    debugger;
     if (symbols.length > 0) {
       result.valid = _.pluck(symbols, 'ticker');
       tokens = _.difference(tokens, result.valid);
