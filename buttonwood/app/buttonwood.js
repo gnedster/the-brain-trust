@@ -16,7 +16,7 @@ var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 /**
  * Find the best match for symbols given some text
  * @param  {String}     text  String to parse
- * @return {String[]}         List of valid symbols
+ * @return {Object}           Object containing valid and invalid symbols
  */
 function matchSymbols(text) {
   var tokens = _.uniq(_.map(text.split(' '), function(term) {
