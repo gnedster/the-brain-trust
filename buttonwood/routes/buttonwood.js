@@ -121,7 +121,12 @@ router.post('/commands/quote_add', function(req, res, next) {
   if (req.symbols.valid.length > 0) {
     req.portfolio.save()
       .then(function() {
-        res.end(`Added ${req.symbols.valid} to portfolio.`);
+        var msg = `Added ${req.symbols.valid} to portfolio.`;
+        if (req.symbols.invalid.length > 0) {
+          msg += ` ${req.symbols.invalid} could not be found.`;
+        }
+
+        res.end(msg);
       });
   } else {
     res.end(`${req.symbols.invalid} could not be found.`);
@@ -134,7 +139,12 @@ router.post('/commands/quote_remove', function(req, res, next) {
   if (req.symbols.valid.length > 0) {
     req.portfolio.save()
       .then(function() {
-        res.end(`Removed ${req.symbols.valid} from portfolio.`);
+        var msg = `Removed ${req.symbols.valid} to portfolio.`;
+        if (req.symbols.invalid.length > 0) {
+          msg += ` ${req.symbols.invalid} could not be found.`;
+        }
+
+        res.end(msg);
       });
   } else {
     res.end(`${req.symbols.invalid} could not be found.`);
