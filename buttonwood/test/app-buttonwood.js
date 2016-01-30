@@ -43,9 +43,16 @@ describe('buttonwood', function(){
     done();
   });
 
+  it('should return a symbol using ticker lookup', function(done) {
+    buttonwood.matchSymbols('msft').then(function(symbols) {
+      assert.equal(symbols.valid[0], ['MSFT']);
+      done();
+    });
+  });
+
   it('should return a symbol using ngram index', function(done) {
-    buttonwood.matchSymbol('microsoft').then(function(symbols) {
-      assert.equal(symbols, ['MSFT']);
+    buttonwood.matchSymbols('microsoft').then(function(symbols) {
+      assert.equal(symbols.valid[0], ['MSFT']);
       done();
     });
   });

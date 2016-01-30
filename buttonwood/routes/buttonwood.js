@@ -48,14 +48,14 @@ router.post('/commands/quote*', function(req, res, next) {
     text = _.get(req, 'body.text') || '';
 
     if (text.length === 0) {
-      res.send('please enter a valid stock ticker symbol');
+      res.send('Please enter a valid stock ticker symbol.');
+    } else {
+      buttonwood.matchSymbols(_.get(req, 'body.text') || '')
+        .then(function(symbols){
+          req.symbols = symbols;
+          next();
+        });
     }
-
-    buttonwood.matchSymbols(_.get(req, 'body.text') || '')
-      .then(function(symbols){
-        req.symbols = symbols;
-        next();
-      });
   }
 });
 
@@ -112,10 +112,7 @@ router.post('/commands/quote*', function(req, res, next) {
       req.portfolio = tuple[0];
       next();
     })
-    .catch(function(err) {
-      logger.error(err);
-      res.sendStatus(500);
-    });
+    .catch(next);
 });
 
 router.post('/commands/quote_add', function(req, res, next) {

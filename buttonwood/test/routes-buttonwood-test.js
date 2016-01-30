@@ -37,7 +37,7 @@ describe('/buttonwood', function() {
         });
     });
 
-    it('responds 404 without text', function(done){
+    it('responds 200 without text', function(done){
       request(app)
         .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
@@ -196,8 +196,8 @@ describe('/buttonwood', function() {
         .expect(200)
         .end(function(err, res) {
           assert(res);
-          assert(res.text.match(/QQQAAA is not/));
-          assert(res.text.match(/QQQAAT is not/));
+          assert(res.text.match(/QQQAAA/));
+          assert(res.text.match(/QQQAAT/));
           done();
         });
     });
