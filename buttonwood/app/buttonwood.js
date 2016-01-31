@@ -43,7 +43,9 @@ function matchSymbols(text) {
     }
   }).then(function(symbols) {
     if (symbols.length > 0) {
-      result.valid = _.pluck(symbols, 'ticker');
+      result.valid = _.map(symbols, function(symbol) {
+        return symbol.ticker;
+      });
       tokens = _.difference(tokens, result.valid);
     }
 
