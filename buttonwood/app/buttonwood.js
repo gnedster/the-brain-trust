@@ -93,7 +93,8 @@ function matchSymbols(text) {
 
 /**
  * Return formatted message
- * @param  {String[]} symbols     Symbols to get price quotes for
+ * @param  {Object}   symbols     Symbols to get price quotes for, containing
+ *                                valid and invalid arrays
  * @param  {String[]} isDetailed  Provide more information than necessary
  * @return {Promise}              Promise containing Slack messages for symbols
  */
