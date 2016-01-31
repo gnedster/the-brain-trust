@@ -50,11 +50,17 @@ router.post('/commands/quote*', function(req, res, next) {
     if (text.length === 0) {
       res.send('Please enter a valid stock ticker symbol.');
     } else {
-      buttonwood.matchSymbols(_.get(req, 'body.text') || '')
-        .then(function(symbols){
-          req.symbols = symbols;
-          next();
-        });
+
+      if (_.contains(req.path, 'quote_remove')) {
+        req.symbols = text.split(' ');
+        next();
+      } else {
+        buttonwood.matchSymbols(text)
+          .then(function(symbols){
+            req.symbols = symbols;
+            next();
+          });
+      }
     }
   }
 });
@@ -134,21 +140,11 @@ router.post('/commands/quote_add', function(req, res, next) {
 });
 
 router.post('/commands/quote_remove', function(req, res, next) {
-  req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols.valid);
-
-  if (req.symbols.valid.length > 0) {
-    req.portfolio.save()
-      .then(function() {
-        var msg = `Removed ${req.symbols.valid} to portfolio.`;
-        if (req.symbols.invalid.length > 0) {
-          msg += ` ${req.symbols.invalid} could not be found.`;
-        }
-
-        res.end(msg);
-      });
-  } else {
-    res.end(`${req.symbols.invalid} could not be found.`);
-  }
+  req.portfolio.symbols = _.difference(req.portfolio.symbols, req.symbols);
+  req.portfolio.save()
+    .then(function() {
+      res.end(`Removed ${req.symbols} from portfolio.`);
+    });
 });
 
 router.post('/commands/quote_list', function(req, res, next) {
