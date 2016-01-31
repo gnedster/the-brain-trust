@@ -34,6 +34,15 @@ var Symbol = rds.define('Symbol', {
   paranoid: false,
   classMethods: {
     /**
+     * Create the pg_tgrm index on the name column
+     * @return {Promise} Result of index construction
+     */
+    createTgrmIndex: function() {
+      return rds.query('CREATE EXTENSION pg_trgm').then(function() {
+        return rds.query('CREATE INDEX name_trgm_idx ON symbols USING GIN (name gin_trgm_ops)');
+      });
+    },
+    /**
      * Find closest match given a company name. Priority is given to companies
      * listed in the United States on equal similarity. Use pg's trgrm index.
      * @param  {String}   name  Company name

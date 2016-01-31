@@ -12,11 +12,7 @@ require('../rds/registry'); // Load app specific models
  * but due to time and budget constraints, there is one shared RDS.
  */
 rds.sync()
-  .then(function() {
-    return rds.query('CREATE EXTENSION pg_trgm').then(function() {
-      return rds.query('CREATE INDEX name_trgm_idx ON symbols USING GIN (name gin_trgm_ops)');
-    });
-  })
+.then(rds.models.Symbol.createTgrmIndex)
   .then(botManager.init)
   .then(sqsListener.init)
   .catch(function(err) {

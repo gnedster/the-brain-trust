@@ -12,9 +12,7 @@ describe('buttonwood', function(){
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function(){
-        return rds.query('CREATE EXTENSION pg_trgm').then(function() {
-          return rds.query('CREATE INDEX name_trgm_idx ON symbols USING GIN (name gin_trgm_ops)');
-        });
+        return rds.models.Symbol.createTgrmIndex();
       })
       .then(function() {
         return factory.createMany('symbol', [{}, {
