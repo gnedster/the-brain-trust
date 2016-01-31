@@ -44,19 +44,28 @@ function matchSymbols(text) {
     }
   }).then(function(symbols) {
     if (symbols.length > 0) {
-      result.valid = _.map(symbols, function(symbol) {
-        return symbol.ticker;
+      _.each(tokens, function(token, idx) {
+        if (_.find(symbols, 'ticker', token)) {
+          result.valid.push(token);
+          tokens[idx] = ' ';
+        }
       });
-      tokens = _.difference(tokens, result.valid);
     }
 
-    return rds.models.Symbol.findSymbol(tokens.join(' '));
+    tokens = tokens.join(' ').split(/[\s]{2,}/g);
+
+    return Promise.all(_.map(tokens, function(token) {
+      return rds.models.Symbol.findSymbol(token);
+    }));
   }).then(function(results){
-    if (_.first(results)) {
-      result.valid.push(_.first(results).ticker);
-    } else {
-      result.invalid = tokens;
-    }
+    _.each(results, function(matches, idx) {
+      var firstMatch = _.first(matches);
+      if (firstMatch) {
+        result.valid.push(firstMatch.ticker);
+      } else {
+        result.invalid.push(tokens[idx]);
+      }
+    });
 
     return result;
   });

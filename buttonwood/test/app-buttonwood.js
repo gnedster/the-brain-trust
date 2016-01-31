@@ -22,6 +22,9 @@ describe('buttonwood', function(){
         }, {
           ticker: 'AAPL',
           name: 'Apple Inc.'
+        }, {
+          ticker: 'TWTR',
+          name: 'Twitter'
         }]);
       })
       .then(function() {done();})
@@ -51,15 +54,24 @@ describe('buttonwood', function(){
   describe ('matchSymbols', function() {
     it('should return a symbol using composite lookup', function(done) {
       buttonwood.matchSymbols('apple inc. msft').then(function(symbols) {
-        assert.equal(symbols.valid[0], ['MSFT']);
-        assert.equal(symbols.valid[1], ['AAPL']);
+        assert.equal(symbols.valid[0], 'MSFT');
+        assert.equal(symbols.valid[1], 'AAPL');
         done();
       });
     });
 
     it('should return a symbol using ngram index', function(done) {
       buttonwood.matchSymbols('microsoft').then(function(symbols) {
-        assert.equal(symbols.valid[0], ['MSFT']);
+        assert.equal(symbols.valid[0], 'MSFT');
+        done();
+      });
+    });
+
+    it('should return a symbol using ngram index', function(done) {
+      buttonwood.matchSymbols('microsoft TWTR no name').then(function(symbols) {
+        assert.equal(symbols.valid[0], 'TWTR');
+        assert.equal(symbols.valid[1], 'MSFT');
+        assert.equal(symbols.invalid[0], 'NO NAME');
         done();
       });
     });
