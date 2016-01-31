@@ -18,7 +18,8 @@ var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
  * checked against the tickers in db, then the remaining terms are assumed to
  * be some ticker name.
  * @param  {String}     text  String to parse
- * @return {Object}           Object containing valid and invalid symbols
+ * @return {Promise}          Promise resolves object containing valid and
+ *                            invalid symbols
  */
 function matchSymbols(text) {
   var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
