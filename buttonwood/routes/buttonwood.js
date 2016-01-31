@@ -41,25 +41,26 @@ router.post('/commands/*', function(req, res, next) {
 });
 
 router.post('/commands/quote*', function(req, res, next) {
+  var text;
   if (_.contains(req.path, 'quote_list')) {
     next();
   } else {
-    var symbols = _.uniq(_.compact(_.map((_.get(req, 'body.text') || '').split(' '),
-      function(symbol) {
-        var arr = symbol.match(buttonwood.getStockCmdRegex());
-        if (arr) {
-          return arr.join(' ').toUpperCase();
-        } else {
-          return '';
-        }
-      }
-    )));
+    text = _.get(req, 'body.text') || '';
 
-    if (symbols.length > 0) {
-      req.symbols = symbols;
-      next();
+    if (text.length === 0) {
+      res.send('Please enter a valid stock ticker symbol.');
     } else {
-      res.send('please enter a valid stock ticker symbol');
+
+      if (_.contains(req.path, 'quote_remove')) {
+        req.symbols = text.split(' ');
+        next();
+      } else {
+        buttonwood.matchSymbols(text)
+          .then(function(symbols){
+            req.symbols = symbols;
+            next();
+          });
+      }
     }
   }
 });
@@ -117,18 +118,25 @@ router.post('/commands/quote*', function(req, res, next) {
       req.portfolio = tuple[0];
       next();
     })
-    .catch(function(err) {
-      logger.error(err);
-      res.sendStatus(500);
-    });
+    .catch(next);
 });
 
 router.post('/commands/quote_add', function(req, res, next) {
-  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols));
-  req.portfolio.save()
-    .then(function() {
-      res.end(`Added ${req.symbols} to portfolio.`);
-    });
+  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
+
+  if (req.symbols.valid.length > 0) {
+    req.portfolio.save()
+      .then(function() {
+        var msg = `Added ${req.symbols.valid} to portfolio.`;
+        if (req.symbols.invalid.length > 0) {
+          msg += ` ${req.symbols.invalid} could not be found.`;
+        }
+
+        res.end(msg);
+      });
+  } else {
+    res.end(`${req.symbols.invalid} could not be found.`);
+  }
 });
 
 router.post('/commands/quote_remove', function(req, res, next) {
@@ -141,7 +149,7 @@ router.post('/commands/quote_remove', function(req, res, next) {
 
 router.post('/commands/quote_list', function(req, res, next) {
   if (req.portfolio.symbols.length > 0) {
-    buttonwood.messageQuote(req.portfolio.symbols, false)
+    buttonwood.messageQuote({valid: req.portfolio.symbols}, false)
       .then(function(message) {
         message.response_type = 'ephemeral';
         res.json(message);

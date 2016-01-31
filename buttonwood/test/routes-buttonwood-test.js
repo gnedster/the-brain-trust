@@ -37,7 +37,7 @@ describe('/buttonwood', function() {
         });
     });
 
-    it('responds 404 without text', function(done){
+    it('responds 200 without text', function(done){
       request(app)
         .post(`/buttonwood/commands/quote${command}`)
         .set('Accept', 'application/json')
@@ -56,12 +56,12 @@ describe('/buttonwood', function() {
         .type('form')
         .send({
           token: commandToken,
-          text: '$!@$@!',
+          text: 'asdf',
           team_id: faker.random.uuid(),
           channel_id: faker.random.uuid(),
           user_id: faker.random.uuid()
         })
-        .expect(200, /valid/, done);
+        .expect(200, /asdf/i, done);
     });
   }
 
@@ -83,9 +83,15 @@ describe('/buttonwood', function() {
   before(function(done) {
     this.timeout(3000);
 
-    require('../models/registry');
+    require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
+      .then(function(){
+        return rds.models.Symbol.createTgrmIndex();
+      })
+      .then(function() {
+        return factory.create('symbol');
+      })
       .then(function() {
         return factory.create('application-permission', {
           commandToken: commandToken
@@ -142,7 +148,7 @@ describe('/buttonwood', function() {
         .type('form')
         .send({
           token: commandToken,
-          text: 'AAPL',
+          text: 'MSFT',
           team_id: faker.random.uuid(),
           channel_id: faker.random.uuid(),
           user_id: userId
@@ -171,8 +177,8 @@ describe('/buttonwood', function() {
     shouldNotBeFoundWithoutToken('list');
   });
 
-  describe('POST commands/quote with 2 invalid symbols', function(){
-    it('expecting not to find either invalid stocks', function(done){
+  describe('POST commands/quote with invalid symbols', function(){
+    it('should notify invalid symbols', function(done){
       request(app)
         .post(`/buttonwood/commands/quote`)
         .set('Accept', 'application/json')
@@ -191,28 +197,6 @@ describe('/buttonwood', function() {
           assert(res.text.match(/QQQAAA/));
           assert(res.text.match(/QQQAAT/));
           assert.equal(null, res.text.match(/QQQAAAQQQAAT/));
-          done();
-        });
-    });
-
-    it('expecting not to find either first stock and drop garbage character', function(done){
-      request(app)
-        .post(`/buttonwood/commands/quote`)
-        .set('Accept', 'application/json')
-        .type('form')
-        .send({
-          token: commandToken,
-          text: 'QQQAAA $!@$@!',
-          team_id: faker.random.uuid(),
-          channel_id: faker.random.uuid(),
-          user_id: faker.random.uuid()
-        })
-        .expect('Content-Type', 'application/json')
-        .expect(200)
-        .end(function(err, res) {
-          assert(res);
-          assert(res.text.match(/QQQAAA/));
-          assert.equal(null, res.text.match(/$!@$@!/));
           done();
         });
     });

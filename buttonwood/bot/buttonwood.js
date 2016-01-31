@@ -50,8 +50,7 @@ function hearsSymbol(controller) {
       }
     });
 
-
-    buttonwood.messageQuote(symbols, isDetailed)
+    buttonwood.messageQuote({valid: symbols}, isDetailed)
       .then(function(response) {
         return new Promise(function(resolve, reject) {
           bot.reply(message, response, function(err, resp) {

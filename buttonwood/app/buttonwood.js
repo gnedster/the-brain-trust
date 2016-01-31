@@ -6,16 +6,95 @@ var accounting = require('accounting');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
+var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '([a-z]{2,4}:(?![a-z\\d]+\\.))?(\\^?[a-z]{1,7}|\\d{1,3}(?=\\.[a-z]{2}))(\\.[a-z]{1,4})?';
+var stockRegexString = '(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
-var stockCmdRegex = new RegExp(stockRegexString,'gi');
+
+/**
+ * Find the best match for symbols given some text. Each term is first
+ * checked against the tickers in db, then the remaining terms are assumed to
+ * be some ticker name.
+ * @param  {String}     text  String to parse
+ * @return {Promise}          Promise resolves object containing valid and
+ *                            invalid symbols
+ */
+function matchSymbols(text) {
+  var searchTerms = [];
+  var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
+    return term.toUpperCase();
+  })));
+
+  var result = Object.create({
+    valid: [],
+    invalid: []
+  });
+
+  if (text.length === 0) {
+    return Promise.resolve(result);
+  }
+
+  return rds.models.Symbol.findAll({
+    attributes: ['ticker'],
+    where: {
+      ticker: {
+        $in: tokens
+      }
+    }
+  }).then(function(symbols) {
+    if (symbols.length > 0) {
+      _.each(tokens, function(token, idx) {
+        if (_.find(symbols, 'ticker', token)) {
+          result.valid.push(token);
+          tokens[idx] = null;
+        }
+      });
+    }
+
+    var searchTerm = null;
+
+    for (var i = 0, ii = tokens.length + 1; i < ii; i++) {
+      if (_.isString(tokens[i])) {
+        searchTerm = searchTerm || '';
+        searchTerm += ` ${tokens[i]}`;
+      } else {
+        if (searchTerm) {
+          searchTerms.push(_.trim(searchTerm));
+          searchTerm = null;
+        }
+        if (i < ii - 1) {
+          searchTerms.push(null);
+        }
+      }
+    }
+
+    return Promise.all(_.map(searchTerms, function(searchTerm) {
+      if (searchTerm === null) {
+        return []; // Simulate an empty result set
+      } else {
+        return rds.models.Symbol.findSymbol(searchTerm);
+      }
+    }));
+  }).then(function(results){
+    _.each(results, function(matches, idx) {
+      var firstMatch = _.first(matches);
+      if (firstMatch) {
+        result.valid.splice(idx, 0, firstMatch.ticker);
+      } else if (_.isString(searchTerms[idx])){
+        result.invalid.push(searchTerms[idx]);
+      }
+    });
+
+    return result;
+  });
+}
 
 /**
  * Return formatted message
- * @param  {String[]} symbols     Symbols to get price quotes for
+ * @param  {Object}   symbols     Symbols to get price quotes for, containing
+ *                                valid and invalid arrays
  * @param  {String[]} isDetailed  Provide more information than necessary
  * @return {Promise}              Promise containing Slack messages for symbols
  */
@@ -47,76 +126,88 @@ function messageQuote(symbols, isDetailed) {
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
 
-  return yahooFinance.snapshot({
-      symbols: symbols,
-      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
-    }).then(function (snapshots) {
-      var attachments = _.map(snapshots, function(data) {
-        logger.debug(data);
+  var invalidAttachments = _.map(symbols.invalid, (function(symbol) {
+    return {
+      fallback: notFoundTpl({symbol}),
+      text: notFoundTpl({symbol}),
+      mrkdwn_in : ['text']
+    };
+  }));
 
-        var attachmentFieldsBasic = [{
-          title: 'Last Trade',
-          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
-          short: true
-        }, {
-          title: 'Change',
-          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
-          short: true
-        }];
+  if (symbols.valid.length > 0) {
+    return yahooFinance.snapshot({
+        symbols: symbols.valid,
+        fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+      }).then(function (snapshots) {
+        var attachments = _.map(snapshots, function(data) {
+          logger.debug(data);
 
-        var attachmentFieldsDetailed = [{
-          title: 'Volume',
-          value: accounting.formatNumber(data.volume),
-          short: true
-        }, {
-          title: 'Avg. Daily Volume',
-          value: accounting.formatNumber(data.averageDailyVolume),
-          short: true
-        }, {
-          title: 'Day Range',
-          value: data.daysRange || 'n/a',
-          short: true
-        }, {
-          title: '52 Week Range',
-          value: data['52WeekRange'] || 'n/a',
-          short: true
-        }, {
-          title: 'P/E',
-          value: data.peRatio || 'n/a',
-          short: true
-        }, {
-          title: 'EPS',
-          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
-          short: true
-        }, {
-          title: 'Market Capitalization',
-          value: data.marketCapitalization || 'n/a',
-          short: true
-        }];
+          var attachmentFieldsBasic = [{
+            title: 'Last Trade',
+            value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+            short: true
+          }, {
+            title: 'Change',
+            value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+            short: true
+          }];
 
-        if (_.isEmpty(data.name)) {
-          return {
-            fallback: notFoundTpl(data),
-            text: notFoundTpl(data),
-            mrkdwn_in : ['text']
-          };
-        } else {
-          return {
-            fallback: priceTpl(data),
-            color: number.color(data.changeInPercent),
-            title: _.template('<%= symbol %> (<%= name %>)')(data),
-            title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
-            text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-            fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
-            mrkdwn_in : ['title', 'text']
-          };
-        }
+          var attachmentFieldsDetailed = [{
+            title: 'Volume',
+            value: accounting.formatNumber(data.volume),
+            short: true
+          }, {
+            title: 'Avg. Daily Volume',
+            value: accounting.formatNumber(data.averageDailyVolume),
+            short: true
+          }, {
+            title: 'Day Range',
+            value: data.daysRange || 'n/a',
+            short: true
+          }, {
+            title: '52 Week Range',
+            value: data['52WeekRange'] || 'n/a',
+            short: true
+          }, {
+            title: 'P/E',
+            value: data.peRatio || 'n/a',
+            short: true
+          }, {
+            title: 'EPS',
+            value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+            short: true
+          }, {
+            title: 'Market Capitalization',
+            value: data.marketCapitalization || 'n/a',
+            short: true
+          }];
+
+          if (_.isEmpty(data.name)) {
+            return {
+              fallback: notFoundTpl(data),
+              text: notFoundTpl(data),
+              mrkdwn_in : ['text']
+            };
+          } else {
+            return {
+              fallback: priceTpl(data),
+              color: number.color(data.changeInPercent),
+              title: _.template('<%= symbol %> (<%= name %>)')(data),
+              title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
+              text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
+              fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+              mrkdwn_in : ['title', 'text']
+            };
+          }
+        }).concat(invalidAttachments);
+
+        return {
+          attachments: attachments
+        };
       });
-
-      return {
-        attachments: attachments
-      };
-    });
+    } else {
+      return Promise.resolve({attachments: invalidAttachments});
+    }
 }
 
 /**
@@ -129,14 +220,6 @@ function parseStockQuote(str) {
 }
 
 /**
- * Return stock regex
- * @return {RegExp} to parse valid stock input
- */
-function getStockCmdRegex() {
-  return stockCmdRegex;
-}
-
-/**
  * Return stock regex string
  * @return {String} to be used by botkit listener
  */
@@ -146,7 +229,7 @@ function getStockListenRegex() {
 
 module.exports = {
   messageQuote: messageQuote,
+  matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
-  getStockCmdRegex: getStockCmdRegex,
   getStockListenRegex: getStockListenRegex
 };

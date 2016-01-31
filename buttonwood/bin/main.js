@@ -4,7 +4,7 @@ var botManager = require('../lib/bot-manager.js');
 var sqsListener = require('../lib/sqs-listener.js');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
-require('../models/registry'); // Load app specific models
+require('../rds/registry'); // Load app specific models
 
 /**
  * This is just a little dangerous since multiple applications are able to sync.
@@ -12,6 +12,7 @@ require('../models/registry'); // Load app specific models
  * but due to time and budget constraints, there is one shared RDS.
  */
 rds.sync()
+.then(rds.models.Symbol.createTgrmIndex)
   .then(botManager.init)
   .then(sqsListener.init)
   .catch(function(err) {

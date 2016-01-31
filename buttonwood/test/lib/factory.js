@@ -2,6 +2,7 @@ var q = require('q');
 var factory = require('factory-girl').promisify(q);
 var faker = require('faker');
 var rds = require('@the-brain-trust/rds');
+var registry = require('../../rds/registry');
 require('factory-girl-sequelize')();
 
 factory.define('platform', rds.models.Platform, {
@@ -61,5 +62,13 @@ factory.define('application-platform-entity',
   }
 });
 
+factory.define('symbol', registry.Symbol, {
+  ticker: 'MSFT',
+  name: 'Microsoft Corporation',
+  exchange: 'NMS',
+  country: 'USA',
+  categoryName: 'Business Software & Services',
+  categoryNumber: 826
+});
 
 module.exports = factory;
