@@ -48,18 +48,28 @@ describe('buttonwood', function(){
     done();
   });
 
-  it('should return a symbol using composite lookup', function(done) {
-    buttonwood.matchSymbols('apple inc. msft').then(function(symbols) {
-      assert.equal(symbols.valid[0], ['MSFT']);
-      assert.equal(symbols.valid[1], ['AAPL']);
-      done();
+  describe ('matchSymbols', function() {
+    it('should return a symbol using composite lookup', function(done) {
+      buttonwood.matchSymbols('apple inc. msft').then(function(symbols) {
+        assert.equal(symbols.valid[0], ['MSFT']);
+        assert.equal(symbols.valid[1], ['AAPL']);
+        done();
+      });
     });
-  });
 
-  it('should return a symbol using ngram index', function(done) {
-    buttonwood.matchSymbols('microsoft').then(function(symbols) {
-      assert.equal(symbols.valid[0], ['MSFT']);
-      done();
+    it('should return a symbol using ngram index', function(done) {
+      buttonwood.matchSymbols('microsoft').then(function(symbols) {
+        assert.equal(symbols.valid[0], ['MSFT']);
+        done();
+      });
+    });
+
+    it('should return an empty value', function(done) {
+      buttonwood.matchSymbols('   ').then(function(symbols) {
+        assert(symbols.valid.length === 0);
+        assert(symbols.valid.length === 0);
+        done();
+      });
     });
   });
 });

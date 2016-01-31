@@ -198,6 +198,7 @@ describe('/buttonwood', function() {
           assert(res);
           assert(res.text.match(/QQQAAA/));
           assert(res.text.match(/QQQAAT/));
+          assert.equal(null, res.text.match(/QQQAAAQQQAAT/));
           done();
         });
     });

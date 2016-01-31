@@ -14,22 +14,25 @@ var stockRegexString = '(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
 /**
- * Find the best match for symbols given some text
+ * Find the best match for symbols given some text. Each term is first
+ * checked against the tickers in db, then the remaining terms are assumed to
+ * be some ticker name.
  * @param  {String}     text  String to parse
  * @return {Object}           Object containing valid and invalid symbols
  */
 function matchSymbols(text) {
-  var tokens = _.uniq(_.map(text.split(' '), function(term) {
+  var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
     return term.toUpperCase();
-  }));
+  })));
 
-  if (text.length === 0) {
-    return Promise.resolve([]);
-  }
   var result = Object.create({
     valid: [],
     invalid: []
   });
+
+  if (text.length === 0) {
+    return Promise.resolve(result);
+  }
 
   return rds.models.Symbol.findAll({
     attributes: ['ticker'],
