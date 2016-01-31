@@ -22,6 +22,7 @@ var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
  *                            invalid symbols
  */
 function matchSymbols(text) {
+  var searchTerms = [];
   var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
     return term.toUpperCase();
   })));
@@ -47,23 +48,42 @@ function matchSymbols(text) {
       _.each(tokens, function(token, idx) {
         if (_.find(symbols, 'ticker', token)) {
           result.valid.push(token);
-          tokens[idx] = ' ';
+          tokens[idx] = null;
         }
       });
     }
 
-    tokens = tokens.join(' ').split(/[\s]{2,}/g);
+    var searchTerm = null;
 
-    return Promise.all(_.map(tokens, function(token) {
-      return rds.models.Symbol.findSymbol(token);
+    for (var i = 0, ii = tokens.length + 1; i < ii; i++) {
+      if (_.isString(tokens[i])) {
+        searchTerm = searchTerm || '';
+        searchTerm += ` ${tokens[i]}`;
+      } else {
+        if (searchTerm) {
+          searchTerms.push(_.trim(searchTerm));
+          searchTerm = null;
+        }
+        if (i < ii - 1) {
+          searchTerms.push(null);
+        }
+      }
+    }
+
+    return Promise.all(_.map(searchTerms, function(searchTerm) {
+      if (searchTerm === null) {
+        return []; // Simulate an empty result set
+      } else {
+        return rds.models.Symbol.findSymbol(searchTerm);
+      }
     }));
   }).then(function(results){
     _.each(results, function(matches, idx) {
       var firstMatch = _.first(matches);
       if (firstMatch) {
-        result.valid.push(firstMatch.ticker);
-      } else {
-        result.invalid.push(tokens[idx]);
+        result.valid.splice(idx, 0, firstMatch.ticker);
+      } else if (_.isString(searchTerms[idx])){
+        result.invalid.push(searchTerms[idx]);
       }
     });
 
