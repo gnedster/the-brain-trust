@@ -52,7 +52,7 @@ var Symbol = rds.define('Symbol', {
       return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
 FROM symbols
 WHERE name % '${name}'
-ORDER BY similarity DESC, country='USA' DESC;`, { type: Sequelize.QueryTypes.SELECT });
+ORDER BY country='USA' DESC, similarity DESC;`, { type: Sequelize.QueryTypes.SELECT });
     }
   }
 });
