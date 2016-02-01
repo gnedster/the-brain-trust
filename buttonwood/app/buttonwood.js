@@ -83,7 +83,7 @@ function matchSymbols(text) {
       if (firstMatch) {
         result.valid.splice(idx, 0, firstMatch.ticker);
       } else if (_.isString(searchTerms[idx])){
-        result.invalid.push(searchTerms[idx]);
+        result.invalid = result.invalid.concat(searchTerms[idx].split(' '));
       }
     });
 
@@ -126,88 +126,77 @@ function messageQuote(symbols, isDetailed) {
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
 
-  var invalidAttachments = _.map(symbols.invalid, (function(symbol) {
-    return {
-      fallback: notFoundTpl({symbol}),
-      text: notFoundTpl({symbol}),
-      mrkdwn_in : ['text']
-    };
-  }));
+  return yahooFinance.snapshot({
+      // We might not have every Yahoo symbol
+      symbols: symbols.valid.concat(symbols.invalid),
+      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+    }).then(function (snapshots) {
+      var attachments = _.map(snapshots, function(data) {
+        logger.debug(data);
 
-  if (symbols.valid.length > 0) {
-    return yahooFinance.snapshot({
-        symbols: symbols.valid,
-        fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
-      }).then(function (snapshots) {
-        var attachments = _.map(snapshots, function(data) {
-          logger.debug(data);
+        var attachmentFieldsBasic = [{
+          title: 'Last Trade',
+          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+          short: true
+        }, {
+          title: 'Change',
+          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+          short: true
+        }];
 
-          var attachmentFieldsBasic = [{
-            title: 'Last Trade',
-            value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
-            short: true
-          }, {
-            title: 'Change',
-            value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
-            short: true
-          }];
+        var attachmentFieldsDetailed = [{
+          title: 'Volume',
+          value: accounting.formatNumber(data.volume),
+          short: true
+        }, {
+          title: 'Avg. Daily Volume',
+          value: accounting.formatNumber(data.averageDailyVolume),
+          short: true
+        }, {
+          title: 'Day Range',
+          value: data.daysRange || 'n/a',
+          short: true
+        }, {
+          title: '52 Week Range',
+          value: data['52WeekRange'] || 'n/a',
+          short: true
+        }, {
+          title: 'P/E',
+          value: data.peRatio || 'n/a',
+          short: true
+        }, {
+          title: 'EPS',
+          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+          short: true
+        }, {
+          title: 'Market Capitalization',
+          value: data.marketCapitalization || 'n/a',
+          short: true
+        }];
 
-          var attachmentFieldsDetailed = [{
-            title: 'Volume',
-            value: accounting.formatNumber(data.volume),
-            short: true
-          }, {
-            title: 'Avg. Daily Volume',
-            value: accounting.formatNumber(data.averageDailyVolume),
-            short: true
-          }, {
-            title: 'Day Range',
-            value: data.daysRange || 'n/a',
-            short: true
-          }, {
-            title: '52 Week Range',
-            value: data['52WeekRange'] || 'n/a',
-            short: true
-          }, {
-            title: 'P/E',
-            value: data.peRatio || 'n/a',
-            short: true
-          }, {
-            title: 'EPS',
-            value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
-            short: true
-          }, {
-            title: 'Market Capitalization',
-            value: data.marketCapitalization || 'n/a',
-            short: true
-          }];
-
-          if (_.isEmpty(data.name)) {
-            return {
-              fallback: notFoundTpl(data),
-              text: notFoundTpl(data),
-              mrkdwn_in : ['text']
-            };
-          } else {
-            return {
-              fallback: priceTpl(data),
-              color: number.color(data.changeInPercent),
-              title: _.template('<%= symbol %> (<%= name %>)')(data),
-              title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
-              text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-              fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
-              mrkdwn_in : ['title', 'text']
-            };
-          }
-        }).concat(invalidAttachments);
-
-        return {
-          attachments: attachments
-        };
+        if (_.isEmpty(data.name)) {
+          return {
+            fallback: notFoundTpl(data),
+            text: notFoundTpl(data),
+            mrkdwn_in : ['text']
+          };
+        } else {
+          return {
+            fallback: priceTpl(data),
+            color: number.color(data.changeInPercent),
+            title: _.template('<%= symbol %> (<%= name %>)')(data),
+            title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
+            text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
+            fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+            mrkdwn_in : ['title', 'text']
+          };
+        }
       });
-    } else {
-      return Promise.resolve({attachments: invalidAttachments});
-    }
+
+      return {
+        attachments: attachments
+      };
+    });
 }
 
 /**

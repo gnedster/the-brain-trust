@@ -69,7 +69,8 @@ describe('buttonwood', function(){
       buttonwood.matchSymbols('microsoft TWTR no name').then(function(symbols) {
         assert.equal(symbols.valid[0], 'MSFT');
         assert.equal(symbols.valid[1], 'TWTR');
-        assert.equal(symbols.invalid[0], 'NO NAME');
+        assert.equal(symbols.invalid[0], 'NO');
+        assert.equal(symbols.invalid[1], 'NAME');
         done();
       });
     });
