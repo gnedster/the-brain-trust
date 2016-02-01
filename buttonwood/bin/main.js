@@ -12,7 +12,6 @@ require('../rds/registry'); // Load app specific models
  * but due to time and budget constraints, there is one shared RDS.
  */
 rds.sync()
-.then(rds.models.Symbol.createTgrmIndex)
   .then(botManager.init)
   .then(sqsListener.init)
   .catch(function(err) {
