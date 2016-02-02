@@ -116,7 +116,7 @@ function getTimeseries(options) {
   var entityId = options.entityId;
 
   // Hardcoded for team_id
-  var whereClause = entityId ? `team_id = ${entityId}` : '1 = 1';
+  var whereClause = entityId ? `team_id = '${entityId}'` : '1 = 1';
 
   return rds.query(
 `SELECT extract(epoch from date_trunc('${interval}', timestamp)) * 1000 AS timestamp, count(*)

@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/metric",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "library to record application metrics",
   "main": "metric.js",
   "scripts": {

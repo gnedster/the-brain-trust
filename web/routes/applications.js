@@ -218,7 +218,7 @@ router.post('/:name/platforms', function(req, res, next) {
 router.get('/:name/metrics.:format?', function(req, res, next) {
   if (req.isAuthenticated()) {
     if (req.params.format === 'json') {
-      metric.getTimeseries({entityId: req.params.entityId})
+      metric.getTimeseries({entityId: req.query.entityId})
         .then(function(timeseries){
           res.json({
             data: timeseries
