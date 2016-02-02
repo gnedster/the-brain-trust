@@ -35,6 +35,10 @@ var Event = sequelize.define('Event', {
     allowNull: false
   }
 }, {
+  indexes: [{
+    fields: 'teamId',
+    method: 'BTREE'
+  }],
   timestamps: false,
   paranoid: false
 });
