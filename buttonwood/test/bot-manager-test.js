@@ -15,7 +15,7 @@ describe('BotButtonwood', function(){
 
     require('../rds/registry');
 
-    rds.sync({force: true, logging: logger.stream.write})
+    rds.sync({logging: logger.stream.write})
       .then(function() {
         return factory.create('application-platform-entity');
       })
