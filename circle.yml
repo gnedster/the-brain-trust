@@ -1,5 +1,5 @@
-database:
-  post:
+test:
+  pre:
     - psql -c "CREATE EXTENSION pg_tgrm;" -d circle_test
 dependencies:
   cache_directories:
