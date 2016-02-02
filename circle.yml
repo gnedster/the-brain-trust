@@ -1,3 +1,6 @@
+database:
+  post:
+    - psql -c "CREATE EXTENSION pg_trgm;" -d circle_test
 dependencies:
   cache_directories:
     - "buttonwood/node_modules"
