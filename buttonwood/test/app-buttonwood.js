@@ -10,10 +10,7 @@ describe('buttonwood', function(){
 
     require('../rds/registry');
 
-    rds.query('CREATE EXTENSION pg_tgrm;')
-      .then(function(){
-        rds.sync({force: true, logging: logger.stream.write});
-      })
+    rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
         return factory.createMany('symbol', [{}, {
           ticker: 'MSFT.MX'
