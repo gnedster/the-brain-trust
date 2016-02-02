@@ -1,4 +1,7 @@
 database:
+  pre:
+    - sudo service postgresql stop && sudo apt-get install -y postgresql-contrib-9.4
+    - sudo service postgresql restart
   post:
     - psql -c "CREATE EXTENSION pg_tgrm;" -d circle_test
 machine:
