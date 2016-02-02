@@ -1,3 +1,6 @@
+database:
+  post:
+    - psql -c "CREATE EXTENSION IF NOT EXIST pg_tgrm;" -d circle_test
 machine:
   ruby:
     version: ruby-2.2.3
