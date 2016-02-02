@@ -31,17 +31,12 @@ var Symbol = rds.define('Symbol', {
     allowNull: false
   }
 }, {
-  paranoid: false,
+  indexes: [{
+    fields: ['name'],
+    using: 'gin',
+    operator: 'gin_trgm_ops'
+  }],
   classMethods: {
-    /**
-     * Create the pg_tgrm index on the name column
-     * @return {Promise} Result of index construction
-     */
-    createTgrmIndex: function() {
-      return rds.query('CREATE EXTENSION pg_trgm').then(function() {
-        return rds.query('CREATE INDEX name_trgm_idx ON symbols USING GIN (name gin_trgm_ops)');
-      });
-    },
     /**
      * Find closest match given a company name. Priority is given to companies
      * listed in the United States on equal similarity. Use pg's trgrm index.
@@ -53,7 +48,8 @@ var Symbol = rds.define('Symbol', {
 FROM symbols
 WHERE name % '${name}'
 ORDER BY country='USA' DESC, similarity DESC;`, { type: Sequelize.QueryTypes.SELECT });
-    }
+    },
+    paranoid: false
   }
 });
 
