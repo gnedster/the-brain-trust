@@ -5,6 +5,13 @@ dependencies:
   cache_directories:
     - "buttonwood"
     - "web"
+    - "error"
+    - "logger"
+    - "mailer"
+    - "metric"
+    - "rds"
+    - "sqs"
+    - "utility"
 machine:
   ruby:
     version: ruby-2.2.3
