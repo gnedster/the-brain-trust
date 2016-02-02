@@ -71,10 +71,22 @@ function matchSymbols(text) {
     }
 
     return Promise.all(_.map(searchTerms, function(searchTerm) {
+      var xchgRegexp = new RegExp('(.+):(.+)');
       if (searchTerm === null) {
         return []; // Simulate an empty result set
       } else {
-        return rds.models.Symbol.findSymbol(searchTerm);
+        /* If colon is in term we are expecting it to be formated as
+         * exchange:term
+         */
+        var xchgRegexResult = xchgRegexp.exec();
+        var xchg = null;
+        if (!_.isNull(xchgRegexResult)) {
+          //TODO make sure there is only one colon
+          xchg = xchgRegexResult[1];
+          //TODO map various known exchanges with internal symbols
+          searchTerm = xchgRegexResult[2];
+        }
+        return rds.models.Symbol.findSymbol(searchTerm, xchg);
       }
     }));
   }).then(function(results){
