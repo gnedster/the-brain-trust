@@ -87,7 +87,7 @@ describe('/buttonwood', function() {
 
     rds.query('CREATE EXTENSION pg_tgrm;')
       .then(function(){
-        rds.sync({force: true, logging: logger.stream.write});
+        return rds.sync({force: true, logging: logger.stream.write});
       })
       .then(function() {
         return factory.create('symbol');
