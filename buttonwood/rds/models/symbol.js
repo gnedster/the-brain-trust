@@ -48,9 +48,9 @@ var Symbol = rds.define('Symbol', {
 FROM symbols
 WHERE name % '${name}'
 ORDER BY country='USA' DESC, similarity DESC;`, { type: Sequelize.QueryTypes.SELECT });
-    },
-    paranoid: false
-  }
+    }
+  },
+  paranoid: false
 });
 
 module.exports = Symbol;
