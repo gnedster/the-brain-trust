@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var accounting = require('accounting');
+var exchangeMap = require('./lib/exchange-mapping.js');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
@@ -79,11 +80,9 @@ function matchSymbols(text) {
          * exchange:term
          */
         var xchgRegexResult = xchgRegexp.exec();
-        var xchg = null;
+        var xchg = undefined;
         if (!_.isNull(xchgRegexResult)) {
-          //TODO make sure there is only one colon
-          xchg = xchgRegexResult[1];
-          //TODO map various known exchanges with internal symbols
+          xchg = exchangeMap.get(xchgRegexResult[1]);
           searchTerm = xchgRegexResult[2];
         }
         return rds.models.Symbol.findSymbol(searchTerm, xchg);
@@ -137,78 +136,100 @@ function messageQuote(symbols, isDetailed) {
   var notFoundTpl =_.template(
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
+  var colonSymbols = [];
+  var invalidSymbols = [];
 
-  return yahooFinance.snapshot({
-      // We might not have every Yahoo symbol
-      symbols: symbols.valid.concat(symbols.invalid),
-      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
-    }).then(function (snapshots) {
-      var attachments = _.map(snapshots, function(data) {
-        logger.debug(data);
+  //Symbols with ':' do not work well with Yahoo API remove them
+  for (var i = 0, ii = symbols.invalid.length; i < ii; i++) {
+    if (/:/.test(symbols.invalid[i])) {
+      colonSymbols.push(symbols.invalid[i]);
+    } else {
+      invalidSymbols.push(symbols.invalid[i]);
+    }
+  }
+  var invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
+    return {
+      fallback: notFoundTpl({symbol}),
+      text: notFoundTpl({symbol}),
+      mrkdwn_in : ['text']
+    };
+  }));
 
-        var attachmentFieldsBasic = [{
-          title: 'Last Trade',
-          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
-          short: true
-        }, {
-          title: 'Change',
-          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
-          short: true
-        }];
-
-        var attachmentFieldsDetailed = [{
-          title: 'Volume',
-          value: accounting.formatNumber(data.volume),
-          short: true
-        }, {
-          title: 'Avg. Daily Volume',
-          value: accounting.formatNumber(data.averageDailyVolume),
-          short: true
-        }, {
-          title: 'Day Range',
-          value: data.daysRange || 'n/a',
-          short: true
-        }, {
-          title: '52 Week Range',
-          value: data['52WeekRange'] || 'n/a',
-          short: true
-        }, {
-          title: 'P/E',
-          value: data.peRatio || 'n/a',
-          short: true
-        }, {
-          title: 'EPS',
-          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
-          short: true
-        }, {
-          title: 'Market Capitalization',
-          value: data.marketCapitalization || 'n/a',
-          short: true
-        }];
-
-        if (_.isEmpty(data.name)) {
-          return {
-            fallback: notFoundTpl(data),
-            text: notFoundTpl(data),
-            mrkdwn_in : ['text']
-          };
-        } else {
-          return {
-            fallback: priceTpl(data),
-            color: number.color(data.changeInPercent),
-            title: _.template('<%= symbol %> (<%= name %>)')(data),
-            title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
-            text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-            fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
-            mrkdwn_in : ['title', 'text']
-          };
-        }
+  if ((symbols.valid.length + invalidSymbols.length) > 0) {
+    return yahooFinance.snapshot({
+        // We might not have every Yahoo symbol
+        symbols: symbols.valid.concat(invalidSymbols),
+        fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+      }).then(function (snapshots) {
+        var attachments = _.map(snapshots, function(data) {
+          logger.debug(data);
+  
+          var attachmentFieldsBasic = [{
+            title: 'Last Trade',
+            value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+            short: true
+          }, {
+            title: 'Change',
+            value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+            short: true
+          }];
+  
+          var attachmentFieldsDetailed = [{
+            title: 'Volume',
+            value: accounting.formatNumber(data.volume),
+            short: true
+          }, {
+            title: 'Avg. Daily Volume',
+            value: accounting.formatNumber(data.averageDailyVolume),
+            short: true
+          }, {
+            title: 'Day Range',
+            value: data.daysRange || 'n/a',
+            short: true
+          }, {
+            title: '52 Week Range',
+            value: data['52WeekRange'] || 'n/a',
+            short: true
+          }, {
+            title: 'P/E',
+            value: data.peRatio || 'n/a',
+            short: true
+          }, {
+            title: 'EPS',
+            value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+            short: true
+          }, {
+            title: 'Market Capitalization',
+            value: data.marketCapitalization || 'n/a',
+            short: true
+          }];
+  
+          if (_.isEmpty(data.name)) {
+            return {
+              fallback: notFoundTpl(data),
+              text: notFoundTpl(data),
+              mrkdwn_in : ['text']
+            };
+          } else {
+            return {
+              fallback: priceTpl(data),
+              color: number.color(data.changeInPercent),
+              title: _.template('<%= symbol %> (<%= name %>)')(data),
+              title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
+              text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
+              fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+              mrkdwn_in : ['title', 'text']
+            };
+          }
+        }).concat(invalidColonAttachments);
+  
+        return {
+          attachments: attachments
+        };
       });
-
-      return {
-        attachments: attachments
-      };
-    });
+  } else {
+    return Promise.resolve({attachments: invalidColonAttachments});
+  }
 }
 
 /**

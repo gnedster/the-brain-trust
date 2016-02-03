@@ -1,5 +1,9 @@
 .DS_Store
 
+# vim swap-file
+*.swp
+*.swo
+
 # Logs
 logs
 *.log

@@ -51,7 +51,7 @@ var Symbol = rds.define('Symbol', {
      * @return {Promise}        Query result
      */
     findSymbol: function(name, xchg) {
-      if (_.isNull(xchg)) {
+      if (_.isUndefined(xchg)) {
         return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
 FROM symbols
 WHERE name % '${name}'
