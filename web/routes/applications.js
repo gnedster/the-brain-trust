@@ -218,16 +218,22 @@ router.post('/:name/platforms', function(req, res, next) {
 router.get('/:name/metrics.:format?', function(req, res, next) {
   if (req.isAuthenticated()) {
     if (req.params.format === 'json') {
-      metric.getTimeseries()
+      metric.getTimeseries({entityId: req.query.entityId})
         .then(function(timeseries){
           res.json({
             data: timeseries
           });
         }).catch(next);
     } else {
-      res.render('applications/metrics', {
-        application: req.application
-      });
+      req.application.getApplicationPlatformEntities()
+        .then(function(applicationPlatformEntities) {
+          res.render('applications/metrics', {
+            application: req.application,
+            entityIds: _.map(applicationPlatformEntities, function(applicationPlatformEntity) {
+              return _.get(applicationPlatformEntity, 'credentials.team_id');
+            })
+          });
+        });
     }
   } else {
     next();
