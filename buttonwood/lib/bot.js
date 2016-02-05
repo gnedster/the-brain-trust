@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Botkit = require('botkit');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
+var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 
 const rtmInterval = 5000;
@@ -29,7 +30,40 @@ function Bot(applicationPlatformEntity) {
   });
 
   this.bot = this.controller.spawn({token:token});
+
+  this.populateUsers();
 }
+
+/**
+ * Populate users for a given team.
+ */
+Bot.prototype.populateUsers = function() {
+  var self = this;
+
+  self.bot.api.users.list({}, function(err,response) {
+    rds.models.Platform.findOne({
+        where: {
+          name: 'slack'
+        }
+      }).then(function(platform) {
+        _.each(response.members, function(member) {
+          rds.models.PlatformEntity.findOrCreate({
+            where: {
+              entityId: member.id,
+              platform_id: platform.id,
+              kind: 'user'
+            }
+          }).then(function(tuple) {
+            var user = tuple[0];
+            user.update({
+              parent_id: self.applicationPlatformEntity.platform_entity_id
+            });
+          });
+        });
+      });
+  });
+
+};
 
 /**
  * Getter for Bot Id
