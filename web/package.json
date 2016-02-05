@@ -57,6 +57,7 @@
     "maildev": "^0.12.1",
     "mocha": "^2.3.4",
     "nodemailer": "^2.0.0",
+    "pg": "^4.4.4",
     "q": "^1.4.1",
     "supertest": "^1.1.0",
     "supertest-session": "^2.0.0"
