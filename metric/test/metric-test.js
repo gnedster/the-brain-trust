@@ -76,7 +76,7 @@ describe('metric', function(){
     }, {
       timestamp: moment().add(2, 'hour')
     }]).then(function(){
-      return metric.getTimeseries('hour');
+      return metric.getTimeseries({interval: 'hour', entityId: 'team_id'});
     }).then(function(ts){
       assert.equal(ts.length % 24, 0);
       done();

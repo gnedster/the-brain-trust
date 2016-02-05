@@ -1,3 +1,17 @@
+database:
+  post:
+    - psql -c "CREATE EXTENSION pg_trgm;" -d circle_test
+dependencies:
+  cache_directories:
+    - "buttonwood/node_modules"
+    - "web/node_modules"
+    - "error/node_modules"
+    - "logger/node_modules"
+    - "mailer/node_modules"
+    - "metric/node_modules"
+    - "rds/node_modules"
+    - "sqs/node_modules"
+    - "utility/node_modules"
 machine:
   ruby:
     version: ruby-2.2.3

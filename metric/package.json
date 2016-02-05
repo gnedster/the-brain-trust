@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/metric",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "description": "library to record application metrics",
   "main": "metric.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
     "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "^0.6.8",
+    "@the-brain-trust/rds": "^0.6.10",
     "lodash": "^4.0.0"
   },
   "devDependencies": {

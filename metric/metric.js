@@ -105,14 +105,23 @@ function aggregate() {
 
 /**
  * Return a timeseries grouped by a given intervalhs
- * @param {String} interval  Align metrics to a given interval in UTC
+ * @param {Object} options            Options hash
+ * @param {String} options.interval   Interval to aggregate values to.
+ * @param {String} options.entityId   Entity id to search against.
  * @return {Promise}         Promise containing an array of intervals in UTC
  */
-function getTimeseries(interval) {
-  interval = interval || 'hour';
+function getTimeseries(options) {
+  options = options || {};
+  var interval = options.interval || 'hour';
+  var entityId = options.entityId;
+
+  // Hardcoded for team_id
+  var whereClause = entityId ? `team_id = '${entityId}'` : '1 = 1';
+
   return rds.query(
 `SELECT extract(epoch from date_trunc('${interval}', timestamp)) * 1000 AS timestamp, count(*)
  FROM events
+ WHERE ${whereClause}
  GROUP BY 1
  ORDER BY timestamp ASC`,
     { type: rds.QueryTypes.SELECT }

@@ -14,5 +14,11 @@ block content
         metrics
 
   .application-metrics
-    .application-metrics-controls
     .application-metrics-chart
+    .application-metrics-controls
+      .form-group
+        label(for='entity') entity:
+        select.application-metrics-controls-entity(name='entity').form-control
+          option(selected=true)
+          each entityId in entityIds
+            option= entityId

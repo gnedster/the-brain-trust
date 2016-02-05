@@ -11,9 +11,6 @@ describe('buttonwood', function(){
     require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
-      .then(function(){
-        return rds.models.Symbol.createTgrmIndex();
-      })
       .then(function() {
         return factory.createMany('symbol', [{}, {
           ticker: 'MSFT.MX'

@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/rds",
-  "version": "0.6.8",
+  "version": "0.6.10",
   "description": "orm to access the primary rds",
   "engines": {
     "node": "4.1.1",
