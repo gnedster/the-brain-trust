@@ -139,7 +139,7 @@ function BotButtonwood(applicationPlatformEntity) {
   this.listeners = [hearsHello, hearsSymbol];
 
   // Push summaries at 4:20 PM ET every weekday. Possible to clear out
-  new CronJob('00 4 20 * * 1-5',
+  new CronJob('00 16 20 * * 1-5',
     _.bind(pushSummaries, this),
     null,
     true,
