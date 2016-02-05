@@ -39,6 +39,12 @@ factory.define('platform-entity-team', rds.models.PlatformEntity, {
   //platform_id: factory.assoc('platform', 'id')
 });
 
+factory.define('platform-entity-user', rds.models.PlatformEntity, {
+  entityId: faker.random.uuid(),
+  kind: 'user',
+  parent_id: factory.assoc('platform-entity-team', 'id')
+});
+
 factory.define('application-platform-entity',
   rds.models.ApplicationPlatformEntity, {
   application_id: factory.assoc('application', 'id'),

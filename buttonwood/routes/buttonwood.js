@@ -87,30 +87,44 @@ router.post('/commands/quote_detailed', function (req, res, next) {
     });
 });
 
+// All commands after should be user specific
 router.post('/commands/quote*', function(req, res, next) {
   rds.models.Platform.findOne({
       where: {
         name: 'slack'
       }
-    }).then(function(platform) {
+    })
+    .then(function(platform) {
       if (platform instanceof rds.models.Platform.Instance) {
-        return rds.models.PlatformEntity.findOrCreate({
+        return Promise.all([platform, rds.models.PlatformEntity.findOrCreate({
           where: {
-            entityId: _.get(req, 'body.user_id'),
+            entityId: _.get(req, 'body.team_id'),
             platform_id: platform.id,
-            kind: 'user'
+            kind: 'team'
           }
-        });
+        })]);
       } else {
         return Promise.reject('platform not found');
       }
     })
     .then(function(tuple) {
-      var platform_entity = tuple[0];
+      var platform = tuple[0];
+      var team = tuple[1][0];
+      return rds.models.PlatformEntity.findOrCreate({
+        where: {
+          entityId: _.get(req, 'body.user_id'),
+          platform_id: platform.id,
+          kind: 'user',
+          parent_id: team.id
+        }
+      });
+    })
+    .then(function(tuple) {
+      var platformEntity = tuple[0];
 
       return rds.models.Portfolio.findOrCreate({
         where: {
-          platform_entity_id: platform_entity.id
+          platform_entity_id: platformEntity.id
         }
       });
     })
