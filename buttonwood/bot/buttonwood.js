@@ -131,7 +131,8 @@ function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
   this.listeners = [hearsHello, hearsSymbol];
 
-  new CronJob('*/5 * * * * *',
+  // Push summaries at 4:20 PM ET every weekday. Possible to clear out
+  new CronJob('00 4 16 * * 1-5',
     _.bind(pushSummaries, this),
     null,
     true,
