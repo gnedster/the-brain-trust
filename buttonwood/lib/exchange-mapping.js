@@ -1,7 +1,6 @@
 /* This is JS Map instead of RDS as the mapping is small
  * If this gets big we should consider it being in RDS
  */
-
 var exchangeMap = new Map();
 
 exchangeMap.set('TSX', 'TOR');

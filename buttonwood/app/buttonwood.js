@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 var accounting = require('accounting');
-var exchangeMap = require('./lib/exchange-mapping.js');
+var exchangeMap = require('../lib/exchange-mapping.js');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
@@ -79,13 +79,21 @@ function matchSymbols(text) {
         /* If colon is in term we are expecting it to be formated as
          * exchange:term
          */
-        var xchgRegexResult = xchgRegexp.exec();
+        var xchgRegexResult = xchgRegexp.exec(searchTerm);
         var xchg = undefined;
         if (!_.isNull(xchgRegexResult)) {
           xchg = exchangeMap.get(xchgRegexResult[1]);
           searchTerm = xchgRegexResult[2];
+          return rds.models.Symbol.findAll({
+            attributes: ['ticker'],
+            where: {
+              ticker: searchTerm,
+              exchange: xchg
+            }
+          });
+        } else {
+          return rds.models.Symbol.findSymbol(searchTerm);
         }
-        return rds.models.Symbol.findSymbol(searchTerm, xchg);
       }
     }));
   }).then(function(results){
@@ -138,22 +146,25 @@ function messageQuote(symbols, isDetailed) {
     );
   var colonSymbols = [];
   var invalidSymbols = [];
+  var invalidColonAttachments;
 
   //Symbols with ':' do not work well with Yahoo API remove them
-  for (var i = 0, ii = symbols.invalid.length; i < ii; i++) {
-    if (/:/.test(symbols.invalid[i])) {
-      colonSymbols.push(symbols.invalid[i]);
-    } else {
-      invalidSymbols.push(symbols.invalid[i]);
+  if (!(_.isUndefined(symbols.invalid))) {
+    for (var i = 0, ii = symbols.invalid.length; i < ii; i++) {
+      if (/:/.test(symbols.invalid[i])) {
+        colonSymbols.push(symbols.invalid[i]);
+      } else {
+        invalidSymbols.push(symbols.invalid[i]);
+      }
     }
+    invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
+      return {
+        fallback: notFoundTpl({symbol}),
+        text: notFoundTpl({symbol}),
+        mrkdwn_in : ['text']
+      };
+    }));
   }
-  var invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
-    return {
-      fallback: notFoundTpl({symbol}),
-      text: notFoundTpl({symbol}),
-      mrkdwn_in : ['text']
-    };
-  }));
 
   if ((symbols.valid.length + invalidSymbols.length) > 0) {
     return yahooFinance.snapshot({
@@ -163,7 +174,7 @@ function messageQuote(symbols, isDetailed) {
       }).then(function (snapshots) {
         var attachments = _.map(snapshots, function(data) {
           logger.debug(data);
-  
+
           var attachmentFieldsBasic = [{
             title: 'Last Trade',
             value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
@@ -173,7 +184,7 @@ function messageQuote(symbols, isDetailed) {
             value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
             short: true
           }];
-  
+
           var attachmentFieldsDetailed = [{
             title: 'Volume',
             value: accounting.formatNumber(data.volume),
@@ -203,7 +214,7 @@ function messageQuote(symbols, isDetailed) {
             value: data.marketCapitalization || 'n/a',
             short: true
           }];
-  
+
           if (_.isEmpty(data.name)) {
             return {
               fallback: notFoundTpl(data),
@@ -222,7 +233,7 @@ function messageQuote(symbols, isDetailed) {
             };
           }
         }).concat(invalidColonAttachments);
-  
+
         return {
           attachments: attachments
         };

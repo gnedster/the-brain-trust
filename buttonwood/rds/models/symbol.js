@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var rds = require('@the-brain-trust/rds');
 var Sequelize = require('sequelize');
 
@@ -47,22 +46,13 @@ var Symbol = rds.define('Symbol', {
      * Find closest match given a company name. Priority is given to companies
      * listed in the United States on equal similarity. Use pg's trgrm index.
      * @param  {String}   name  Company name
-     * @param  {String}   xchg  Exhange name
      * @return {Promise}        Query result
      */
-    findSymbol: function(name, xchg) {
-      if (_.isUndefined(xchg)) {
-        return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
+    findSymbol: function(name) {
+      return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
 FROM symbols
 WHERE name % '${name}'
 ORDER BY country='USA' DESC, similarity DESC;`, { type: Sequelize.QueryTypes.SELECT });
-      } else {
-        return rds.query(`SELECT ticker, name, similarity(name, '${name}') AS similarity
-FROM symbols
-WHERE name % '${name}', exchange = '{$xchg}'
-ORDER BY country='USA' DESC, similarity DESC;`, { type: Sequelize.QueryTypes.SELECT });
-      //TODO ORDER is probably not needed
-      }
     }
   }
 });
