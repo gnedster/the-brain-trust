@@ -58,12 +58,10 @@ PlatformEntity.hasMany(ApplicationPlatformEntity, {
 });
 
 PlatformEntity.hasOne(PlatformEntity, {
-  as: 'Parent',
   foreignKey: 'parent_id'
 });
 
 PlatformEntity.hasMany(PlatformEntity, {
-  as: 'Children',
   foreignKey: 'parent_id'
 });
 

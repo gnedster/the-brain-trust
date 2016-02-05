@@ -89,32 +89,39 @@ function hearsSymbol(controller) {
 function pushSummaries() {
   var self = this;
 
-  rds.models.Portfolio.findAll({
-    where: {
-      summary: {
-        $ne: null
+  self.applicationPlatformEntity.getPlatformEntity({
+    include: [
+      {
+        model: rds.models.PlatformEntity,
+        required: true,
+        include: [{
+          model: rds.models.Portfolio,
+          where: {
+            summary: {
+              $ne: null
+            }
+          },
+          required: true
+        }]
       }
-    },
-    include: [{
-      model: rds.models.PlatformEntity,
-      required: true
-    }]
-  }).then(function(portfolios) {
-    _.each(portfolios, function(portfolio) {
+    ]
+  }).then(function(platformEntity) {
+    // The base platform entity should correspond to a team, its children
+    // should be reflect a user
+    _.each(platformEntity.PlatformEntities, function(platformEntity) {
       self.bot.startPrivateConversation(
         {
-          user: portfolio.PlatformEntity.entityId
+          user: platformEntity.entityId
         }, function(err,convo) {
           if (err) {
             logger.error(err);
           } else {
             buttonwood
-              .messageQuote({valid: portfolio.symbols}, false)
+              .messageQuote({valid: platformEntity.portfolio.symbols}, false)
               .then(function(message) {
                 convo.say(_.merge({
                   text: `*Your summary for ${moment().format('LL')}*`
                 }, message));
-
               });
           }
         });
