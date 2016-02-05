@@ -96,7 +96,7 @@ router.post('/commands/quote*', function(req, res, next) {
       if (platform instanceof rds.models.Platform.Instance) {
         return rds.models.PlatformEntity.findOrCreate({
           where: {
-            entity_id: _.get(req, 'body.user_id'),
+            entityId: _.get(req, 'body.user_id'),
             platform_id: platform.id,
             kind: 'user'
           }
