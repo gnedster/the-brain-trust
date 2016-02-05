@@ -1,10 +1,12 @@
 var _ = require('lodash');
 var Bot = require('../lib/bot');
 var buttonwood = require('../app/buttonwood');
+var CronJob = require('cron').CronJob;
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
+var rds = require('@the-brain-trust/rds');
 
 /**
  * Return usage information.
@@ -69,6 +71,8 @@ function hearsSymbol(controller) {
                 symbols: symbols
               }
             });
+
+            resolve();
           });
         });
       }).catch(function(err){
@@ -80,17 +84,62 @@ function hearsSymbol(controller) {
 }
 
 /**
+ * Push portfolio summaries to users
+ */
+function pushSummaries() {
+  var self = this;
+
+  rds.models.Portfolio.findAll({
+    where: {
+      summary: {
+        $ne: null
+      }
+    },
+    include: [{
+      model: rds.models.PlatformEntity,
+      required: true
+    }]
+  }).then(function(portfolios) {
+    _.each(portfolios, function(portfolio) {
+      self.bot.startPrivateConversation(
+        {
+          user: portfolio.PlatformEntity.entityId
+        }, function(err,convo) {
+          if (err) {
+            logger.error(err);
+          } else {
+            buttonwood
+              .messageQuote({valid: portfolio.symbols}, false)
+              .then(function(message) {
+                convo.say(_.merge({
+                  text: `*Your summary for ${moment().format('LL')}*`
+                }, message));
+
+              });
+          }
+        });
+    });
+  });
+}
+
+/**
  * @class
  * Defines the behavior for the buttonwood bot
  * @param {ApplicationPlatformEntity} applicationPlatformEntity  Slack token
  */
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
-
   this.listeners = [hearsHello, hearsSymbol];
+
+  new CronJob('*/5 * * * * *',
+    _.bind(pushSummaries, this),
+    null,
+    true,
+    'America/New_York');
 }
 
 BotButtonwood.prototype = Object.create(Bot.prototype);
 BotButtonwood.prototype.constructor = Bot;
+BotButtonwood.prototype.pushSummaries = pushSummaries;
 
 module.exports = BotButtonwood;

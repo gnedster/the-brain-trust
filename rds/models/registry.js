@@ -57,6 +57,11 @@ PlatformEntity.hasMany(ApplicationPlatformEntity, {
   foreign_key: 'platform_entity_id'
 });
 
+PlatformEntity.hasOne(PlatformEntity, {
+  as: 'Parent',
+  foreignKey: 'parent_id'
+});
+
 Application.hasMany(ApplicationUser, {
   foreignKey: 'application_id'
 });

@@ -75,7 +75,6 @@ describe('buttonwood', function(){
     it('should return an empty value', function(done) {
       buttonwood.matchSymbols('   ').then(function(symbols) {
         assert(symbols.valid.length === 0);
-        assert(symbols.valid.length === 0);
         done();
       });
     });

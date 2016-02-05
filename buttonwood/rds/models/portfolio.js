@@ -10,6 +10,9 @@ var Portfolio = rds.define('Portfolio', {
     type: Sequelize.ARRAY(Sequelize.STRING),
     defaultValue: [],
     allowNull: false
+  },
+  summary: {
+    type: Sequelize.ENUM('daily', 'weekly', 'monthly')
   }
 });
 

@@ -30,7 +30,7 @@ factory.define('application-permission', rds.models.ApplicationPlatform, {
 });
 
 factory.define('platform-entity-team', rds.models.PlatformEntity, {
-  entity_id: faker.random.uuid(),
+  entityId: faker.random.uuid(),
   kind: 'team'
   /**
    * Adding the line below, although correct, compels sequelize to create the
