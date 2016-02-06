@@ -108,6 +108,10 @@ describe('buttonwood', function(){
             .then(function(summaries) {
               assert(summaries);
               assert(summaries.length > 0);
+              var summary = summaries[0];
+              assert(summary.applicationPlatformEntity);
+              assert(summary.platformEntity);
+              assert(summary.message.attachments.length === 2);
               done();
             });
           });

@@ -46,7 +46,7 @@ factory.define('platform-entity-user', rds.models.PlatformEntity, {
 });
 
 factory.define('portfolio', rds.models.Portfolio, {
-  symbols: ['MSFT'],
+  symbols: ['MSFT', 'AAPL'],
   summary: 'daily',
   platform_entity_id: factory.assoc('platform-entity-user', 'id')
 });

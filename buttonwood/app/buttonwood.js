@@ -263,10 +263,13 @@ function getPortfolioSummaries() {
           });
 
           return {
-            applicationPlatformEntity: portfolio.PlatformEntity.PlatformEntity.ApplicationPlatformEntity,
+            // Assumes there is only one platform (Slack)
+            applicationPlatformEntity: portfolio.PlatformEntity
+                                                .PlatformEntity
+                                                .ApplicationPlatformEntities[0],
             platformEntity: portfolio.PlatformEntity,
             message: {
-              text: 'Your Daily Summary',
+              text: `Portfolio Summary for ${moment().format('LL')}`,
               attachments: attachments
             }
           };
