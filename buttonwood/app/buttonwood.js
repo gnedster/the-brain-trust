@@ -125,10 +125,18 @@ function messageQuote(symbols, isDetailed) {
   var notFoundTpl =_.template(
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
+  var allSymbols = symbols.valid.concat(symbols.invalid || []);
+
+  if (allSymbols.length === 0) {
+    logger.warn('no symbols');
+    return Promise.resolve({
+      attachments: []
+    });
+  }
 
   return yahooFinance.snapshot({
       // We might not have every Yahoo symbol
-      symbols: symbols.valid.concat(symbols.invalid),
+      symbols: allSymbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
       var attachments = _.map(snapshots, function(data) {
@@ -204,7 +212,7 @@ function messageQuote(symbols, isDetailed) {
  * @return {Object} Contains messages for portfolio summaries
  */
 function getPortfolioSummaries() {
-  rds.models.Portfolio.findAll({
+  return rds.models.Portfolio.findAll({
     where: {
       summary: {
         $ne: null
@@ -223,13 +231,15 @@ function getPortfolioSummaries() {
       }]
     }]
   }).then(function(portfolios) {
-    var symbols = _.uniq(_.reduce(portfolios, function(symbols, portfolio) {
-      return symbols.concat(portfolio.symbols);
+    var symbols = _.uniq(_.reduce(portfolios, function(accum, portfolio) {
+      return accum.concat(portfolio.symbols);
     }, []));
 
-    return Promise.all[portfolios, symbols, messageQuote({
+    symbols = symbols || [];
+
+    return Promise.all([portfolios, symbols, messageQuote({
       valid: symbols
-    }, false)];
+    }, false)]);
   }).then(function(tuple) {
     return new Promise(function (resolve, reject) {
       try {
@@ -243,7 +253,7 @@ function getPortfolioSummaries() {
 
         // The base platform entity should correspond to a team, its children
         // should be reflect a user
-        resolve(_.map(portfolios, function(portfolio) {
+        resolve(_.compact(_.map(portfolios, function(portfolio) {
           if (portfolio.symbols.length === 0) {
             return;
           }
@@ -260,7 +270,7 @@ function getPortfolioSummaries() {
               attachments: attachments
             }
           };
-        }));
+        })));
       } catch (err) {
         reject(err);
       }

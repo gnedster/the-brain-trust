@@ -45,6 +45,12 @@ factory.define('platform-entity-user', rds.models.PlatformEntity, {
   parent_id: factory.assoc('platform-entity-team', 'id')
 });
 
+factory.define('portfolio', rds.models.Portfolio, {
+  symbols: ['MSFT'],
+  summary: 'daily',
+  platform_entity_id: factory.assoc('platform-entity-user', 'id')
+});
+
 factory.define('application-platform-entity',
   rds.models.ApplicationPlatformEntity, {
   application_id: factory.assoc('application', 'id'),
