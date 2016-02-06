@@ -1,12 +1,10 @@
 var _ = require('lodash');
 var Bot = require('../lib/bot');
 var buttonwood = require('../app/buttonwood');
-var CronJob = require('cron').CronJob;
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
-var rds = require('@the-brain-trust/rds');
 
 /**
  * Return usage information.
@@ -84,52 +82,6 @@ function hearsSymbol(controller) {
 }
 
 /**
- * Push portfolio summaries to users
- */
-function pushSummaries() {
-  var self = this;
-
-  self.applicationPlatformEntity.getPlatformEntity({
-    include: [
-      {
-        model: rds.models.PlatformEntity,
-        required: true,
-        include: [{
-          model: rds.models.Portfolio,
-          where: {
-            summary: {
-              $ne: null
-            }
-          },
-          required: true
-        }]
-      }
-    ]
-  }).then(function(platformEntity) {
-    // The base platform entity should correspond to a team, its children
-    // should be reflect a user
-    _.each(platformEntity.PlatformEntities, function(platformEntity) {
-      self.bot.startPrivateConversation(
-        {
-          user: platformEntity.entityId
-        }, function(err,convo) {
-          if (err) {
-            logger.error(err);
-          } else {
-            buttonwood
-              .messageQuote({valid: platformEntity.portfolio.symbols}, false)
-              .then(function(message) {
-                convo.say(_.merge({
-                  text: `*Your summary for ${moment().format('LL')}*`
-                }, message));
-              });
-          }
-        });
-    });
-  });
-}
-
-/**
  * @class
  * Defines the behavior for the buttonwood bot
  * @param {ApplicationPlatformEntity} applicationPlatformEntity  Slack token
@@ -137,17 +89,9 @@ function pushSummaries() {
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
   this.listeners = [hearsHello, hearsSymbol];
-
-  // Push summaries at 4:20 PM ET every weekday. Possible to clear out
-  new CronJob('00 16 20 * * 1-5',
-    _.bind(pushSummaries, this),
-    null,
-    true,
-    'America/New_York');
 }
 
 BotButtonwood.prototype = Object.create(Bot.prototype);
 BotButtonwood.prototype.constructor = Bot;
-BotButtonwood.prototype.pushSummaries = pushSummaries;
 
 module.exports = BotButtonwood;

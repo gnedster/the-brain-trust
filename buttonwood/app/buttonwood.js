@@ -200,6 +200,75 @@ function messageQuote(symbols, isDetailed) {
 }
 
 /**
+ * Push portfolio summaries
+ * @return {Object} Contains messages for portfolio summaries
+ */
+function getPortfolioSummaries() {
+  rds.models.Portfolio.findAll({
+    where: {
+      summary: {
+        $ne: null
+      }
+    },
+    include: [{
+      model: rds.models.PlatformEntity,
+      required: true,
+      include: [{
+        model: rds.models.PlatformEntity,
+        required: true,
+        include: [{
+          model: rds.models.ApplicationPlatformEntity,
+          required: true
+        }]
+      }]
+    }]
+  }).then(function(portfolios) {
+    var symbols = _.uniq(_.reduce(portfolios, function(symbols, portfolio) {
+      return symbols.concat(portfolio.symbols);
+    }, []));
+
+    return Promise.all[portfolios, symbols, messageQuote({
+      valid: symbols
+    }, false)];
+  }).then(function(tuple) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var portfolios = tuple[0];
+        var symbols = tuple[1];
+        var message = tuple[2];
+
+        var symbolsHash =_.indexBy(message.attachments, function(attachments, idx) {
+          return symbols[idx];
+        });
+
+        // The base platform entity should correspond to a team, its children
+        // should be reflect a user
+        resolve(_.map(portfolios, function(portfolio) {
+          if (portfolio.symbols.length === 0) {
+            return;
+          }
+
+          var attachments = _.map(portfolio.symbols, function(symbol) {
+            return symbolsHash[symbol];
+          });
+
+          return {
+            applicationPlatformEntity: portfolio.PlatformEntity.PlatformEntity.ApplicationPlatformEntity,
+            platformEntity: portfolio.PlatformEntity,
+            message: {
+              text: 'Your Daily Summary',
+              attachments: attachments
+            }
+          };
+        }));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+}
+
+/**
  * Return array with with stock strings
  * @param  {String} to be parsed
  * @return {Array} of stock strings
@@ -220,5 +289,6 @@ module.exports = {
   messageQuote: messageQuote,
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
+  getPortfolioSummaries: getPortfolioSummaries,
   getStockListenRegex: getStockListenRegex
 };

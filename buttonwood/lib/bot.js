@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Botkit = require('botkit');
+var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var rds = require('@the-brain-trust/rds');
@@ -96,6 +97,26 @@ Bot.prototype.setStatus = function(status) {
  */
 Bot.prototype.getErrors = function() {
   return this.errors;
+};
+
+/**
+ * Send a privateMessage to a given user
+ * @param  {Object}         options                Options for the function
+ * @param  {PlatformEntity} options.platformEntity PlatformEntity representing a user
+ * @param  {Object}         options.message        Message to send to user
+ */
+Bot.prototype.sendPrivateMessage = function(options) {
+  this.bot.startPrivateConversation(
+    {
+      user: options.platformEntity.entityId
+    }, function(err,convo) {
+      if (err) {
+        error.notify('buttonwood', err);
+        logger.error(err);
+      } else {
+        convo.say(options.message);
+      }
+    });
 };
 
 /**
