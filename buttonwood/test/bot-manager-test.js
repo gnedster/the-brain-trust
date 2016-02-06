@@ -40,6 +40,7 @@ describe('BotButtonwood', function(){
           botManager.getStatus([applicationPlatformEntity])
             .get(applicationPlatformEntity.id)
           );
+        assert(botManager.getBot(applicationPlatformEntity));
         done();
       });
   });

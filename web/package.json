@@ -16,7 +16,7 @@
     "@the-brain-trust/logger": "0.0.1",
     "@the-brain-trust/mailer": "0.0.2",
     "@the-brain-trust/metric": "0.0.13",
-    "@the-brain-trust/rds": "0.6.10",
+    "@the-brain-trust/rds": "0.6.14",
     "@the-brain-trust/sqs": "0.0.4",
     "@the-brain-trust/utility": "0.0.1",
     "aws-sdk": "^2.2.26",
@@ -57,6 +57,7 @@
     "maildev": "^0.12.1",
     "mocha": "^2.3.4",
     "nodemailer": "^2.0.0",
+    "pg": "^4.4.4",
     "q": "^1.4.1",
     "supertest": "^1.1.0",
     "supertest-session": "^2.0.0"

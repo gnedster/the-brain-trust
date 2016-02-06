@@ -30,13 +30,25 @@ factory.define('application-permission', rds.models.ApplicationPlatform, {
 });
 
 factory.define('platform-entity-team', rds.models.PlatformEntity, {
-  entity_id: faker.random.uuid(),
+  entityId: faker.random.uuid(),
   kind: 'team'
   /**
    * Adding the line below, although correct, compels sequelize to create the
    * same model twice causing a unique validation error.
    */
   //platform_id: factory.assoc('platform', 'id')
+});
+
+factory.define('platform-entity-user', rds.models.PlatformEntity, {
+  entityId: faker.random.uuid(),
+  kind: 'user',
+  parent_id: factory.assoc('platform-entity-team', 'id')
+});
+
+factory.define('portfolio', rds.models.Portfolio, {
+  symbols: ['MSFT', 'AAPL'],
+  summary: 'daily',
+  platform_entity_id: factory.assoc('platform-entity-user', 'id')
 });
 
 factory.define('application-platform-entity',
