@@ -269,7 +269,7 @@ function getPortfolioSummaries() {
                                                 .ApplicationPlatformEntities[0],
             platformEntity: portfolio.PlatformEntity,
             message: {
-              text: `Portfolio Summary for ${moment().format('LL')}`,
+              text: `*Portfolio Summary for ${moment().format('LL')}*`,
               attachments: attachments
             }
           };
