@@ -295,13 +295,21 @@ function setPortfolioSummary(options) {
    * @return {Array}          Tuple of PlatformEntity and created value
    */
   function getPlatformEntity(options) {
-    if (options.PlatformEntity) {
+    if (options.platformEntity instanceof rds.models.PlatformEntity.Instance) {
       return Promise.resolve([options.PlatformEntity, false]);
     } else {
-      return rds.models.PlatformEntity.findOrCreate({
+      return rds.models.Platform.findOne({
         where: {
-          entityId: options.entityId
+          name: 'slack'
         }
+      }).then(function(platform) {
+        return rds.models.PlatformEntity.findOrCreate({
+          where: {
+            entityId: options.entityId,
+            kind: 'user',
+            platform_id: platform.id
+          }
+        });
       });
     }
   }
@@ -315,9 +323,9 @@ function setPortfolioSummary(options) {
       });
     })
     .then(function(tuple) {
-      return Promise.all([tuple[0].update({
+      return tuple[0].update({
         summary: options.summary
-      })]);
+      });
     });
 }
 
