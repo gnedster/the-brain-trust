@@ -3,7 +3,7 @@
  */
 var _ = require('lodash');
 var accounting = require('accounting');
-var exchangeMap = require('../lib/exchange-mapping.js');
+var exchangeMap = require('./exchange-mapping.js');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
@@ -84,16 +84,17 @@ function matchSymbols(text) {
         if (!_.isNull(xchgRegexResult)) {
           xchg = exchangeMap.get(xchgRegexResult[1]);
           searchTerm = xchgRegexResult[2];
-          return rds.models.Symbol.findAll({
-            attributes: ['ticker'],
-            where: {
-              ticker: searchTerm,
-              exchange: xchg
-            }
-          });
-        } else {
-          return rds.models.Symbol.findSymbol(searchTerm);
+          if(!(_.isUndefined(xchg))) {
+            return rds.models.Symbol.findAll({
+              attributes: ['ticker'],
+              where: {
+                ticker: searchTerm,
+                exchange: xchg
+              }
+            });
+          }
         }
+        return rds.models.Symbol.findSymbol(searchTerm);
       }
     }));
   }).then(function(results){

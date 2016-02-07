@@ -59,7 +59,7 @@ describe('buttonwood', function(){
     });
 
     it('should return a symbol using ngram index', function(done) {
-      buttonwood.matchSymbols('microsoft').then(function(symbols) {
+      buttonwood.matchSymbols('MICROSOFT').then(function(symbols) {
         assert.equal(symbols.valid[0], 'MSFT');
         done();
       });
@@ -90,8 +90,8 @@ describe('buttonwood', function(){
     });
 
     it('should return invalid symbol using ngram index', function(done) {
-      buttonwood.matchSymbols('NDDAQ:GOOG').then(function(symbols) {
-        assert.equal(symbols.invalid[0], 'NDDAQ:GOOG');
+      buttonwood.matchSymbols('NDDAQ:GGGOOG').then(function(symbols) {
+        assert.equal(symbols.invalid[0], 'NDDAQ:GGGOOG');
         done();
       });
     });
