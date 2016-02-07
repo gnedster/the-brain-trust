@@ -182,7 +182,7 @@ Bot.prototype.startRtm = function() {
  */
 Bot.prototype.hearsHello = function(controller) {
   controller.hears(['hi, hello'], 'direct_message', function(bot, message) {
-    bot.reply('Hi there! Type \'help\' to see what I can do.');
+    bot.reply('Hi there! Type *help* to see what I can do.');
   });
 };
 
