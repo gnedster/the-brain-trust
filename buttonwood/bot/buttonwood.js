@@ -6,6 +6,8 @@ var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
 
+const errorMessage = 'something went horribly wrong.';
+
 /**
  * Return usage information.
  * @param  {CoreController}
@@ -75,7 +77,7 @@ function hearsSymbol(controller) {
           });
         });
       }).catch(function(err){
-        bot.reply(message, 'something went horribly wrong');
+        bot.reply(message, errorMessage);
         error.notify('buttonwood', err); // Should be higher up the stack
         logger.error(err);
       });
@@ -116,7 +118,7 @@ function hearsStop(controller) {
       bot.reply(message, 'Ok, I\'ll stop sending you daily portfolio summaries. ' +
         'If you change your mind, you can just tell me to *start*.');
     }).catch(function(){
-      bot.reply(message, 'Looks like something went horribly wrong');
+      bot.reply(message, errorMessage);
     });
   });
 }
@@ -134,7 +136,7 @@ function hearsStart(controller) {
       bot.reply(message, 'Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
         'If you change your mind, you can just tell me to *stop*.');
     }).catch(function(){
-      bot.reply(message, 'Looks like something went horribly wrong');
+      bot.reply(message, errorMessage);
     });
   });
 }
