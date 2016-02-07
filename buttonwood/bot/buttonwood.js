@@ -127,7 +127,7 @@ function hearsStart(controller) {
       platformEntity: message.user,
       summary: 'daily' // Only daily summaries are supported
     }).then(function(tuple) {
-      bot.reply('Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM EST. ' +
+      bot.reply('Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
         'If you change your mind, you can just tell me to *stop*.');
     }).catch(function(){
       bot.reply('Looks like something went horribly wrong');
