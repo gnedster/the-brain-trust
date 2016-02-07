@@ -92,8 +92,8 @@ function hearsHelp(controller) {
   controller.hears(['help', 'halp'], 'direct_message,direct_mention,mention', function(bot, message) {
     bot.reply(message, [
       '*In any channel buttonwood is present:*',
-      '_$<ticker>_: provide a quote',
-      '_$<ticker> detail_: provide a detailed quote',
+      '_$<ticker>_: get stock quotes',
+      '_$<ticker> detail_: get detailed stock quotes',
       '*When directly mentioning:*',
       '_help_: shows this message',
       '*When direct messaging:*',
