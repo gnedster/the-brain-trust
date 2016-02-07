@@ -312,7 +312,7 @@ function setPortfolioSummary(options) {
         where: {
           platform_entity_id: tuple[0].id
         }
-      })
+      });
     })
     .then(function(tuple) {
       return Promise.all([tuple[0].update({
