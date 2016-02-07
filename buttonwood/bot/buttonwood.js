@@ -99,8 +99,8 @@ function hearsHelp(controller) {
       '*When directly mentioning:*',
       '_help_: shows this message',
       '*When direct messaging:*',
-      '_start_: send portfolio summaries at 4:20 PM ET every weekday',
-      '_stop_: stop sending daily portfolio summaries'
+      '_start summaries_: send portfolio summaries at 4:20 PM ET every weekday',
+      '_stop summaries_: stop sending daily portfolio summaries'
     ].join('\n'));
   });
 }
@@ -110,13 +110,13 @@ function hearsHelp(controller) {
  * @param  {CoreController} controller
  */
 function hearsStop(controller) {
-  controller.hears(['stop'], 'direct_message', function(bot, message) {
+  controller.hears(['stop summaries'], 'direct_message', function(bot, message) {
     buttonwood.setPortfolioSummary({
       entityId: message.user,
       summary: null
     }).then(function(tuple) {
       bot.reply(message, 'Ok, I\'ll stop sending you daily portfolio summaries. ' +
-        'If you change your mind, you can just tell me to *start*.');
+        'If you change your mind, you can just tell me to *start summaries*.');
     }).catch(function(){
       bot.reply(message, errorMessage);
     });
@@ -128,13 +128,13 @@ function hearsStop(controller) {
  * @param  {CoreController} controller
  */
 function hearsStart(controller) {
-  controller.hears(['start'], 'direct_message', function(bot,message) {
+  controller.hears(['start summaries'], 'direct_message', function(bot,message) {
     buttonwood.setPortfolioSummary({
       entityId: message.user,
       summary: 'daily' // Only daily summaries are supported
     }).then(function(tuple) {
       bot.reply(message, 'Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
-        'If you change your mind, you can just tell me to *stop*.');
+        'If you change your mind, you can just tell me to *stop summaries*.');
     }).catch(function(){
       bot.reply(message, errorMessage);
     });
