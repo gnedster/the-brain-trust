@@ -6,6 +6,10 @@ Portfolio.belongsTo(rds.models.PlatformEntity, {
   foreignKey: 'platform_entity_id'
 });
 
+rds.models.PlatformEntity.hasMany(rds.models.Portfolio, {
+  foreignKey: 'platform_entity_id'
+});
+
 module.exports = {
   Portfolio: Portfolio,
   Symbol: Symbol

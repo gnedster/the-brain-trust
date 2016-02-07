@@ -146,7 +146,7 @@ function messageQuote(symbols, isDetailed) {
     );
   var colonSymbols = [];
   var invalidSymbols = [];
-  var invalidColonAttachments;
+  var invalidColonAttachments = [];
 
   //Symbols with ':' do not work well with Yahoo API remove them
   if (!(_.isUndefined(symbols.invalid))) {
@@ -165,82 +165,159 @@ function messageQuote(symbols, isDetailed) {
       };
     }));
   }
+  var allSymbols = symbols.valid.concat(invalidSymbols);
 
-  if ((symbols.valid.length + invalidSymbols.length) > 0) {
-    return yahooFinance.snapshot({
-        // We might not have every Yahoo symbol
-        symbols: symbols.valid.concat(invalidSymbols),
-        fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
-      }).then(function (snapshots) {
-        var attachments = _.map(snapshots, function(data) {
-          logger.debug(data);
-
-          var attachmentFieldsBasic = [{
-            title: 'Last Trade',
-            value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
-            short: true
-          }, {
-            title: 'Change',
-            value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
-            short: true
-          }];
-
-          var attachmentFieldsDetailed = [{
-            title: 'Volume',
-            value: accounting.formatNumber(data.volume),
-            short: true
-          }, {
-            title: 'Avg. Daily Volume',
-            value: accounting.formatNumber(data.averageDailyVolume),
-            short: true
-          }, {
-            title: 'Day Range',
-            value: data.daysRange || 'n/a',
-            short: true
-          }, {
-            title: '52 Week Range',
-            value: data['52WeekRange'] || 'n/a',
-            short: true
-          }, {
-            title: 'P/E',
-            value: data.peRatio || 'n/a',
-            short: true
-          }, {
-            title: 'EPS',
-            value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
-            short: true
-          }, {
-            title: 'Market Capitalization',
-            value: data.marketCapitalization || 'n/a',
-            short: true
-          }];
-
-          if (_.isEmpty(data.name)) {
-            return {
-              fallback: notFoundTpl(data),
-              text: notFoundTpl(data),
-              mrkdwn_in : ['text']
-            };
-          } else {
-            return {
-              fallback: priceTpl(data),
-              color: number.color(data.changeInPercent),
-              title: _.template('<%= symbol %> (<%= name %>)')(data),
-              title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
-              text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-              fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
-              mrkdwn_in : ['title', 'text']
-            };
-          }
-        }).concat(invalidColonAttachments);
-
-        return {
-          attachments: attachments
-        };
-      });
-  } else {
-    return Promise.resolve({attachments: invalidColonAttachments});
+  if (allSymbols.length === 0) {
+    logger.warn('no symbols');
+    return Promise.resolve({
+      attachments: invalidColonAttachments
+    });
   }
+
+  return yahooFinance.snapshot({
+      // We might not have every Yahoo symbol
+      symbols: allSymbols,
+      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+    }).then(function (snapshots) {
+      var attachments = _.map(snapshots, function(data) {
+        logger.debug(data);
+
+        var attachmentFieldsBasic = [{
+          title: 'Last Trade',
+          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+          short: true
+        }, {
+          title: 'Change',
+          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+          short: true
+        }];
+
+        var attachmentFieldsDetailed = [{
+          title: 'Volume',
+          value: accounting.formatNumber(data.volume),
+          short: true
+        }, {
+          title: 'Avg. Daily Volume',
+          value: accounting.formatNumber(data.averageDailyVolume),
+          short: true
+        }, {
+          title: 'Day Range',
+          value: data.daysRange || 'n/a',
+          short: true
+        }, {
+          title: '52 Week Range',
+          value: data['52WeekRange'] || 'n/a',
+          short: true
+        }, {
+          title: 'P/E',
+          value: data.peRatio || 'n/a',
+          short: true
+        }, {
+          title: 'EPS',
+          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+          short: true
+        }, {
+          title: 'Market Capitalization',
+          value: data.marketCapitalization || 'n/a',
+          short: true
+        }];
+
+        if (_.isEmpty(data.name)) {
+          return {
+            fallback: notFoundTpl(data),
+            text: notFoundTpl(data),
+            mrkdwn_in : ['text']
+          };
+        } else {
+          return {
+            fallback: priceTpl(data),
+            color: number.color(data.changeInPercent),
+            title: _.template('<%= symbol %> (<%= name %>)')(data),
+            title_link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
+            text: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
+            fields: isDetailed ? attachmentFieldsBasic.concat(attachmentFieldsDetailed) : attachmentFieldsBasic,
+            mrkdwn_in : ['title', 'text']
+          };
+        }
+      }).concat(invalidColonAttachments);
+      return {
+        attachments: attachments
+      };
+    });
+}
+
+/**
+ * Push portfolio summaries
+ * @return {Object} Contains messages for portfolio summaries
+ */
+function getPortfolioSummaries() {
+  return rds.models.Portfolio.findAll({
+    where: {
+      summary: {
+        $ne: null
+      }
+    },
+    include: [{
+      model: rds.models.PlatformEntity,
+      required: true,
+      include: [{
+        model: rds.models.PlatformEntity,
+        required: true,
+        include: [{
+          model: rds.models.ApplicationPlatformEntity,
+          required: true
+        }]
+      }]
+    }]
+  }).then(function(portfolios) {
+    var symbols = _.uniq(_.reduce(portfolios, function(accum, portfolio) {
+      return accum.concat(portfolio.symbols);
+    }, []));
+
+    symbols = symbols || [];
+
+    return Promise.all([portfolios, symbols, messageQuote({
+      valid: symbols
+    }, false)]);
+  }).then(function(tuple) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var portfolios = tuple[0];
+        var symbols = tuple[1];
+        var message = tuple[2];
+
+        var symbolsHash =_.indexBy(message.attachments, function(attachments, idx) {
+          return symbols[idx];
+        });
+
+        // The base platform entity should correspond to a team, its children
+        // should be reflect a user
+        resolve(_.compact(_.map(portfolios, function(portfolio) {
+          if (portfolio.symbols.length === 0) {
+            return;
+          }
+
+          var attachments = _.map(portfolio.symbols, function(symbol) {
+            return symbolsHash[symbol];
+          });
+
+          return {
+            // Assumes there is only one platform (Slack)
+            applicationPlatformEntity: portfolio.PlatformEntity
+                                                .PlatformEntity
+                                                .ApplicationPlatformEntities[0],
+            platformEntity: portfolio.PlatformEntity,
+            message: {
+              text: `*Portfolio Summary for ${moment().format('LL')}*`,
+              attachments: attachments
+            }
+          };
+        })));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
 }
 
 /**
@@ -264,5 +341,6 @@ module.exports = {
   messageQuote: messageQuote,
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
+  getPortfolioSummaries: getPortfolioSummaries,
   getStockListenRegex: getStockListenRegex
 };

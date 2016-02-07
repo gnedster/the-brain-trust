@@ -162,7 +162,7 @@ OAuthClient.prototype.processGetAuthAccessRequest =
         rds.models.PlatformEntity
           .findOrCreate({
             where: {
-              entity_id: results.team_id,
+              entityId: results.team_id,
               platform_id: self.platform.id,
               kind: 'team'
             }

@@ -69,6 +69,8 @@ function hearsSymbol(controller) {
                 symbols: symbols
               }
             });
+
+            resolve();
           });
         });
       }).catch(function(err){
@@ -86,7 +88,6 @@ function hearsSymbol(controller) {
  */
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
-
   this.listeners = [hearsHello, hearsSymbol];
 }
 

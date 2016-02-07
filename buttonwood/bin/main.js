@@ -1,4 +1,5 @@
 var app = require('../app.js');
+var cron = require('../cron.js');
 var http = require('http');
 var botManager = require('../lib/bot-manager.js');
 var sqsListener = require('../lib/sqs-listener.js');
@@ -14,6 +15,7 @@ require('../rds/registry'); // Load app specific models
 rds.sync()
   .then(botManager.init)
   .then(sqsListener.init)
+  .then(cron.init)
   .catch(function(err) {
     logger.error(err);
   });

@@ -138,6 +138,7 @@ describe('/buttonwood', function() {
 
     it('responds with OK with token and saved quotes', function(done){
       var userId = faker.random.uuid();
+      var teamId = faker.random.uuid();
 
       request(app)
         .post('/buttonwood/commands/quote_add')
@@ -146,7 +147,7 @@ describe('/buttonwood', function() {
         .send({
           token: commandToken,
           text: 'MSFT',
-          team_id: faker.random.uuid(),
+          team_id: teamId,
           channel_id: faker.random.uuid(),
           user_id: userId
         })
@@ -159,7 +160,7 @@ describe('/buttonwood', function() {
             .type('form')
             .send({
               token: commandToken,
-              team_id: faker.random.uuid(),
+              team_id: teamId,
               channel_id: faker.random.uuid(),
               user_id: userId
             })

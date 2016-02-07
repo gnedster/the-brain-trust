@@ -96,4 +96,42 @@ describe('buttonwood', function(){
       });
     });
   });
+
+  describe ('getPortfolioSummaries', function() {
+    it('should return an empty array with no entries', function(done) {
+      buttonwood.getPortfolioSummaries()
+        .then(function(summaries) {
+          assert(summaries);
+          assert(summaries.length === 0);
+          done();
+        });
+    });
+
+    it('should return an object with at least one entry', function(done) {
+      factory.create('portfolio')
+        .then(function(portfolio) {
+          return portfolio.getPlatformEntity();
+        })
+        .then(function(platformEntity) {
+          return platformEntity.getPlatformEntity();
+        })
+        .then(function(platformEntity) {
+          return factory.create('application-platform-entity', {
+            platform_entity_id: platformEntity.id
+          });
+        })
+        .then(function(){
+          buttonwood.getPortfolioSummaries()
+            .then(function(summaries) {
+              assert(summaries);
+              assert(summaries.length > 0);
+              var summary = summaries[0];
+              assert(summary.applicationPlatformEntity);
+              assert(summary.platformEntity);
+              assert(summary.message.attachments.length === 2);
+              done();
+            });
+          });
+      });
+  });
 });

@@ -14,26 +14,26 @@ const platformName = 'slack';
  */
 function init() {
   return rds.models.Platform.findOne({
-      where: {
-        name: platformName
-      },
-      include: [
-        {
-          model: rds.models.ApplicationPlatformEntity,
-          include: [
-            rds.models.Application
-          ]
-        }
-      ]
-    })
-    .then(function(platform) {
-      if (platform instanceof rds.models.Platform.Instance) {
-        return platform.ApplicationPlatformEntities;
+    where: {
+      name: platformName
+    },
+    include: [
+      {
+        model: rds.models.ApplicationPlatformEntity,
+        include: [
+          rds.models.Application
+        ]
       }
+    ]
+  })
+  .then(function(platform) {
+    if (platform instanceof rds.models.Platform.Instance) {
+      return platform.ApplicationPlatformEntities;
+    }
 
-      return Promise.reject('platform not found');
-    })
-    .then(create);
+    return Promise.reject('platform not found');
+  })
+  .then(create);
 }
 
 /**
@@ -75,6 +75,15 @@ function create(applicationPlatformEntities) {
 }
 
 /**
+ * Get bot given an applicationPlatformEntity
+ * @param  {ApplicationPlatformEntity} applicationPlatformEntity
+ * @return {Bot|undefined}             Bot
+ */
+function getBot(applicationPlatformEntity) {
+  return bots.get(applicationPlatformEntity.id);
+}
+
+/**
  * Get statuses for a subset or entire collection of bots
  * @param {ApplicationPlatformEntity[]} [applicationPlatformEntities]
  *        A collection of ApplicationPlatformEntity for initialization
@@ -100,5 +109,6 @@ function getStatus(applicationPlatformEntities) {
 module.exports = {
   init: init,
   create: create,
+  getBot: getBot,
   getStatus: getStatus
 };
