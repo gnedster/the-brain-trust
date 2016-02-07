@@ -132,9 +132,13 @@ Bot.prototype.start = function (){
   }
 
   // init listeners
-  _.each(this.listeners.concat([this.hearsPong]), function(listener){
-    listener.call(self, self.controller);
-  });
+  _.each(this.listeners.concat([
+    this.hearsPong,
+    this.hearsHelp,
+    this.hearsHello]),
+    function(listener){
+      listener.call(self, self.controller);
+    });
 
   return this;
 };
@@ -168,6 +172,29 @@ Bot.prototype.startRtm = function() {
       }
       self.ping();
     }
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
+ * Handle hello message
+ */
+Bot.prototype.hearsHello = function(controller) {
+  controller.hears(['hi, hello'], 'direct_message', function(bot, message) {
+    bot.reply('Hi there! Type \'help\' to see what I can do.');
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
+ * Handle help message
+ */
+Bot.prototype.hearsHelp = function(controller) {
+  controller.hears(['help'], 'direct_message', function(bot, message) {
+    bot.reply('Looks like there isn\'t any help text. ' +
+      'In case of an emergency, please dial 911.');
   });
 };
 

@@ -82,16 +82,71 @@ function hearsSymbol(controller) {
 }
 
 /**
+ * @private
+ * @override
+ * @param {Slackbot} controller  An instance of Slackbot
+ * Handle help message
+ */
+function hearsHelp(controller) {
+  controller.hears(['help'], 'direct_message', function(bot, message) {
+    bot.reply([
+      'Here are available commands:',
+      '*help:* shows this message',
+      '*$symbol*: provide a quote',
+      '*$symbol detail*: provide a detailed quote',
+      '*start:* start sending daily portfolio summaries',
+      '*stop:* stop sending daily portfolio summaries'
+    ].join('\n'));
+  });
+}
+
+/**
+ * Stop delivering portfolio summaries
+ * @param  {CoreController} controller
+ */
+function hearsStop(controller) {
+  controller.hears(['stop'], 'direct_message', function(bot,message) {
+    buttonwood.setPortfolioSummary({
+      entityId: message.user
+    }).then(function(tuple) {
+      bot.reply('Ok, I\'ll stop sending you daily portfolio summaries. ' +
+        'If you change your mind, you can just tell me to *start*.');
+    }).catch(function(){
+      bot.reply('Looks like something went horribly wrong');
+    });
+  });
+}
+
+/**
+ * Start delivering portfolio summaries
+ * @param  {CoreController} controller
+ */
+function hearsStart(controller) {
+  controller.hears(['start'], 'direct_message', function(bot,message) {
+    buttonwood.setPortfolioSummary({
+      platformEntity: message.user,
+      summary: 'daily' // Only daily summaries are supported
+    }).then(function(tuple) {
+      bot.reply('Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM EST. ' +
+        'If you change your mind, you can just tell me to *stop*.');
+    }).catch(function(){
+      bot.reply('Looks like something went horribly wrong');
+    });
+  });
+}
+
+/**
  * @class
  * Defines the behavior for the buttonwood bot
  * @param {ApplicationPlatformEntity} applicationPlatformEntity  Slack token
  */
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
-  this.listeners = [hearsHello, hearsSymbol];
+  this.listeners = [hearsHello, hearsStop, hearsStart, hearsSymbol];
 }
 
 BotButtonwood.prototype = Object.create(Bot.prototype);
 BotButtonwood.prototype.constructor = Bot;
+BotButtonwood.prototype.hearsHelp = hearsHelp;
 
 module.exports = BotButtonwood;
