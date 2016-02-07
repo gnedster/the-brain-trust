@@ -182,7 +182,7 @@ Bot.prototype.startRtm = function() {
  */
 Bot.prototype.hearsHello = function(controller) {
   controller.hears(['hi, hello'], 'direct_message', function(bot, message) {
-    bot.reply('Hi there! Type *help* to see what I can do.');
+    bot.reply(message, 'Hi there! Type *help* to see what I can do.');
   });
 };
 
@@ -192,9 +192,8 @@ Bot.prototype.hearsHello = function(controller) {
  * Handle help message
  */
 Bot.prototype.hearsHelp = function(controller) {
-  controller.hears(['help'], 'direct_message', function(bot, message) {
-    bot.reply('Looks like there isn\'t any help text. ' +
-      'In case of an emergency, please dial 911.');
+  controller.hears(['help', 'halp'], 'direct_message', function(bot, message) {
+    bot.reply(message, 'In case of an emergency, please dial 911.');
   });
 };
 
@@ -215,6 +214,7 @@ Bot.prototype.hearsPong = function(controller) {
     }
   });
 };
+
 /**
  * @private
  * Start ping/pong to determine connectivity, monitor latency,

@@ -11,8 +11,9 @@ var moment = require('moment');
  * @param  {CoreController}
  */
 function hearsHello(controller) {
-  var introduction = 'I\'m buttonwood, it\'s nice to meet you!' +
-    'Type out a stock symbol like *$AAPL*, and I\'ll get a price quote for you.';
+  var introduction = ['I\'m buttonwood, it\'s nice to meet you!',
+    'Type out a stock quote like *$AAPL* and I\'ll get a quote for you.'
+    ].join(' ');
 
   controller.hears(['hello', 'hi'],
     'hello,direct_message,direct_mention,mention',
@@ -26,7 +27,7 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsSymbol(controller) {
-  controller.hears(['',buttonwood.getStockListenRegex()],
+  controller.hears([buttonwood.getStockListenRegex()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
     var matches = buttonwood.parseStockQuote(message.text);
     var isDetailed = /detail/ig.test(message.text);
@@ -88,14 +89,16 @@ function hearsSymbol(controller) {
  * Handle help message
  */
 function hearsHelp(controller) {
-  controller.hears(['help'], 'direct_message', function(bot, message) {
-    bot.reply([
-      'Here are available commands:',
-      '*help:* shows this message',
-      '*$symbol*: provide a quote',
-      '*$symbol detail*: provide a detailed quote',
-      '*start:* start sending daily portfolio summaries',
-      '*stop:* stop sending daily portfolio summaries'
+  controller.hears(['help', 'halp'], 'direct_message,direct_mention,mention', function(bot, message) {
+    bot.reply(message, [
+      '*In any channel buttonwood is present:*',
+      '_$<ticker>_: provide a quote',
+      '_$<ticker> detail_: provide a detailed quote',
+      '*When directly mentioning:*',
+      '_help_: shows this message',
+      '*When direct messaging:*',
+      '_start_: send portfolio summaries at 4:20 PM ET every weekday',
+      '_stop_: stop sending daily portfolio summaries'
     ].join('\n'));
   });
 }
@@ -105,14 +108,14 @@ function hearsHelp(controller) {
  * @param  {CoreController} controller
  */
 function hearsStop(controller) {
-  controller.hears(['stop'], 'direct_message', function(bot,message) {
+  controller.hears(['stop'], 'direct_message', function(bot, message) {
     buttonwood.setPortfolioSummary({
       entityId: message.user
     }).then(function(tuple) {
-      bot.reply('Ok, I\'ll stop sending you daily portfolio summaries. ' +
+      bot.reply(message, 'Ok, I\'ll stop sending you daily portfolio summaries. ' +
         'If you change your mind, you can just tell me to *start*.');
     }).catch(function(){
-      bot.reply('Looks like something went horribly wrong');
+      bot.reply(message, 'Looks like something went horribly wrong');
     });
   });
 }
@@ -124,13 +127,13 @@ function hearsStop(controller) {
 function hearsStart(controller) {
   controller.hears(['start'], 'direct_message', function(bot,message) {
     buttonwood.setPortfolioSummary({
-      platformEntity: message.user,
+      entityId: message.user,
       summary: 'daily' // Only daily summaries are supported
     }).then(function(tuple) {
-      bot.reply('Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
+      bot.reply(message, 'Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
         'If you change your mind, you can just tell me to *stop*.');
     }).catch(function(){
-      bot.reply('Looks like something went horribly wrong');
+      bot.reply(message, 'Looks like something went horribly wrong');
     });
   });
 }
@@ -142,11 +145,12 @@ function hearsStart(controller) {
  */
 function BotButtonwood(applicationPlatformEntity) {
   Bot.call(this, applicationPlatformEntity);
-  this.listeners = [hearsHello, hearsStop, hearsStart, hearsSymbol];
+  this.listeners = [hearsStop, hearsStart, hearsSymbol];
 }
 
 BotButtonwood.prototype = Object.create(Bot.prototype);
 BotButtonwood.prototype.constructor = Bot;
 BotButtonwood.prototype.hearsHelp = hearsHelp;
+BotButtonwood.prototype.hearsHello = hearsHello;
 
 module.exports = BotButtonwood;
