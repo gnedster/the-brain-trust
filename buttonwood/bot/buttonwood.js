@@ -110,7 +110,8 @@ function hearsHelp(controller) {
 function hearsStop(controller) {
   controller.hears(['stop'], 'direct_message', function(bot, message) {
     buttonwood.setPortfolioSummary({
-      entityId: message.user
+      entityId: message.user,
+      summary: null
     }).then(function(tuple) {
       bot.reply(message, 'Ok, I\'ll stop sending you daily portfolio summaries. ' +
         'If you change your mind, you can just tell me to *start*.');
