@@ -26,6 +26,9 @@ describe('buttonwood', function(){
         }, {
           ticker: 'TWTR',
           name: 'Twitter'
+        }, {
+          ticker: 'GOOG',
+          name: 'Google'
         }]);
       })
       .then(function() {done();})
@@ -81,6 +84,20 @@ describe('buttonwood', function(){
     it('should return an empty value', function(done) {
       buttonwood.matchSymbols('   ').then(function(symbols) {
         assert(symbols.valid.length === 0);
+        done();
+      });
+    });
+
+    it('should return a symbol using ngram index', function(done) {
+      buttonwood.matchSymbols('NDAQ:GOOG').then(function(symbols) {
+        assert.equal(symbols.valid[0], 'GOOG');
+        done();
+      });
+    });
+
+    it('should return invalid symbol using ngram index', function(done) {
+      buttonwood.matchSymbols('NDDAQ:GGGOOG').then(function(symbols) {
+        assert.equal(symbols.invalid[0], 'NDDAQ:GGGOOG');
         done();
       });
     });

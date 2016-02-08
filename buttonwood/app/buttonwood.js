@@ -3,6 +3,7 @@
  */
 var _ = require('lodash');
 var accounting = require('accounting');
+var exchangeMap = require('./exchange-mapping.js');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
@@ -22,6 +23,7 @@ var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
  *                            invalid symbols
  */
 function matchSymbols(text) {
+  var exchangeRegexp = new RegExp('(.+):(.+)');
   var searchTerms = [];
   var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
     return term.toUpperCase();
@@ -71,11 +73,29 @@ function matchSymbols(text) {
     }
 
     return Promise.all(_.map(searchTerms, function(searchTerm) {
-      if (searchTerm === null) {
+      var exchangeRegexResult;
+      var exchange = undefined;
+      if (searchTerm === null)
         return []; // Simulate an empty result set
-      } else {
-        return rds.models.Symbol.findSymbol(searchTerm);
+      /* If colon is in term we are expecting it to be formated as
+       * exchange:term
+       */
+      exchangeRegexResult = exchangeRegexp.exec(searchTerm);
+      if (exchange instanceof Array) {
+        exchange = exchangeMap.get(exchangeRegexResult[1]);
+        searchTerm = exchangeRegexResult[2];
+        if(exchange instanceof String) {
+//TODO Terence need to batch all colon calls into one query
+          return rds.models.Symbol.findAll({
+            attributes: ['ticker'],
+            where: {
+              ticker: searchTerm,
+              exchange: exchange
+            }
+          });
+        }
       }
+      return rds.models.Symbol.findSymbol(searchTerm);
     }));
   }).then(function(results){
     _.each(results, function(matches, idx) {
@@ -125,12 +145,32 @@ function messageQuote(symbols, isDetailed) {
   var notFoundTpl =_.template(
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
-  var allSymbols = symbols.valid.concat(symbols.invalid || []);
+  var allSymbols = [];
+
+  var colonSymbols = [];
+  var invalidColonAttachments = [];
+  var combinedSymbols = symbols.valid.concat(symbols.invalid || []);
+
+  //Symbols with ':' do not work well with Yahoo API remove them
+  for (var i = 0, ii = combinedSymbols.length; i < ii; i++) {
+    if (/:/.test(combinedSymbols[i])) {
+      colonSymbols.push(combinedSymbols[i]);
+    } else {
+      allSymbols.push(combinedSymbols[i]);
+    }
+  }
+  invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
+    return {
+      fallback: notFoundTpl({symbol}),
+      text: notFoundTpl({symbol}),
+      mrkdwn_in : ['text']
+    };
+  }));
 
   if (allSymbols.length === 0) {
     logger.warn('no symbols');
     return Promise.resolve({
-      attachments: []
+      attachments: invalidColonAttachments
     });
   }
 
@@ -199,8 +239,7 @@ function messageQuote(symbols, isDetailed) {
             mrkdwn_in : ['title', 'text']
           };
         }
-      });
-
+      }).concat(invalidColonAttachments);
       return {
         attachments: attachments
       };
