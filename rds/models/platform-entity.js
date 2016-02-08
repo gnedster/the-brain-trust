@@ -25,7 +25,7 @@ var PlatformEntity = sequelize.define('PlatformEntity', {
 }, {
   indexes: [{
     unique: true,
-    fields: ['entity_id', 'kind', 'platform_id']
+    fields: ['entity_id', 'kind', 'platform_id', 'platform_entity_id']
   }]
 });
 
