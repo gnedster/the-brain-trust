@@ -48,17 +48,13 @@ Bot.prototype.populateUsers = function() {
         }
       }).then(function(platform) {
         _.each(response.members, function(member) {
-          rds.models.PlatformEntity.findOrCreate({
+          rds.models.PlatformEntity.findCreateFind({
             where: {
               entityId: member.id,
               platform_id: platform.id,
-              kind: 'user'
-            }
-          }).then(function(tuple) {
-            var user = tuple[0];
-            user.update({
+              kind: 'user',
               parent_id: self.applicationPlatformEntity.platform_entity_id
-            });
+            }
           });
         });
       });
