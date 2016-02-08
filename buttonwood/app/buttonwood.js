@@ -322,10 +322,9 @@ function getPortfolioSummaries() {
 
 /**
  * Sets the portfolio summary frequency.
- * @param   {Object}                     options
- * @param   {PlatformEntity|undefined}   options.platformEntity  The user associated with portfolio
- * @param   {String|undefined}           options.entityId        The entityId of the applicable PlatformEntity
- * @param   {String|undefined}           options.summary         Summary frequency
+ * @param   {Object}                  options
+ * @param   {PlatformEntity|Object}   options.platformEntity  The user associated with portfolio
+ * @param   {String|undefined}        options.summary         Summary frequency
  */
 function setPortfolioSummary(options) {
   /**
@@ -343,11 +342,10 @@ function setPortfolioSummary(options) {
         }
       }).then(function(platform) {
         return rds.models.PlatformEntity.findOrCreate({
-          where: {
-            entityId: options.entityId,
+          where: _.merge(options.platformEntity, {
             kind: 'user',
             platform_id: platform.id
-          }
+          })
         });
       });
     }
