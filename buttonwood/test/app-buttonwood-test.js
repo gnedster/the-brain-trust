@@ -27,6 +27,10 @@ describe('buttonwood', function(){
           ticker: 'TWTR',
           name: 'Twitter'
         }, {
+        }, {
+          ticker: 'TERE',
+          name: 'asdf'
+        }, {
           ticker: 'GOOG',
           name: 'Google'
         }]);
@@ -96,8 +100,9 @@ describe('buttonwood', function(){
     });
 
     it('should return invalid symbol when prepended by invalid exchange', function(done) {
-      buttonwood.matchSymbols('NDDAQ:GGGOOG').then(function(symbols) {
-        assert.equal(symbols.invalid[0], 'NDDAQ:GGGOOG');
+      buttonwood.matchSymbols('NDDAQ:TERE NDDAQ:GGGOOG').then(function(symbols) {
+        assert.equal(symbols.invalid[0], 'NDDAQ:TERE');
+        assert.equal(symbols.invalid[1], 'NDDAQ:GGGOOG');
         done();
       });
     });

@@ -81,10 +81,10 @@ function matchSymbols(text) {
        * exchange:term
        */
       exchangeRegexResult = exchangeRegexp.exec(searchTerm);
-      if (exchange instanceof Array) {
+      if (exchangeRegexResult instanceof Object) {
         exchange = exchangeMap.get(exchangeRegexResult[1]);
         searchTerm = exchangeRegexResult[2];
-        if(exchange instanceof String) {
+        if(_.isString(exchange)) {
 //TODO Terence need to batch all colon calls into one query
           return rds.models.Symbol.findAll({
             attributes: ['ticker'],
