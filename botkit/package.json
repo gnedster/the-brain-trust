@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/botkit",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Fork from Botkit.  Building blocks for Building Bots",
   "main": "lib/Botkit.js",
   "dependencies": {
