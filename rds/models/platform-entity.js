@@ -22,6 +22,11 @@ var PlatformEntity = sequelize.define('PlatformEntity', {
       isIn: [['team', 'channel', 'user']]
     }
   }
+}, {
+  indexes: [{
+    unique: true,
+    fields: ['entity_id', 'kind', 'platform_id', 'parent_id']
+  }]
 });
 
 module.exports = PlatformEntity;

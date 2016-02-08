@@ -321,6 +321,54 @@ function getPortfolioSummaries() {
 }
 
 /**
+ * Sets the portfolio summary frequency.
+ * @param   {Object}                     options
+ * @param   {PlatformEntity|undefined}   options.platformEntity  The user associated with portfolio
+ * @param   {String|undefined}           options.entityId        The entityId of the applicable PlatformEntity
+ * @param   {String|undefined}           options.summary         Summary frequency
+ */
+function setPortfolioSummary(options) {
+  /**
+   * Get the applicable PlatformEntity object
+   * @see setPortfolioSummary
+   * @return {Array}          Tuple of PlatformEntity and created value
+   */
+  function getPlatformEntity(options) {
+    if (options.platformEntity instanceof rds.models.PlatformEntity.Instance) {
+      return Promise.resolve([options.PlatformEntity, false]);
+    } else {
+      return rds.models.Platform.findOne({
+        where: {
+          name: 'slack'
+        }
+      }).then(function(platform) {
+        return rds.models.PlatformEntity.findOrCreate({
+          where: {
+            entityId: options.entityId,
+            kind: 'user',
+            platform_id: platform.id
+          }
+        });
+      });
+    }
+  }
+
+  return getPlatformEntity(options)
+    .then(function(tuple){
+      return rds.models.Portfolio.findOrCreate({
+        where: {
+          platform_entity_id: tuple[0].id
+        }
+      });
+    })
+    .then(function(tuple) {
+      return tuple[0].update({
+        summary: options.summary
+      });
+    });
+}
+
+/**
  * Return array with with stock strings
  * @param  {String} to be parsed
  * @return {Array} of stock strings
@@ -342,5 +390,6 @@ module.exports = {
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
   getPortfolioSummaries: getPortfolioSummaries,
+  setPortfolioSummary: setPortfolioSummary,
   getStockListenRegex: getStockListenRegex
 };

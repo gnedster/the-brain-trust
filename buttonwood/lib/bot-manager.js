@@ -106,9 +106,36 @@ function getStatus(applicationPlatformEntities) {
   return result;
 }
 
+/**
+ * Populate Slack users for all active bots.
+ */
+function populateUsers() {
+  rds.models.Platform.findOne({
+    where: {
+      name: 'slack'
+    }
+  }).then(function(platform) {
+    for (var bot of bots.values()) {
+      bot.bot.api.users.list({}, function(err,response) {
+        _.each(response.members, function(member) {
+          rds.models.PlatformEntity.findCreateFind({
+            where: {
+              entityId: member.id,
+              platform_id: platform.id,
+              kind: 'user',
+              parent_id: bot.applicationPlatformEntity.platform_entity_id
+            }
+          });
+        });
+      });
+    }
+  });
+}
+
 module.exports = {
   init: init,
   create: create,
   getBot: getBot,
-  getStatus: getStatus
+  getStatus: getStatus,
+  populateUsers: populateUsers
 };

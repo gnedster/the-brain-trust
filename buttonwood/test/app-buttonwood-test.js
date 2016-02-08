@@ -1,10 +1,12 @@
 var assert = require('assert');
 var buttonwood = require('../app/buttonwood.js');
 var factory = require('./lib/factory');
+var faker = require('faker');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 
 describe('buttonwood', function(){
+  var platform;
   before(function(done) {
     this.timeout(3000);
 
@@ -12,6 +14,10 @@ describe('buttonwood', function(){
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
+        return factory.create('platform');
+      })
+      .then(function(instance) {
+        platform = instance;
         return factory.createMany('symbol', [{}, {
           ticker: 'MSFT.MX'
         }, {
@@ -97,6 +103,16 @@ describe('buttonwood', function(){
     });
   });
 
+  describe('setPortfolioSummary', function() {
+    it('should return a tuple on an unknown user', function(done) {
+      buttonwood.setPortfolioSummary({entityId: `U${faker.random.number()}`})
+        .then(function(portfolio) {
+          assert(portfolio instanceof rds.models.Portfolio.Instance);
+          done();
+        });
+    });
+  });
+
   describe ('getPortfolioSummaries', function() {
     it('should return an empty array with no entries', function(done) {
       buttonwood.getPortfolioSummaries()
@@ -117,7 +133,8 @@ describe('buttonwood', function(){
         })
         .then(function(platformEntity) {
           return factory.create('application-platform-entity', {
-            platform_entity_id: platformEntity.id
+            platform_entity_id: platformEntity.id,
+            platform_id: platform.id
           });
         })
         .then(function(){

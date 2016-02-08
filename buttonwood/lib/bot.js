@@ -3,7 +3,6 @@ var Botkit = require('botkit');
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
-var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 
 const rtmInterval = 5000;
@@ -31,40 +30,7 @@ function Bot(applicationPlatformEntity) {
   });
 
   this.bot = this.controller.spawn({token:token});
-
-  this.populateUsers();
 }
-
-/**
- * Populate users for a given team.
- */
-Bot.prototype.populateUsers = function() {
-  var self = this;
-
-  self.bot.api.users.list({}, function(err,response) {
-    rds.models.Platform.findOne({
-        where: {
-          name: 'slack'
-        }
-      }).then(function(platform) {
-        _.each(response.members, function(member) {
-          rds.models.PlatformEntity.findOrCreate({
-            where: {
-              entityId: member.id,
-              platform_id: platform.id,
-              kind: 'user'
-            }
-          }).then(function(tuple) {
-            var user = tuple[0];
-            user.update({
-              parent_id: self.applicationPlatformEntity.platform_entity_id
-            });
-          });
-        });
-      });
-  });
-
-};
 
 /**
  * Getter for Bot Id
@@ -132,9 +98,13 @@ Bot.prototype.start = function (){
   }
 
   // init listeners
-  _.each(this.listeners.concat([this.hearsPong]), function(listener){
-    listener.call(self, self.controller);
-  });
+  _.each(this.listeners.concat([
+    this.hearsPong,
+    this.hearsHelp,
+    this.hearsHello]),
+    function(listener){
+      listener.call(self, self.controller);
+    });
 
   return this;
 };
@@ -174,6 +144,28 @@ Bot.prototype.startRtm = function() {
 /**
  * @private
  * @param {Slackbot} controller  An instance of Slackbot
+ * Handle hello message
+ */
+Bot.prototype.hearsHello = function(controller) {
+  controller.hears(['hi, hello'], 'direct_message', function(bot, message) {
+    bot.reply(message, 'Hi there! Type *help* to see what I can do.');
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
+ * Handle help message
+ */
+Bot.prototype.hearsHelp = function(controller) {
+  controller.hears(['help', 'halp'], 'direct_message', function(bot, message) {
+    bot.reply(message, 'Oops! Looks like there\'s no help text.');
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
  * Handle pong message
  */
 Bot.prototype.hearsPong = function(controller) {
@@ -188,6 +180,7 @@ Bot.prototype.hearsPong = function(controller) {
     }
   });
 };
+
 /**
  * @private
  * Start ping/pong to determine connectivity, monitor latency,
