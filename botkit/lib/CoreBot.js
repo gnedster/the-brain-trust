@@ -119,27 +119,27 @@ function Botkit(configuration) {
       // active includes both ACTIVE and ENDING
       // in order to allow the timeout end scripts to play out
       return (this.status=='active' || this.status =='ending');
-    }
+    };
 
     this.deactivate = function() {
       this.status='inactive';
-    }
+    };
 
     this.say = function(message) {
       this.addMessage(message);
-    }
+    };
 
     this.sayFirst = function(message) {
       if (typeof(message)=='string') {
         message = {
           text: message,
           channel: this.source_message.channel
-        }
+        };
       } else {
         message.channel = this.source_message.channel;
       }
       this.messages.unshift(message);
-    }
+    };
 
 
     this.on = function(event,cb) {
@@ -152,7 +152,7 @@ function Botkit(configuration) {
         this.events[events[e]].push(cb);
       }
       return this;
-    }
+    };
 
     this.trigger = function(event,data) {
       if (this.events[event]) {
@@ -167,12 +167,12 @@ function Botkit(configuration) {
       } else {
         botkit.debug('No handler for ',event);
       }
-    }
+    };
 
     // proceed to the next message after waiting for an answer
     this.next = function() {
       this.handler = null;
-    }
+    };
 
     this.repeat = function() {
       if (this.sent.length) {
@@ -180,14 +180,14 @@ function Botkit(configuration) {
       } else {
         // console.log('TRIED TO REPEAT, NOTHING TO SAY');
       }
-    }
+    };
 
     this.silentRepeat = function() {
 
       // do nothing.
       return;
 
-    }
+    };
 
     this.addQuestion = function(message,cb,capture_options,topic) {
 
@@ -195,7 +195,7 @@ function Botkit(configuration) {
           message = {
             text: message,
             channel: this.source_message.channel
-          }
+          };
         } else {
           message.channel = this.source_message.channel;
         }
@@ -207,12 +207,12 @@ function Botkit(configuration) {
         message.handler =cb;
         this.addMessage(message,topic);
 
-    }
+    };
 
 
     this.ask = function(message,cb,capture_options) {
       this.addQuestion(message,cb,capture_options,this.topic||'default');
-    }
+    };
 
     this.addMessage = function(message,topic) {
       if (!topic) {
@@ -222,7 +222,7 @@ function Botkit(configuration) {
         message = {
           text: message,
           channel: this.source_message.channel
-        }
+        };
       } else {
         message.channel = this.source_message.channel;
       }
@@ -237,7 +237,7 @@ function Botkit(configuration) {
         this.messages.push(message);
       }
       //      this.messages.push(message);
-    }
+    };
 
     this.changeTopic = function(topic) {
       this.topic = topic;
@@ -248,12 +248,12 @@ function Botkit(configuration) {
       this.messages = this.topics[topic].slice();
       //console.log(">>> CLEAR HANDLER CHANGE TOPIC");
       this.handler = null;
-    }
+    };
 
     this.combineMessages = function(messages) {
       var x;
       if (messages.length>1) {
-        var txt = []
+        var txt = [];
         var last_user = null;
         var multi_users = false;
         last_user = messages[0].user;
@@ -283,7 +283,7 @@ function Botkit(configuration) {
         }
       }
 
-    }
+    };
 
     this.extractResponses = function() {
 
@@ -292,11 +292,11 @@ function Botkit(configuration) {
         res[key] = this.extractResponse(key);
       }
       return res;
-    }
+    };
 
     this.extractResponse = function(key) {
       return this.combineMessages(this.responses[key]);
-    }
+    };
 
     this.replaceTokens = function(text) {
 
@@ -305,11 +305,11 @@ function Botkit(configuration) {
         responses: this.extractResponses(),
         origin: this.task.source_message,
         vars: this.vars
-      }
+      };
 
       return mustache.render(text,vars);
 
-    }
+    };
 
     this.stop = function(status) {
 
@@ -320,7 +320,7 @@ function Botkit(configuration) {
       botkit.debug('Conversation is over!');
       this.task.conversationEnded(this);
 
-    }
+    };
 
     this.tick = function() {
       var now = new Date();
@@ -423,7 +423,7 @@ function Botkit(configuration) {
           }
         }
       }
-    }
+    };
 
     botkit.debug('CREATED A CONVO FOR',this.source_message.user,this.source_message.channel);
     this.changeTopic('default');
@@ -443,7 +443,7 @@ function Botkit(configuration) {
 
     this.isActive = function() {
       return this.status=='active';
-    }
+    };
 
     this.startConversation = function(message) {
 
@@ -456,7 +456,7 @@ function Botkit(configuration) {
       this.convos.push(convo);
       this.trigger('conversationStarted',[convo]);
       return convo;
-    }
+    };
 
     this.conversationEnded = function(convo) {
 
@@ -473,7 +473,7 @@ function Botkit(configuration) {
         this.taskEnded();
       }
 
-    }
+    };
 
     this.taskEnded = function() {
 
@@ -482,7 +482,7 @@ function Botkit(configuration) {
       this.status='completed';
       this.trigger('end',[this]);
 
-    }
+    };
 
     this.on = function(event,cb) {
       botkit.debug('Setting up a handler for',event);
@@ -494,7 +494,7 @@ function Botkit(configuration) {
         this.events[events[e]].push(cb);
       }
       return this;
-    }
+    };
 
     this.trigger = function(event,data) {
       if (this.events[event]) {
@@ -507,7 +507,7 @@ function Botkit(configuration) {
       } else {
         botkit.debug('No handler for ',event);
       }
-    }
+    };
 
 
     this.getResponsesByUser = function() {
@@ -526,7 +526,7 @@ function Botkit(configuration) {
 
       return users;
 
-    }
+    };
 
     this.getResponsesBySubject = function() {
 
@@ -548,7 +548,7 @@ function Botkit(configuration) {
 
       return answers;
 
-    }
+    };
 
     this.tick = function() {
 
@@ -557,7 +557,7 @@ function Botkit(configuration) {
           this.convos[c].tick();
         }
       }
-    }
+    };
 
   }
 
@@ -567,7 +567,7 @@ function Botkit(configuration) {
         cb(null,botkit.memory_store['teams'][team_id]);
       },
       save: function(team,cb) {
-        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.')
+        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.');
         if (team.id) {
           botkit.memory_store['teams'][team.id] = team;
           cb(null,team.id);
@@ -584,7 +584,7 @@ function Botkit(configuration) {
         cb(null,botkit.memory_store['users'][user_id]);
       },
       save: function(user,cb) {
-        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.')
+        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.');
 
         if (user.id) {
           botkit.memory_store['users'][user.id] = user;
@@ -602,7 +602,7 @@ function Botkit(configuration) {
         cb(null,botkit.memory_store['channels'][channel_id]);
       },
       save: function(channel,cb) {
-        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.')
+        botkit.log('Warning: using temporary storage. Data will be lost when process restarts.');
         if (channel.id) {
           botkit.memory_store['channels'][channel.id] = channel;
           cb(null,channel.id);
@@ -614,7 +614,7 @@ function Botkit(configuration) {
         cb(null,botkit.memory_store['channels']);
       }
     }
-  }
+  };
 
   botkit.debug = function() {
     if (configuration.debug) {
@@ -624,7 +624,7 @@ function Botkit(configuration) {
       }
       logger.debug(args);
     }
-  }
+  };
 
   botkit.log = function() {
     if (configuration.log || configuration.log === undefined) { //default to true
@@ -667,7 +667,7 @@ function Botkit(configuration) {
     }
 
     return this;
-  }
+  };
 
   botkit.on = function(event,cb) {
     botkit.debug('Setting up a handler for',event);
@@ -679,7 +679,7 @@ function Botkit(configuration) {
       this.events[events[e]].push(cb);
     }
     return this;
-  }
+  };
 
   botkit.trigger = function(event,data) {
     if (this.events[event]) {
@@ -692,7 +692,7 @@ function Botkit(configuration) {
     } else {
       botkit.debug('No handler for ',event);
     }
-  }
+  };
 
   botkit.startConversation = function(bot,message,cb) {
     botkit.startTask(bot,message,function(task,convo) {
@@ -705,7 +705,7 @@ function Botkit(configuration) {
       throw new Error('Bot definition must be a constructor function');
     }
     this.worker = unit;
-  }
+  };
 
   botkit.spawn = function(config,cb) {
     var worker = new this.worker(this,config);
@@ -726,7 +726,7 @@ function Botkit(configuration) {
     if (botkit.tickInterval) {
       clearInterval(botkit.tickInterval);
     }
-  }
+  };
 
   botkit.startTask = function(bot,message,cb) {
 
@@ -746,7 +746,7 @@ function Botkit(configuration) {
       return task;
     }
 
-  }
+  };
 
   botkit.receiveMessage = function(bot,message) {
 
@@ -755,10 +755,10 @@ function Botkit(configuration) {
       if (convo) {
         convo.handle(message);
       } else {
-        botkit.trigger('message_received',[bot,message])
+        botkit.trigger('message_received',[bot,message]);
       }
     });
-  }
+  };
 
   botkit.tick = function() {
     var t;
@@ -774,7 +774,7 @@ function Botkit(configuration) {
 
     this.trigger('tick',[]);
 
-  }
+  };
 
 
   /* Define a default worker bot. This function should be customized outside of Botkit and passed in as a parameter
