@@ -14,7 +14,8 @@ const errorMessage = 'something went horribly wrong.';
  */
 function hearsHello(controller) {
   var introduction = ['I\'m buttonwood, it\'s nice to meet you!',
-    'Type out a stock quote like *$AAPL* and I\'ll get a quote for you.'
+    'Type out a stock quote like *$AAPL* and I\'ll get a quote for you.',
+    'For more information, directly message me with *help*.'
     ].join(' ');
 
   controller.hears(['hello', 'hi'],
@@ -96,9 +97,9 @@ function hearsHelp(controller) {
       '*In any channel buttonwood is present:*',
       '_$<ticker>_: get stock quotes',
       '_$<ticker> detail_: get detailed stock quotes',
-      '*When directly mentioning:*',
+      '*When directly mentioning buttonwood:*',
       '_help_: shows this message',
-      '*When direct messaging:*',
+      '*When direct messaging buttonwood:*',
       '_start summaries_: send portfolio summaries at 4:20 PM ET every weekday',
       '_stop summaries_: stop sending daily portfolio summaries'
     ].join('\n'));
