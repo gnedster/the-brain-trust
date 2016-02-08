@@ -105,7 +105,11 @@ describe('buttonwood', function(){
 
   describe('setPortfolioSummary', function() {
     it('should return a tuple on an unknown user', function(done) {
-      buttonwood.setPortfolioSummary({entityId: `U${faker.random.number()}`})
+      buttonwood.setPortfolioSummary({
+          platformEntity: {
+            entityId: `U${faker.random.number()}`
+          }
+        })
         .then(function(portfolio) {
           assert(portfolio instanceof rds.models.Portfolio.Instance);
           done();

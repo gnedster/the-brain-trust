@@ -111,9 +111,13 @@ function hearsHelp(controller) {
  * @param  {CoreController} controller
  */
 function hearsStop(controller) {
+  var self = this;
   controller.hears(['stop summaries'], 'direct_message', function(bot, message) {
     buttonwood.setPortfolioSummary({
-      entityId: message.user,
+      platformEntity: {
+        entityId: message.user,
+        parent_id: self.applicationPlatformEntity.platform_entity_id
+      },
       summary: null
     }).then(function(tuple) {
       bot.reply(message, 'Ok, I\'ll stop sending you daily portfolio summaries. ' +
@@ -129,9 +133,13 @@ function hearsStop(controller) {
  * @param  {CoreController} controller
  */
 function hearsStart(controller) {
+  var self = this;
   controller.hears(['start summaries'], 'direct_message', function(bot,message) {
     buttonwood.setPortfolioSummary({
-      entityId: message.user,
+      platformEntity: {
+        entityId: message.user,
+        parent_id: self.applicationPlatformEntity.platform_entity_id
+      },
       summary: 'daily' // Only daily summaries are supported
     }).then(function(tuple) {
       bot.reply(message, 'Ok, I\'ll send you daily portfolio summaries every weekday at 4:20 PM ET. ' +
