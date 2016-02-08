@@ -88,14 +88,14 @@ describe('buttonwood', function(){
       });
     });
 
-    it('should return a symbol using ngram index', function(done) {
+    it('should return valid symbol when prepended by exchange', function(done) {
       buttonwood.matchSymbols('NDAQ:GOOG').then(function(symbols) {
         assert.equal(symbols.valid[0], 'GOOG');
         done();
       });
     });
 
-    it('should return invalid symbol using ngram index', function(done) {
+    it('should return invalid symbol when prepended by invalid exchange', function(done) {
       buttonwood.matchSymbols('NDDAQ:GGGOOG').then(function(symbols) {
         assert.equal(symbols.invalid[0], 'NDDAQ:GGGOOG');
         done();
