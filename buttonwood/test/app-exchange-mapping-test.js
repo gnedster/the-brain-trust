@@ -9,6 +9,7 @@ describe('buttonwood', function(){
     assert.equal(exchangeMap.get('SES'),'SES');
     done();
   });
+
   it('map to valid exchange', function(done){
     assert.equal(exchangeMap.get('NDDAQ'), undefined);
     done();
