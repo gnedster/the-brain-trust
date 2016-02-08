@@ -145,28 +145,27 @@ function messageQuote(symbols, isDetailed) {
   var notFoundTpl =_.template(
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
+  var allSymbols = [];
+
   var colonSymbols = [];
-  var invalidSymbols = [];
   var invalidColonAttachments = [];
+  var combinedSymbols = symbols.valid.concat(symbols.invalid || []);
 
   //Symbols with ':' do not work well with Yahoo API remove them
-  if (!(_.isUndefined(symbols.invalid))) {
-    for (var i = 0, ii = symbols.invalid.length; i < ii; i++) {
-      if (/:/.test(symbols.invalid[i])) {
-        colonSymbols.push(symbols.invalid[i]);
-      } else {
-        invalidSymbols.push(symbols.invalid[i]);
-      }
+  for (var i = 0, ii = combinedSymbols.length; i < ii; i++) {
+    if (/:/.test(combinedSymbols[i])) {
+      colonSymbols.push(combinedSymbols[i]);
+    } else {
+      allSymbols.push(combinedSymbols[i]);
     }
-    invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
-      return {
-        fallback: notFoundTpl({symbol}),
-        text: notFoundTpl({symbol}),
-        mrkdwn_in : ['text']
-      };
-    }));
   }
-  var allSymbols = symbols.valid.concat(invalidSymbols);
+  invalidColonAttachments = _.map(colonSymbols, (function(symbol) {
+    return {
+      fallback: notFoundTpl({symbol}),
+      text: notFoundTpl({symbol}),
+      mrkdwn_in : ['text']
+    };
+  }));
 
   if (allSymbols.length === 0) {
     logger.warn('no symbols');
