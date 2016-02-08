@@ -132,9 +132,13 @@ Bot.prototype.start = function (){
   }
 
   // init listeners
-  _.each(this.listeners.concat([this.hearsPong]), function(listener){
-    listener.call(self, self.controller);
-  });
+  _.each(this.listeners.concat([
+    this.hearsPong,
+    this.hearsHelp,
+    this.hearsHello]),
+    function(listener){
+      listener.call(self, self.controller);
+    });
 
   return this;
 };
@@ -174,6 +178,28 @@ Bot.prototype.startRtm = function() {
 /**
  * @private
  * @param {Slackbot} controller  An instance of Slackbot
+ * Handle hello message
+ */
+Bot.prototype.hearsHello = function(controller) {
+  controller.hears(['hi, hello'], 'direct_message', function(bot, message) {
+    bot.reply(message, 'Hi there! Type *help* to see what I can do.');
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
+ * Handle help message
+ */
+Bot.prototype.hearsHelp = function(controller) {
+  controller.hears(['help', 'halp'], 'direct_message', function(bot, message) {
+    bot.reply(message, 'Oops! Looks like there\'s no help text.');
+  });
+};
+
+/**
+ * @private
+ * @param {Slackbot} controller  An instance of Slackbot
  * Handle pong message
  */
 Bot.prototype.hearsPong = function(controller) {
@@ -188,6 +214,7 @@ Bot.prototype.hearsPong = function(controller) {
     }
   });
 };
+
 /**
  * @private
  * Start ping/pong to determine connectivity, monitor latency,
