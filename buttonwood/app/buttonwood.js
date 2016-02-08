@@ -23,6 +23,7 @@ var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
  *                            invalid symbols
  */
 function matchSymbols(text) {
+  var exchangeRegexp = new RegExp('(.+):(.+)');
   var searchTerms = [];
   var tokens = _.compact(_.uniq(_.map(text.split(' '), function(term) {
     return term.toUpperCase();
@@ -72,30 +73,29 @@ function matchSymbols(text) {
     }
 
     return Promise.all(_.map(searchTerms, function(searchTerm) {
-      var xchgRegexp = new RegExp('(.+):(.+)');
-      if (searchTerm === null) {
+      var exchangeRegexResult;
+      var exchange = undefined;
+      if (searchTerm === null)
         return []; // Simulate an empty result set
-      } else {
-        /* If colon is in term we are expecting it to be formated as
-         * exchange:term
-         */
-        var xchgRegexResult = xchgRegexp.exec(searchTerm);
-        var xchg = undefined;
-        if (!_.isNull(xchgRegexResult)) {
-          xchg = exchangeMap.get(xchgRegexResult[1]);
-          searchTerm = xchgRegexResult[2];
-          if(!(_.isUndefined(xchg))) {
-            return rds.models.Symbol.findAll({
-              attributes: ['ticker'],
-              where: {
-                ticker: searchTerm,
-                exchange: xchg
-              }
-            });
-          }
+      /* If colon is in term we are expecting it to be formated as
+       * exchange:term
+       */
+      exchangeRegexResult = exchangeRegexp.exec(searchTerm);
+      if (exchange instanceof Array) {
+        exchange = exchangeMap.get(exchangeRegexResult[1]);
+        searchTerm = exchangeRegexResult[2];
+        if(exchange instanceof String) {
+//TODO Terence need to batch all colon calls into one query
+          return rds.models.Symbol.findAll({
+            attributes: ['ticker'],
+            where: {
+              ticker: searchTerm,
+              exchange: exchange
+            }
+          });
         }
-        return rds.models.Symbol.findSymbol(searchTerm);
       }
+      return rds.models.Symbol.findSymbol(searchTerm);
     }));
   }).then(function(results){
     _.each(results, function(matches, idx) {

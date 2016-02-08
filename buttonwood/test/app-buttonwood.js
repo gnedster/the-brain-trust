@@ -59,7 +59,7 @@ describe('buttonwood', function(){
     });
 
     it('should return a symbol using ngram index', function(done) {
-      buttonwood.matchSymbols('MICROSOFT').then(function(symbols) {
+      buttonwood.matchSymbols('microsoft').then(function(symbols) {
         assert.equal(symbols.valid[0], 'MSFT');
         done();
       });

@@ -1,42 +1,16 @@
-/* This is JS Map instead of RDS as the mapping is small
- * If this gets big we should consider it being in RDS
- */
 var exchangeMap = new Map();
 
-exchangeMap.set('TSX', 'TOR');
-exchangeMap.set('TOR', 'TOR');
-
-exchangeMap.set('PNK', 'PNK');
-exchangeMap.set('OTCMKTS','PNK');
-
-exchangeMap.set('NMS', 'NMS');
-exchangeMap.set('NASDAQ','NMS');
-exchangeMap.set('NDAQ','NMS');
-
-exchangeMap.set('NYQ', 'NYQ');
-exchangeMap.set('NYSE','NYQ');
-
-exchangeMap.set('KOE', 'KOE');
-exchangeMap.set('KOSDAQ','KOE');
-
-exchangeMap.set('IST', 'IST');
-exchangeMap.set('BIST','IST');
-
-exchangeMap.set('OTCBB','OBB');
-exchangeMap.set('OBB', 'OBB');
-
-exchangeMap.set('BCBA;','BUE');
-exchangeMap.set('BUE', 'BUE');
-
-exchangeMap.set('FWB','FRA');
-exchangeMap.set('FRA', 'FRA');
-
-exchangeMap.set('SEHK','HKG');
-exchangeMap.set('HKG', 'HKG');
-
-exchangeMap.set('SGX','SES');
-exchangeMap.set('SES', 'SES');
-
+exchangeMap.set('TSX', 'TOR').set('TOR', 'TOR');
+exchangeMap.set('PNK', 'PNK').set('OTCMKTS','PNK');
+exchangeMap.set('NMS', 'NMS').set('NASDAQ','NMS').set('NDAQ','NMS');
+exchangeMap.set('NYQ', 'NYQ').set('NYSE','NYQ');
+exchangeMap.set('KOE', 'KOE').set('KOSDAQ','KOE');
+exchangeMap.set('IST', 'IST').set('BIST','IST');
+exchangeMap.set('OTCBB','OBB').set('OBB', 'OBB');
+exchangeMap.set('BCBA;','BUE').set('BUE', 'BUE');
+exchangeMap.set('FWB','FRA').set('FRA', 'FRA');
+exchangeMap.set('SEHK','HKG').set('HKG', 'HKG');
+exchangeMap.set('SGX','SES').set('SES', 'SES');
 exchangeMap.set('BSE', 'BSE');
 exchangeMap.set('LSE', 'LSE');
 exchangeMap.set('ASE', 'ASE');
