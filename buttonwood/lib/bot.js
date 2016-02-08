@@ -193,7 +193,7 @@ Bot.prototype.hearsHello = function(controller) {
  */
 Bot.prototype.hearsHelp = function(controller) {
   controller.hears(['help', 'halp'], 'direct_message', function(bot, message) {
-    bot.reply(message, 'In case of an emergency, please dial 911.');
+    bot.reply(message, 'Oops! Looks like there\'s no help text.');
   });
 };
 
