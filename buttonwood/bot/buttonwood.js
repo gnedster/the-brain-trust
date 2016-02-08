@@ -94,14 +94,14 @@ function hearsSymbol(controller) {
 function hearsHelp(controller) {
   controller.hears(['help', 'halp'], 'direct_message,direct_mention,mention', function(bot, message) {
     bot.reply(message, [
-      '*In any channel buttonwood is present:*',
+      '*Commands available in any channel buttonwood is present:*',
       '_$<ticker>_: get stock quotes',
       '_$<ticker> detail_: get detailed stock quotes',
       '',
-      '*When directly mentioning buttonwood:*',
+      '*When directly mentioning buttonwood (all of the above and):*',
       '_help_: shows this message',
       '',
-      '*When direct messaging buttonwood:*',
+      '*When direct messaging buttonwood (all of the above and):*',
       '_start summaries_: send portfolio summaries at 4:20 PM ET every weekday',
       '_stop summaries_: stop sending daily portfolio summaries'
     ].join('\n'));
