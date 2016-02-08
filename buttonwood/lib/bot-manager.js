@@ -110,8 +110,6 @@ function getStatus(applicationPlatformEntities) {
  * Populate Slack users for all active bots.
  */
 function populateUsers() {
-  var self = this;
-
   rds.models.Platform.findOne({
     where: {
       name: 'slack'
@@ -125,7 +123,7 @@ function populateUsers() {
               entityId: member.id,
               platform_id: platform.id,
               kind: 'user',
-              parent_id: self.applicationPlatformEntity.platform_entity_id
+              parent_id: bot.applicationPlatformEntity.platform_entity_id
             }
           });
         });
