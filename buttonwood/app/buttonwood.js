@@ -179,6 +179,8 @@ function messageQuote(symbols, isDetailed) {
       symbols: allSymbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
+      var isCompact = allSymbols.length > 3;
+      var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
         var attachmentFieldsBasic, attachmentFieldsDetailed;
         logger.debug(data);
@@ -189,15 +191,20 @@ function messageQuote(symbols, isDetailed) {
             text: notFoundTpl(data),
             mrkdwn_in : ['text']
           };
-        } else if (allSymbols.length > 3) {
+        } else if (isCompact) {
+          logger.debug(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`);
+          lastTradeDateMaximum = moment.max([
+            moment(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`, 'LLL'),
+            lastTradeDateMaximum || moment(0)
+            ]);
           return {
             fallback: priceTpl(data),
             color: number.color(data.changeInPercent),
-            text: _.template('<<%= link %>|*<%= symbol %> (<%= name %>)*>\t\t*<%= lastTrade %>*\t\t<%= change %>')({
+            text: _.template('<<%= link %>|*<%= symbol %> (<%= name %>)*>\n*<%= lastTrade %>*<%= change %>')({
               symbol: data.symbol,
-              name: _.padRight(_.trunc(data.name, {length: 40}), 42),
+              name: data.name,
               link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
-              lastTrade: accounting.formatMoney(data.lastTradePriceOnly),
+              lastTrade: _.padRight(accounting.formatMoney(data.lastTradePriceOnly), 10),
               change: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`
             }),
             mrkdwn_in : ['text']
@@ -255,16 +262,15 @@ function messageQuote(symbols, isDetailed) {
         }
       }).concat(invalidColonAttachments);
 
-      // if (true) {
-      //   attachments.unshift({
-      //     //title: `*${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime} ET*`,
-      //     mrkdwn_in : ['title']
-      //   });
-      // }
-
-      return {
+      var result = {
         attachments: attachments
       };
+
+      if (isCompact && lastTradeDateMaximum instanceof moment) {
+        result.text = `*${lastTradeDateMaximum.format('LLL')}*`;
+      }
+
+      return result;
     });
 }
 
