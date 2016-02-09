@@ -191,7 +191,7 @@ function messageQuote(symbols, isDetailed) {
             text: notFoundTpl(data),
             mrkdwn_in : ['text']
           };
-        } else if (isCompact) {
+        } else if (isCompact && isDetailed === false) {
           lastTradeDateMaximum = moment.max([
             moment(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`, 'LLL'),
             lastTradeDateMaximum || moment(0)
