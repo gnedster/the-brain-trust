@@ -179,7 +179,7 @@ function messageQuote(symbols, isDetailed) {
       symbols: allSymbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
-      var isCompact = allSymbols.length > 3;
+      var isCompact = allSymbols.length > 2;
       var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
         var attachmentFieldsBasic, attachmentFieldsDetailed;
@@ -278,6 +278,32 @@ function messageQuote(symbols, isDetailed) {
  * @return {Object} Contains messages for portfolio summaries
  */
 function getPortfolioSummaries() {
+  /**
+   * Get message text. Message is different if firstPush is set on portfolio,
+   * set firstPush attribute to false once message is delivered.
+   * @return {String}
+   */
+  function getMessageText(portfolio) {
+    var text = '';
+
+    if (portfolio.firstPush === true) {
+      text = ['Hi there! I\'ll be providing portfolio summaries every weekday ',
+        'after US markets close at 4:20 PM ET. If you don\'t want these ',
+        'summaries, just say *stop summaries*.\n'
+        ].join('');
+
+      // TODO: place in callback on successful push only
+      portfolio.update({
+        firstPush: false
+      });
+    }
+
+    text += '*Portfolio Summary*';
+
+    return text;
+  }
+
+
   return rds.models.Portfolio.findAll({
     where: {
       summary: {
@@ -335,7 +361,7 @@ function getPortfolioSummaries() {
                                                 .ApplicationPlatformEntities[0],
             platformEntity: portfolio.PlatformEntity,
             message: {
-              text: `*Portfolio Summary for ${moment().format('LL')}*`,
+              text: getMessageText(portfolio),
               attachments: attachments
             }
           };

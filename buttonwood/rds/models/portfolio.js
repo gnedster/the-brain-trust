@@ -12,7 +12,14 @@ var Portfolio = rds.define('Portfolio', {
     allowNull: false
   },
   summary: {
-    type: Sequelize.ENUM('daily', 'weekly', 'monthly')
+    type: Sequelize.ENUM('daily', 'weekly', 'monthly'),
+    defaultValue: 'daily'
+  },
+  firstPush: {
+    type: Sequelize.BOOLEAN,
+    field: 'first_push',
+    defaultValue: true,
+    allowNull: false
   }
 });
 
