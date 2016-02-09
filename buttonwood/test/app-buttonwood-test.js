@@ -41,9 +41,9 @@ describe('buttonwood', function(){
 
   it('should return valid symbols from string', function(done){
     var str = '$FB $12.12 $NYSE:GOOGL $123.by $1.0 $J12ELK90#$ $12345 $^GSPC' +
-      ' $^^GSPC $$$asd$f';
+      ' $^^GSPC $$$asd$f $12k $12.45K $12l';
     var expectedResult = ['$FB','$NYSE:GOOGL','$123.by','$J12ELK90', '$^GSPC',
-      '$^^GSPC', '$asd', '$f'];
+      '$^^GSPC', '$asd', '$f', '$12l'];
     var result = buttonwood.parseStockQuote(str);
 
     assert.equal(result.length, expectedResult.length);
