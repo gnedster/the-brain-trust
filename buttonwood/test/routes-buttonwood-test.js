@@ -24,7 +24,7 @@ describe('/buttonwood', function() {
         .type('form')
         .send({
           token: commandToken,
-          text: 'AAPL',
+          text: 'AAPL MSFT TWTR IBB',
           team_id: faker.random.uuid(),
           channel_id: faker.random.uuid(),
           user_id: faker.random.uuid()

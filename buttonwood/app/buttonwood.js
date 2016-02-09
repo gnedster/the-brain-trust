@@ -179,48 +179,11 @@ function messageQuote(symbols, isDetailed) {
       symbols: allSymbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
+      var isCompact = allSymbols.length > 3;
+      var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
+        var attachmentFieldsBasic, attachmentFieldsDetailed;
         logger.debug(data);
-
-        var attachmentFieldsBasic = [{
-          title: 'Last Trade',
-          value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
-          short: true
-        }, {
-          title: 'Change',
-          value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
-          short: true
-        }];
-
-        var attachmentFieldsDetailed = [{
-          title: 'Volume',
-          value: accounting.formatNumber(data.volume),
-          short: true
-        }, {
-          title: 'Avg. Daily Volume',
-          value: accounting.formatNumber(data.averageDailyVolume),
-          short: true
-        }, {
-          title: 'Day Range',
-          value: data.daysRange || 'n/a',
-          short: true
-        }, {
-          title: '52 Week Range',
-          value: data['52WeekRange'] || 'n/a',
-          short: true
-        }, {
-          title: 'P/E',
-          value: data.peRatio || 'n/a',
-          short: true
-        }, {
-          title: 'EPS',
-          value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
-          short: true
-        }, {
-          title: 'Market Capitalization',
-          value: data.marketCapitalization || 'n/a',
-          short: true
-        }];
 
         if (_.isEmpty(data.name)) {
           return {
@@ -228,7 +191,64 @@ function messageQuote(symbols, isDetailed) {
             text: notFoundTpl(data),
             mrkdwn_in : ['text']
           };
+        } else if (isCompact && isDetailed === false) {
+          lastTradeDateMaximum = moment.max([
+            moment(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`, 'LLL'),
+            lastTradeDateMaximum || moment(0)
+            ]);
+          return {
+            fallback: priceTpl(data),
+            color: number.color(data.changeInPercent),
+            text: _.template('<<%= link %>|*<%= symbol %> (<%= name %>)*>\n*<%= lastTrade %>*<%= change %>')({
+              symbol: data.symbol,
+              name: data.name,
+              link: util.getRedirectUri(`https://finance.yahoo.com/q?s=${data.symbol}`),
+              lastTrade: _.padRight(accounting.formatMoney(data.lastTradePriceOnly), 10),
+              change: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`
+            }),
+            mrkdwn_in : ['text']
+          };
         } else {
+          attachmentFieldsBasic = [{
+            title: 'Last Trade',
+            value: `${accounting.formatMoney(data.lastTradePriceOnly)}`,
+            short: true
+          }, {
+            title: 'Change',
+            value: `${number.sign(data.change)}${Math.abs(data.change)} (${number.sign(data.changeInPercent)}${number.toPercent(Math.abs(data.changeInPercent))})`,
+            short: true
+          }];
+
+          attachmentFieldsDetailed = [{
+            title: 'Volume',
+            value: accounting.formatNumber(data.volume),
+            short: true
+          }, {
+            title: 'Avg. Daily Volume',
+            value: accounting.formatNumber(data.averageDailyVolume),
+            short: true
+          }, {
+            title: 'Day Range',
+            value: data.daysRange || 'n/a',
+            short: true
+          }, {
+            title: '52 Week Range',
+            value: data['52WeekRange'] || 'n/a',
+            short: true
+          }, {
+            title: 'P/E',
+            value: data.peRatio || 'n/a',
+            short: true
+          }, {
+            title: 'EPS',
+            value: data.earningsPerShare ? accounting.formatMoney(data.earningsPerShare) : 'n/a',
+            short: true
+          }, {
+            title: 'Market Capitalization',
+            value: data.marketCapitalization || 'n/a',
+            short: true
+          }];
+
           return {
             fallback: priceTpl(data),
             color: number.color(data.changeInPercent),
@@ -240,9 +260,16 @@ function messageQuote(symbols, isDetailed) {
           };
         }
       }).concat(invalidColonAttachments);
-      return {
+
+      var result = {
         attachments: attachments
       };
+
+      if (isCompact && lastTradeDateMaximum instanceof moment) {
+        result.text = `*${lastTradeDateMaximum.format('LLL')}*`;
+      }
+
+      return result;
     });
 }
 
