@@ -192,7 +192,6 @@ function messageQuote(symbols, isDetailed) {
             mrkdwn_in : ['text']
           };
         } else if (isCompact) {
-          logger.debug(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`);
           lastTradeDateMaximum = moment.max([
             moment(`${moment(data.lastTradeDate).format('LL')} ${data.lastTradeTime}`, 'LLL'),
             lastTradeDateMaximum || moment(0)
