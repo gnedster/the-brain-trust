@@ -289,7 +289,7 @@ function getPortfolioSummaries() {
     if (portfolio.firstPush === true) {
       text = ['Hi there! I\'ll be providing portfolio summaries every weekday ',
         'after US markets close at 4:20 PM ET. If you don\'t want these ',
-        'summaries, just type *stop summaries* at any time.\n'
+        'summaries, just direct message *stop summaries* to me at any time.\n'
         ].join('');
 
       // TODO: place in callback on successful push only
