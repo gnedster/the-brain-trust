@@ -52,7 +52,9 @@ router.post('/commands/quote*', function(req, res, next) {
     } else {
 
       if (_.contains(req.path, 'quote_remove')) {
-        req.symbols = text.split(' ');
+        req.symbols = _.map(text.split(' '), function(symbol) {
+          return symbol.toUpperCase();
+        });
         next();
       } else {
         buttonwood.matchSymbols(text)
