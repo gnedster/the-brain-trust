@@ -179,7 +179,7 @@ function messageQuote(symbols, isDetailed) {
       symbols: allSymbols,
       fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
     }).then(function (snapshots) {
-      var isCompact = allSymbols.length > 3;
+      var isCompact = allSymbols.length > 2;
       var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
         var attachmentFieldsBasic, attachmentFieldsDetailed;
