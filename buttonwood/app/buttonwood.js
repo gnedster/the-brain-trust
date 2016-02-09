@@ -11,7 +11,7 @@ var rds = require('@the-brain-trust/rds');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
+var stockRegexString = '(?!\\d+(.\\d+)?([gkmb]))(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
 /**
