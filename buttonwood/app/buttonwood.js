@@ -298,7 +298,7 @@ function getPortfolioSummaries() {
       });
     }
 
-    text += '*Portfolio Summary*';
+    text += `*Portfolio Summary - ${moment().format('LL')}*`;
 
     return text;
   }
