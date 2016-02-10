@@ -108,6 +108,13 @@ describe('buttonwood', function(){
     });
   });
 
+  describe('messageNews', function() {
+    buttonwood.messageNews({symbols: {valid: ['MSFT', 'TWTR']}})
+      .then(function(message){
+        assert(message.attachments);
+      });
+  });
+
   describe('setPortfolioSummary', function() {
     it('should return a tuple on an unknown user', function(done) {
       buttonwood.setPortfolioSummary({

@@ -312,6 +312,8 @@ function messageNews(symbols) {
                 }];
               }
 
+              logger.debug(attachments);
+
               resolve({
                 attachments: attachments
               });
