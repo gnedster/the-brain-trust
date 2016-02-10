@@ -79,6 +79,8 @@ function hearsSymbol(controller) {
             timestamp: moment.unix(resp.ts),
             name: 'chat:buttonwood:slack:​*:*​:reply',
             details: {
+              news: isNews,
+              detailed: isDetailed,
               symbols: symbols
             }
           });
