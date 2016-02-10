@@ -33,6 +33,9 @@ function hearsSymbol(controller) {
   controller.hears([buttonwood.getStockListenRegex()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
     var matches = buttonwood.parseStockQuote(message.text);
+
+    // Javascript Regex doesn't support lookbehind, so we reverse the string
+    // and look ahead to test for 'news' but ignore $news
     var isNews = /swen(?!(\$))/ig.test(message.text.split('').reverse().join(''));
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
@@ -103,7 +106,7 @@ function hearsHelp(controller) {
       '*Commands available in any channel buttonwood is present:*',
       '_$<ticker>_: get stock quotes',
       '_$<ticker> detail_: get detailed stock quotes',
-      '_$<ticker> news: get news about your stock quotes',
+      '_$<ticker> news_: get news about your stock quotes',
       '',
       '*When directly mentioning buttonwood (all of the above and):*',
       '_help_: shows this message',
