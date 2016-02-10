@@ -14,7 +14,7 @@ var request = require('request');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '(?!\\d+(.\\d+)?([gkmb]))(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
+var stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
 /**
@@ -478,7 +478,12 @@ function setPortfolioSummary(options) {
  * @return {Array} of stock strings
  */
 function parseStockQuote(str) {
-  return str.match(stockRegex);
+  var matches = [];
+  var match;
+  while ((match = stockRegex.exec(str)) instanceof Object) {
+    matches.push(match[2]);
+  }
+  return matches;
 }
 
 /**
