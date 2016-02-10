@@ -7,7 +7,10 @@ var exchangeMap = require('./exchange-mapping.js');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
 var number = require('../lib/number');
+var parseString = require('xml2js').parseString;
+var querystring = require('querystring');
 var rds = require('@the-brain-trust/rds');
+var request = require('request');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
@@ -85,7 +88,7 @@ function matchSymbols(text) {
         exchange = exchangeMap.get(exchangeRegexResult[1]);
         searchTerm = exchangeRegexResult[2];
         if(_.isString(exchange)) {
-//TODO Terence need to batch all colon calls into one query
+          //TODO Terence need to batch all colon calls into one query
           return rds.models.Symbol.findAll({
             attributes: ['ticker'],
             where: {
@@ -116,7 +119,7 @@ function matchSymbols(text) {
  * @param  {Object}   symbols     Symbols to get price quotes for, containing
  *                                valid and invalid arrays
  * @param  {String[]} isDetailed  Provide more information than necessary
- * @return {Promise}              Promise containing Slack messages for symbols
+ * @return {Promise}              Promise containing quotes for Slack
  */
 function messageQuote(symbols, isDetailed) {
   /**
@@ -270,6 +273,56 @@ function messageQuote(symbols, isDetailed) {
       }
 
       return result;
+    });
+}
+
+/**
+ * Return formatted message containing relevant news
+ * @param  {Object} symbols Symbols to get price quotes for, containing
+ *                          valid and invalid arrays
+ * @return {Promise}        Promise containing news for Slack
+ */
+function messageNews(symbols) {
+  return new Promise(function(resolve, reject) {
+    request(`http://www.fool.com/feeds/tickerfeed.aspx?${querystring.stringify({ s: symbols.valid })}`,
+      function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          parseString(body, function (err, result) {
+            var attachments;
+            if (err) {
+              reject(err);
+            } else {
+              if (_.isArray(result.rss.channel[0].item)) {
+                attachments = _.map(result.rss.channel[0].item.splice(0, 4), function(item) {
+                  return {
+                    title: `${item.title}`,
+                    title_link: item.link[0] + '?' + querystring.stringify({
+                      source: 'braintrust',
+                      utm_campaign: 'article',
+                      utm_medium: 'feed',
+                      utm_source: 'braintrust'
+                    }),
+                    text: `*${moment(item.pubDate[0]).tz('America/New_York').format('LLL')} ET*\n${item.description}`,
+                    mrkdwn_in: ['text']
+                  };
+                });
+              } else {
+                attachments = [{
+                  text: 'No news found. Please check your symbols.'
+                }];
+              }
+
+              logger.debug(attachments);
+
+              resolve({
+                attachments: attachments
+              });
+            }
+          });
+        } else {
+          reject(error);
+        }
+      });
     });
 }
 
@@ -437,6 +490,7 @@ function getStockListenRegex() {
 }
 
 module.exports = {
+  messageNews: messageNews,
   messageQuote: messageQuote,
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
