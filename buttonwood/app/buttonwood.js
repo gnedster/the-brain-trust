@@ -293,7 +293,7 @@ function messageNews(symbols) {
               reject(err);
             } else {
               if (_.isArray(result.rss.channel[0].item)) {
-                attachments = _.map(result.rss.channel[0].item.splice(0, 4), function(item) {
+                attachments = _.map(result.rss.channel[0].item.splice(0, 3), function(item) {
                   return {
                     title: `${item.title}`,
                     title_link: item.link[0] + '?' + querystring.stringify({
