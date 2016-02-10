@@ -39,7 +39,7 @@ function hearsSymbol(controller) {
     var isNews = /swen(?!(\$))/ig.test(message.text.split('').reverse().join(''));
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
-      return symbol.substring(1).toUpperCase();
+      return symbol.toUpperCase();
     }));
 
     if (_.isEmpty(symbols)) {
