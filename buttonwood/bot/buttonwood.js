@@ -33,6 +33,7 @@ function hearsSymbol(controller) {
   controller.hears([buttonwood.getStockListenRegex()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
     var matches = buttonwood.parseStockQuote(message.text);
+    var isNews = /swen(?!(\$))/ig.test(message.text.split('').reverse().join(''));
     var isDetailed = /detail/ig.test(message.text);
     var symbols = _.compact(_.map(matches, function(symbol) {
       return symbol.substring(1).toUpperCase();
@@ -54,34 +55,39 @@ function hearsSymbol(controller) {
       }
     });
 
-    buttonwood.messageQuote({valid: symbols}, isDetailed)
-      .then(function(response) {
-        return new Promise(function(resolve, reject) {
-          bot.reply(message, response, function(err, resp) {
-            if (err) {
-              reject(err);
+    (function() {
+      if (isNews === true) {
+        return buttonwood.messageNews({valid: symbols});
+      } else {
+        return buttonwood.messageQuote({valid: symbols}, isDetailed);
+      }
+    })().then(function(response) {
+      return new Promise(function(resolve, reject) {
+        bot.reply(message, response, function(err, resp) {
+          if (err) {
+            reject(err);
+          }
+
+          metric.write({
+            teamId: bot.team_info.id,
+            channelId: message.channel,
+            userId: message.user,
+            initiator: 'server x app',
+            timestamp: moment.unix(resp.ts),
+            name: 'chat:buttonwood:slack:​*:*​:reply',
+            details: {
+              symbols: symbols
             }
-
-            metric.write({
-              teamId: bot.team_info.id,
-              channelId: resp.channel,
-              userId: message.user,
-              initiator: 'server x app',
-              timestamp: moment.unix(resp.ts),
-              name: 'chat:buttonwood:slack:​*:*​:reply',
-              details: {
-                symbols: symbols
-              }
-            });
-
-            resolve();
           });
+
+          resolve();
         });
-      }).catch(function(err){
-        bot.reply(message, errorMessage);
-        error.notify('buttonwood', err); // Should be higher up the stack
-        logger.error(err);
       });
+    }).catch(function(err){
+      bot.reply(message, errorMessage);
+      error.notify('buttonwood', err); // Should be higher up the stack
+      logger.error(err);
+    });
   });
 }
 
@@ -97,6 +103,7 @@ function hearsHelp(controller) {
       '*Commands available in any channel buttonwood is present:*',
       '_$<ticker>_: get stock quotes',
       '_$<ticker> detail_: get detailed stock quotes',
+      '_$<ticker> news: get news about your stock quotes',
       '',
       '*When directly mentioning buttonwood (all of the above and):*',
       '_help_: shows this message',
