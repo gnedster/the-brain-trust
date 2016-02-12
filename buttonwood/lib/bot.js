@@ -15,21 +15,15 @@ const rtmInterval = 5000;
 function Bot(applicationPlatformEntity) {
   this.status = 'new';
   this.lastStatusChangeAt = moment.now();
-  this.applicationPlatformEntity = applicationPlatformEntity;
+  this.applicationPlatformEntity = null;
   this.listeners = [];
   this.errors = [];
   this.pingTimeout = null;
   this.timeToLiveTimeout = null;
+  this.controller = null;
+  this.bot = null;
 
-  // TODO: hardcoded for Slack
-  var token = _.get(applicationPlatformEntity,
-    'credentials.bot.bot_access_token');
-
-  this.controller = Botkit.slackbot({
-    debug: util.isProduction() ? false : true
-  });
-
-  this.bot = this.controller.spawn({token:token});
+  this.updateBot(applicationPlatformEntity);
 }
 
 /**
@@ -45,7 +39,7 @@ Bot.prototype.getId = function() {
  * @return {String} Current status of the bot
  */
 Bot.prototype.getStatus = function() {
-  return `${this.status}:${moment(this.lastStatusChangeAt).fromNow()}`;
+  return this.status;
 };
 
 /**
@@ -63,6 +57,14 @@ Bot.prototype.setStatus = function(status) {
  */
 Bot.prototype.getErrors = function() {
   return this.errors;
+};
+
+/**
+ * Get Bot status with timestamps of latest status Change
+ * @return {String} Current status of the bot with timestamp
+ */
+Bot.prototype.getStatusString = function() {
+  return `${this.status}:${moment(this.lastStatusChangeAt).fromNow()}`;
 };
 
 /**
@@ -107,6 +109,23 @@ Bot.prototype.start = function (){
     });
 
   return this;
+};
+
+/**
+ * Update values to autorize bot
+ * @param {ApplicationPlatformEntity} applicationPlatformEntity
+ */
+Bot.prototype.updateBot = function(applicationPlatformEntity) {
+  this.applicationPlatformEntity = applicationPlatformEntity;
+  // TODO: hardcoded for Slack
+  var token = _.get(applicationPlatformEntity,
+    'credentials.bot.bot_access_token');
+
+  this.controller = Botkit.slackbot({
+    debug: util.isProduction() ? false : true
+  });
+
+  this.bot = this.controller.spawn({token:token});
 };
 
 /**
