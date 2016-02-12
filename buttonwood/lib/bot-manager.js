@@ -47,8 +47,10 @@ function create(applicationPlatformEntities) {
     try {
       var result = _.map(applicationPlatformEntities,
         function(applicationPlatformEntity) {
-        var id = applicationPlatformEntity.id,
-            application, bot;
+        var id = applicationPlatformEntity.id;
+        var application;
+        var bot;
+
         if (bots.has(id) === false) {
           // Lazy retrieval of bot classes
           application = applicationPlatformEntity.Application;
@@ -63,7 +65,12 @@ function create(applicationPlatformEntities) {
           bot.start();
           return bot;
         } else {
-          return bots.get(id);
+          bot = bots.get(id);
+          if (bot.getStatus() === 'error') {
+            /* This is a re-authorization */
+            bot.start();
+          }
+          return bot;
         }
       });
 
