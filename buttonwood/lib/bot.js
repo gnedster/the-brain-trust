@@ -23,7 +23,7 @@ function Bot(applicationPlatformEntity) {
   this.controller = null;
   this.bot = null;
 
-  this.updateBot(applicationPlatformEntity);
+  this.setApplicationPlatformEntity(applicationPlatformEntity);
 }
 
 /**
@@ -63,7 +63,7 @@ Bot.prototype.getErrors = function() {
  * Get Bot status with timestamps of latest status Change
  * @return {String} Current status of the bot with timestamp
  */
-Bot.prototype.getStatusString = function() {
+Bot.prototype.getStatusTimestamp = function() {
   return `${this.status}:${moment(this.lastStatusChangeAt).fromNow()}`;
 };
 
@@ -115,7 +115,8 @@ Bot.prototype.start = function (){
  * Update values to autorize bot
  * @param {ApplicationPlatformEntity} applicationPlatformEntity
  */
-Bot.prototype.updateBot = function(applicationPlatformEntity) {
+Bot.prototype.setApplicationPlatformEntity =
+  function(applicationPlatformEntity) {
   this.applicationPlatformEntity = applicationPlatformEntity;
   // TODO: hardcoded for Slack
   var token = _.get(applicationPlatformEntity,
