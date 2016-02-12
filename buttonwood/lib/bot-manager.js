@@ -68,6 +68,7 @@ function create(applicationPlatformEntities) {
           bot = bots.get(id);
           if (bot.getStatus() === 'error') {
             /* This is a re-authorization */
+            bot.setApplicationPlatformEntity(applicationPlatformEntity);
             bot.start();
           }
           return bot;
@@ -101,12 +102,13 @@ function getStatus(applicationPlatformEntities) {
   if (applicationPlatformEntities) {
     _.each(applicationPlatformEntities, function(applicationPlatformEntity) {
       var bot = bots.get(applicationPlatformEntity.id);
-      var status = bot instanceof Bot ? bot.getStatus() : 'not created';
+      var status = bot instanceof Bot ?
+          bot.getStatusTimestamp() : 'not created';
       result.set(applicationPlatformEntity.id, status);
     });
   } else {
     bots.forEach(function(bot) {
-      result.set(bot.getId(), bot.getStatus());
+      result.set(bot.getId(), bot.getStatusTimestamp());
     });
   }
 
