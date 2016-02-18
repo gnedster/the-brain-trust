@@ -1,10 +1,13 @@
 var app = require('../app.js');
-var cron = require('../cron.js');
-var http = require('http');
 var botManager = require('../lib/bot-manager.js');
-var sqsListener = require('../lib/sqs-listener.js');
+var cron = require('../cron.js');
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
 var logger = require('@the-brain-trust/logger');
+var sqsListener = require('../lib/sqs-listener.js');
 var rds = require('@the-brain-trust/rds');
+var util = require('@the-brain-trust/utility');
 require('../rds/registry'); // Load app specific models
 
 /**
@@ -24,6 +27,7 @@ rds.sync()
  * Get port from environment and store in Express.
  */
 var port = normalizePort(process.env.PORT || '3001');
+var securePort;
 
 /**
  * Create HTTP server.
@@ -37,6 +41,25 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+/**
+ * Create HTTPS server.
+ */
+var httpsServer;
+if (util.isProduction())
+{
+  let httpsOptions;
+  securePort = normalizePort('443'); //TODO Terence
+  httpsOptions = {
+    key: fs.readFileSync('/tmp/cert.pem'),
+    cert: fs.readFileSync('/tmp/key.pem')
+    //requestCert: true, //TODO Terence is the needed, I dont think so
+  };
+  httpsServer = https.createServer(httpsOptions, app);
+  httpsServer.listen(securePort);
+  httpsServer.on('error', onError);
+  httpsServer.on('listening', onListening);
+}
 
 /**
  * Normalize a port into a number, string, or false.
