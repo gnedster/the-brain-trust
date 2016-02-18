@@ -1,9 +1,9 @@
 var app = require('../app.js');
+var botManager = require('../lib/bot-manager.js');
 var cron = require('../cron.js');
 var http = require('http');
-var botManager = require('../lib/bot-manager.js');
-var sqsListener = require('../lib/sqs-listener.js');
 var logger = require('@the-brain-trust/logger');
+var sqsListener = require('../lib/sqs-listener.js');
 var rds = require('@the-brain-trust/rds');
 require('../rds/registry'); // Load app specific models
 
