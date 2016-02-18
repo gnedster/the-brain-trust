@@ -46,13 +46,14 @@ server.on('listening', onListening);
  * Create HTTPS server.
  */
 var httpsServer;
+var httpsOptions;
 if (util.isProduction())
 {
-  let httpsOptions;
   securePort = normalizePort('443'); //TODO Terence
   httpsOptions = {
-    key: fs.readFileSync('/tmp/cert.pem'),
-    cert: fs.readFileSync('/tmp/key.pem')
+    key: fs.readFileSync('/tmp/key.pem'),
+    cert: fs.readFileSync('/tmp/cert.pem'),
+    ca: fs.readFileSync('/tmp/ca.pem')
     //requestCert: true, //TODO Terence is the needed, I dont think so
   };
   httpsServer = https.createServer(httpsOptions, app);
