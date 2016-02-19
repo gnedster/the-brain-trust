@@ -115,13 +115,13 @@ function matchSymbols(text) {
 }
 
 /**
- * Return formatted message
+ * Return raw list of quotes
  * @param  {Object}   symbols     Symbols to get price quotes for, containing
  *                                valid and invalid arrays
  * @param  {String[]} isDetailed  Provide more information than necessary
- * @return {Promise}              Promise containing quotes for Slack
+ * @return {Promise}              Promise containing quotes list
  */
-function messageQuote(symbols, isDetailed) {
+function getQuotes(symbols, isDetailed) {
   /**
    * https://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
    * s = symbol
@@ -142,14 +142,29 @@ function messageQuote(symbols, isDetailed) {
   var fieldsBasic = ['s', 'n', 'l1', 'c1', 'p2', 'd1', 't1'];
   var fieldsDetailed = ['v', 'a2', 'r', 'w', 'e', 'm', 'j1'];
 
+  return yahooFinance.snapshot({
+      symbols: symbols,
+      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
+    });
+}
+
+/**
+ * Return formatted message
+ * @param  {Object}   symbols     Symbols to get price quotes for, containing
+ *                                valid and invalid arrays
+ * @param  {String[]} isDetailed  Provide more information than necessary
+ * @return {Promise}              Promise containing quotes for Slack
+ */
+function messageQuote(symbols, isDetailed) {
+
   var priceTpl = _.template(
     '<%= symbol %> (<%= name %>) last traded at $<%= lastTradePriceOnly %>.'
     );
   var notFoundTpl =_.template(
     '<%= symbol %> doesn\'t look like a valid symbol.'
     );
-  var allSymbols = [];
 
+  var allSymbols = [];
   var colonSymbols = [];
   var invalidColonAttachments = [];
   var combinedSymbols = symbols.valid.concat(symbols.invalid || []);
@@ -177,15 +192,12 @@ function messageQuote(symbols, isDetailed) {
     });
   }
 
-  return yahooFinance.snapshot({
-      // We might not have every Yahoo symbol
-      symbols: allSymbols,
-      fields: isDetailed ? fieldsBasic.concat(fieldsDetailed) : fieldsBasic
-    }).then(function (snapshots) {
+  return getQuotes(allSymbols, isDetailed)
+    .then(function (snapshots) {
       var isCompact = allSymbols.length > 2;
       var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
-        var attachmentFieldsBasic, attachmentFieldsDetailed;
+       var attachmentFieldsBasic, attachmentFieldsDetailed;
         logger.debug(data);
 
         if (_.isEmpty(data.name)) {
@@ -496,6 +508,7 @@ function getStockListenRegex() {
 
 module.exports = {
   messageNews: messageNews,
+  getQuotes: getQuotes,
   messageQuote: messageQuote,
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,

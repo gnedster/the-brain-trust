@@ -114,6 +114,22 @@ describe('/buttonwood', function() {
   describe('POST commands/quote_add', function(){
     shouldRespondToQuoteRequest('add');
     shouldNotBeFoundWithoutToken('add');
+
+    it('Post cmd/quote_add with token not in Symbols table', function(done){
+      request(app)
+        .post(`/buttonwood/commands/quote_add`)
+        .set('Accept', 'application/json')
+        .type('form')
+        .send({
+          token: commandToken,
+          text: 'VXC.TO',
+          team_id: faker.random.uuid(),
+          channel_id: faker.random.uuid(),
+          user_id: faker.random.uuid()
+        })
+        .expect(200, /Added VXC\.TO/i, done);
+    });
+
   });
 
   describe('POST commands/quote_remove', function(){
