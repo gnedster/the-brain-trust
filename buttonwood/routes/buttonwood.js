@@ -136,26 +136,23 @@ router.post('/commands/quote*', function(req, res, next) {
 });
 
 router.post('/commands/quote_add', function(req, res, next) {
-  var invalidSymbols = [];
-  new Promise(function(resolve, reject) {
+  function attemptInvalidSearch(req) {
     if (req.symbols.invalid.length > 0) {
       /* We might not have every Yahoo symbol, attempting search */
-      buttonwood.getQuotes(req.symbols.invalid)
-        .then(function(quotes) {
-          _.map(quotes, function(data) {
-            if (_.isEmpty(data.name)) {
-              invalidSymbols.push(data.symbol);
-            } else {
-              req.symbols.valid.push(data.symbol);
-            }
-          });
-          resolve();
-        });
-    } else {
-      resolve();
+      return buttonwood.getQuotes(req.symbols.invalid);
     }
-  })
-  .then(function() {
+    return Promise.resolve([]);
+  }
+  var invalidSymbols = [];
+  attemptInvalidSearch(req)
+  .then(function(quotes) {
+    _.map(quotes, function(data) {
+      if (_.isEmpty(data.name)) {
+        invalidSymbols.push(data.symbol);
+      } else {
+        req.symbols.valid.push(data.symbol);
+      }
+    });
     req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
 
     if (req.symbols.valid.length > 0) {
@@ -165,7 +162,6 @@ router.post('/commands/quote_add', function(req, res, next) {
           if (invalidSymbols.length > 0) {
             msg += ` ${invalidSymbols} could not be found.`;
           }
-
           res.end(msg);
         });
     } else {

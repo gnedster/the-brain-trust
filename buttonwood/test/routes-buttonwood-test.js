@@ -115,7 +115,7 @@ describe('/buttonwood', function() {
     shouldRespondToQuoteRequest('add');
     shouldNotBeFoundWithoutToken('add');
 
-    it('Post cmd/quote_add with token not in Symbols table', function(done){
+    it('should add token not in symbols table', function(done){
       request(app)
         .post(`/buttonwood/commands/quote_add`)
         .set('Accept', 'application/json')

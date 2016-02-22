@@ -197,7 +197,7 @@ function messageQuote(symbols, isDetailed) {
       var isCompact = allSymbols.length > 2;
       var lastTradeDateMaximum;
       var attachments = _.map(snapshots, function(data) {
-       var attachmentFieldsBasic, attachmentFieldsDetailed;
+        var attachmentFieldsBasic, attachmentFieldsDetailed;
         logger.debug(data);
 
         if (_.isEmpty(data.name)) {
