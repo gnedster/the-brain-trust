@@ -136,21 +136,37 @@ router.post('/commands/quote*', function(req, res, next) {
 });
 
 router.post('/commands/quote_add', function(req, res, next) {
-  req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
+  var invalidSymbols = [];
+  (function() {
+    if (req.symbols.invalid.length > 0) {
+      /* We might not have every Yahoo symbol, attempting search */
+      return buttonwood.getQuotes(req.symbols.invalid);
+    }
+    return Promise.resolve([]);
+  })()
+  .then(function(quotes) {
+    _.map(quotes, function(data) {
+      if (_.isEmpty(data.name)) {
+        invalidSymbols.push(data.symbol);
+      } else {
+        req.symbols.valid.push(data.symbol);
+      }
+    });
+    req.portfolio.symbols = _.uniq(req.portfolio.symbols.concat(req.symbols.valid));
 
-  if (req.symbols.valid.length > 0) {
-    req.portfolio.save()
-      .then(function() {
-        var msg = `Added ${req.symbols.valid} to portfolio.`;
-        if (req.symbols.invalid.length > 0) {
-          msg += ` ${req.symbols.invalid} could not be found.`;
-        }
-
-        res.end(msg);
-      });
-  } else {
-    res.end(`${req.symbols.invalid} could not be found.`);
-  }
+    if (req.symbols.valid.length > 0) {
+      req.portfolio.save()
+        .then(function() {
+          var msg = `Added ${req.symbols.valid} to portfolio.`;
+          if (invalidSymbols.length > 0) {
+            msg += ` ${invalidSymbols} could not be found.`;
+          }
+          res.end(msg);
+        });
+    } else {
+      res.end(`${invalidSymbols} could not be found.`);
+    }
+  });
 });
 
 router.post('/commands/quote_remove', function(req, res, next) {
