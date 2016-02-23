@@ -136,15 +136,14 @@ router.post('/commands/quote*', function(req, res, next) {
 });
 
 router.post('/commands/quote_add', function(req, res, next) {
-  function attemptInvalidSearch(req) {
+  var invalidSymbols = [];
+  (function() {
     if (req.symbols.invalid.length > 0) {
       /* We might not have every Yahoo symbol, attempting search */
       return buttonwood.getQuotes(req.symbols.invalid);
     }
     return Promise.resolve([]);
-  }
-  var invalidSymbols = [];
-  attemptInvalidSearch(req)
+  })()
   .then(function(quotes) {
     _.map(quotes, function(data) {
       if (_.isEmpty(data.name)) {
