@@ -14,7 +14,7 @@ var request = require('request');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
-var stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]+)';
+var stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\^:@]*[a-z])([a-z\\.\\d\\^:@]*[a-z\\d])';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
 /**
