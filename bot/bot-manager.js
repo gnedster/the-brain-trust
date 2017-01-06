@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var bot = require('./bot');
+var Bot = require('./botkit-wrapper.js');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
 var rdsHelper = require('./lib/rds-helper.js');
@@ -41,11 +41,11 @@ function create(applicationPlatformEntities, BotClass) {
 
         if (bots.has(id) === false) {
           // Lazy retrieval of bot classes
-          if (_.isUndefined(BotClass) || (BotClass.prototype instanceof bot.Bot === false)) {
+          if (_.isUndefined(BotClass) || (BotClass.prototype instanceof Bot === false)) {
             logger.warn('could not find bot class');
           }
           // Dynamic initialization
-          var applicationClass = BotClass || bot.Bot;
+          var applicationClass = BotClass || Bot;
           botInstance = Object.create(applicationClass.prototype);
           applicationClass.apply(botInstance, [applicationPlatformEntity]);
 
