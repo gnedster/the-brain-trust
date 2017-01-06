@@ -2,7 +2,9 @@
  * Tests for the bot module
  */
 var assert = require('assert');
-var botManager = require('../lib/bot-manager');
+
+var botManager = require('../bot-manager');
+
 var factory = require('./lib/factory');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
@@ -12,8 +14,6 @@ describe('BotButtonwood', function(){
 
   before(function(done) {
     this.timeout(3000);
-
-    require('../rds/registry');
 
     rds.sync({force: true, logging: logger.stream.write})
       .then(function() {
@@ -30,7 +30,11 @@ describe('BotButtonwood', function(){
   });
 
   it('should initialize bots', function(done){
-    botManager.init()
+    var registry = {
+      buttonwood: undefined
+    };
+
+    botManager.init(registry)
       .then(function(bots) {
         assert(bots);
 

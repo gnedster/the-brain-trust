@@ -115,10 +115,10 @@ Bot.prototype.start = function (){
  * Update values to autorize bot
  * @param {ApplicationPlatformEntity} applicationPlatformEntity
  */
-Bot.prototype.setApplicationPlatformEntity =
-  function(applicationPlatformEntity) {
+Bot.prototype.setApplicationPlatformEntity = function(applicationPlatformEntity) {
   this.applicationPlatformEntity = applicationPlatformEntity;
   // TODO: hardcoded for Slack
+
   var token = _.get(applicationPlatformEntity,
     'credentials.bot.bot_access_token');
 

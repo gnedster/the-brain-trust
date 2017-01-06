@@ -14,6 +14,7 @@ var request = require('request');
 var util = require('@the-brain-trust/utility');
 var yahooFinance = require('yahoo-finance');
 
+const applicationName = 'buttonwood';
 var stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\=\\^:@]*[a-z])([a-z\\.\\d\\=\\^:@]*[a-z\\d])';
 var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
 
@@ -368,25 +369,33 @@ function getPortfolioSummaries() {
     return text;
   }
 
-
-  return rds.models.Portfolio.findAll({
+  rds.models.Application.findOne({
     where: {
-      summary: {
-        $ne: null
-      }
-    },
-    include: [{
-      model: rds.models.PlatformEntity,
-      required: true,
+      name: applicationName
+    }
+  }).then(function(application) {
+    return rds.models.Portfolio.findAll({
+      where: {
+        summary: {
+          $ne: null
+        }
+      },
       include: [{
         model: rds.models.PlatformEntity,
         required: true,
         include: [{
-          model: rds.models.ApplicationPlatformEntity,
-          required: true
+          model: rds.models.PlatformEntity,
+          required: true,
+          include: [{
+            model: rds.models.ApplicationPlatformEntity,
+            required: true,
+            where: {
+              application_id : application.id
+            }
+          }]
         }]
       }]
-    }]
+    });
   }).then(function(portfolios) {
     var symbols = _.uniq(_.reduce(portfolios, function(accum, portfolio) {
       return accum.concat(portfolio.symbols);

@@ -1,8 +1,8 @@
 var _ = require('lodash');
-var Bot = require('./bot');
-var registry = require('../bot/registry');
+var bot = require('./bot');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
+var rdsHelper = require('./lib/rds-helper.js');
 
 // Contains all created bot instances, key is applicationPlatformEntity id
 const bots = new Map();
@@ -10,71 +10,58 @@ const platformName = 'slack';
 
 /**
  * Create all bot objects
+ * @param {Object} registry Contains key-value pair of applicationNames
+ *                          and corresponding bot Class to initialize
  * @return {Promise} Create bots
  */
-function init() {
-  return rds.models.Platform.findOne({
-    where: {
-      name: platformName
-    },
-    include: [
-      {
-        model: rds.models.ApplicationPlatformEntity,
-        include: [
-          rds.models.Application
-        ]
-      }
-    ]
-  })
-  .then(function(platform) {
-    if (platform instanceof rds.models.Platform.Instance) {
-      return platform.ApplicationPlatformEntities;
-    }
-
-    return Promise.reject('platform not found');
-  })
-  .then(create);
+function init(registry) {
+  return Promise.all([_.mapKeys(registry, function(value, key, object) {
+    return rdsHelper.getApplicationPlatformEntities(platformName, key)
+      .then(function(applicationPlatformEntities) {
+        return create(applicationPlatformEntities, value);
+      });
+  })]);
 }
 
 /**
  * Create bot object if bot does not already exist
  * @param   {ApplicationPlatformEntity[]} applicationPlatformEntities
  *          A collection of ApplicationPlatformEntity for initialization
- * @return  {Promise}     A promise containing the bots created
+ * @param   {Bot} BotClass  A class which prototypes the Bot class {@link botkit-wrapper.js}
+ * @return  {Promise}       A promise containing the bots created
  */
-function create(applicationPlatformEntities) {
+function create(applicationPlatformEntities, BotClass) {
   return new Promise(function(resolve, reject) {
     try {
       var result = _.map(applicationPlatformEntities,
         function(applicationPlatformEntity) {
+
         var id = applicationPlatformEntity.id;
-        var application;
-        var bot;
+        var botInstance;
 
         if (bots.has(id) === false) {
           // Lazy retrieval of bot classes
-          application = applicationPlatformEntity.Application;
-          if (_.isUndefined(registry[application.name])) {
-            logger.warn('could not find bot class', application.name);
+          if (_.isUndefined(BotClass) || (BotClass.prototype instanceof bot.Bot === false)) {
+            logger.warn('could not find bot class');
           }
           // Dynamic initialization
-          var applicationClass = registry[application.name] || Bot;
-          bot = Object.create(applicationClass.prototype);
-          applicationClass.apply(bot, [applicationPlatformEntity]);
-          bots.set(id, bot);
-          bot.start();
-          return bot;
+          var applicationClass = BotClass || bot.Bot;
+          botInstance = Object.create(applicationClass.prototype);
+          applicationClass.apply(botInstance, [applicationPlatformEntity]);
+
+          bots.set(id, botInstance);
+          botInstance.start();
+          return botInstance;
         } else {
-          bot = bots.get(id);
-          if (bot.getStatus() === 'error') {
+          botInstance = bots.get(id);
+          if (botInstance.getStatus() === 'error') {
             /* This is a re-authorization */
-            bot.setApplicationPlatformEntity(applicationPlatformEntity);
-            bot.start();
+            botInstance.setApplicationPlatformEntity(applicationPlatformEntity);
+            botInstance.start();
           }
-          return bot;
+          return botInstance;
         }
       });
-
       resolve(result);
     } catch (err) {
       reject(err);
@@ -102,7 +89,7 @@ function getStatus(applicationPlatformEntities) {
   if (applicationPlatformEntities) {
     _.each(applicationPlatformEntities, function(applicationPlatformEntity) {
       var bot = bots.get(applicationPlatformEntity.id);
-      var status = bot instanceof Bot ?
+      var status = bot instanceof bot.Bot ?
           bot.getStatusTimestamp() : 'not created';
       result.set(applicationPlatformEntity.id, status);
     });
