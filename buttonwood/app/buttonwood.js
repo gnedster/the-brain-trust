@@ -369,33 +369,37 @@ function getPortfolioSummaries() {
     return text;
   }
 
-  rds.models.Application.findOne({
+  return rds.models.Application.findOne({
     where: {
       name: applicationName
     }
   }).then(function(application) {
-    return rds.models.Portfolio.findAll({
-      where: {
-        summary: {
-          $ne: null
-        }
-      },
-      include: [{
-        model: rds.models.PlatformEntity,
-        required: true,
+    if (application instanceof rds.models.Application.Instance) {
+      return rds.models.Portfolio.findAll({
+        where: {
+          summary: {
+            $ne: null
+          }
+        },
         include: [{
           model: rds.models.PlatformEntity,
           required: true,
           include: [{
-            model: rds.models.ApplicationPlatformEntity,
+            model: rds.models.PlatformEntity,
             required: true,
-            where: {
-              application_id : application.id
-            }
+            include: [{
+              model: rds.models.ApplicationPlatformEntity,
+              required: true,
+              where: {
+                application_id : application.id
+              }
+            }]
           }]
         }]
-      }]
-    });
+      });
+    } else {
+      return Promise.resolve([]);
+    }
   }).then(function(portfolios) {
     var symbols = _.uniq(_.reduce(portfolios, function(accum, portfolio) {
       return accum.concat(portfolio.symbols);
