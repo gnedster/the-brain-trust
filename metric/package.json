@@ -21,8 +21,8 @@
     "lodash": "^4.0.0"
   },
   "devDependencies": {
-    "factory-girl": "^2.2.1",
-    "factory-girl-sequelize": "^1.0.0",
+    "factory-girl": "^3.0.0",
+    "factory-girl-sequelize": "^1.0.1",
     "faker": "^3.0.1",
     "mocha": "^2.3.4",
     "moment": "^2.11.1",
