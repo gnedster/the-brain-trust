@@ -170,4 +170,16 @@ describe('buttonwood', function(){
           });
       });
   });
+
+  it('maps to valid exchange', function(done){
+    assert.equal(buttonwood.exchangeMap.get('NDAQ'),'NMS');
+    assert.equal(buttonwood.exchangeMap.get('TSX'),'TOR');
+    assert.equal(buttonwood.exchangeMap.get('SES'),'SES');
+    done();
+  });
+
+  it('maps to valid exchange', function(done){
+    assert.equal(buttonwood.exchangeMap.get('NDDAQ'), undefined);
+    done();
+  });
 });
