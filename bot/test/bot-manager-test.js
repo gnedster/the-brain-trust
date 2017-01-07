@@ -2,11 +2,10 @@
  * Tests for the bot module
  */
 var assert = require('assert');
-var bot = require('@the-brain-trust/bot');
+var bot = require('../bot.js');
 var factory = require('./lib/factory');
 var logger = require('@the-brain-trust/logger');
 var rds = require('@the-brain-trust/rds');
-var registry = require('../bot/registry');
 
 describe('BotButtonwood', function(){
   var applicationPlatformEntity;
@@ -29,16 +28,20 @@ describe('BotButtonwood', function(){
   });
 
   it('should initialize bots', function(done){
-    bot.botManager.init(registry)
-      .then(function(bots) {
+    bot.botManager.init({
+        buttonwood: undefined //testing invalid bot
+      }).then(function(result) {
+        var bots = result[0];
         assert(bots);
 
         assert(bot.botManager.getStatus().get(applicationPlatformEntity.id));
+
         assert.equal(
           bot.botManager.getStatus().get(applicationPlatformEntity.id),
           bot.botManager.getStatus([applicationPlatformEntity])
             .get(applicationPlatformEntity.id)
           );
+
         assert(bot.botManager.getBot(applicationPlatformEntity));
         done();
       });

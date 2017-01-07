@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var CronJob = require('cron').CronJob;
 var buttonwood = require('./app/buttonwood');
-var botManager = require('./lib/bot-manager');
+var bot = require('@the-brain-trust/bot');
 
 /**
  * Push portfolio summaries to users
@@ -9,8 +9,8 @@ var botManager = require('./lib/bot-manager');
 function pushSummaries() {
   buttonwood.getPortfolioSummaries().then(function(portfolioSummaries) {
     _.each(portfolioSummaries, function(portfolioSummary) {
-      var bot = botManager.getBot(portfolioSummary.applicationPlatformEntity);
-      bot.sendPrivateMessage(portfolioSummary);
+      var botInstance = bot.botManager.getBot(portfolioSummary.applicationPlatformEntity);
+      botInstance.sendPrivateMessage(portfolioSummary);
     });
   });
 }
