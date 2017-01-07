@@ -1,25 +1,14 @@
 /**
  * Contains the business logic for constructing responses
  */
-var _ = require('lodash');
-var amazonProductApi = require('amazon-product-api');
-var logger = require('@the-brain-trust/logger');
-var util = require('@the-brain-trust/utility');
+const _ = require('lodash');
+const amazonProductApiClient = require('../lib/amazon-product-api.js');
+const logger = require('@the-brain-trust/logger');
 
 // Naive filter for purchase intent
-var purchaseIntentRegex = /(buy|shop|purchase)/i;
-
-var searchResultTpl = _.template(
-  '<%= title %>'
-  );
-
-var notFoundText = 'marcopolo couldn\'t find anything in his travels. Perhaps try a different name.';
-
-const amazonProductApiClient = amazonProductApi.createClient({
-  awsId: process.env.AWS_ACCESS_KEY_ID,
-  awsSecret: process.env.AWS_SECRET_ACCESS_KEY,
-  awsTag: process.env.AMAZON_ASSOCIATE_TAG
-});
+const purchaseIntent = '(buy|shop|purchase)';
+const notFoundText = 'marcopolo couldn\'t find anything in his travels. Perhaps try a different name.';
+const numberOfResults = 3; //number of results to show by default
 
 /**
  * Return raw list of quotes
@@ -36,20 +25,53 @@ function getAmazonResults(products) {
 }
 
 /**
+ * Return stock regex string
+ * @return {String} to be used by botkit listener
+ */
+function getPurchaseIntent() {
+  return purchaseIntent;
+}
+
+/**
  * Return formatted message
  * @param  {Object}   products    Product names to get product quotes for
  * @return {Promise}              Promise containing quotes for Slack
  */
 function messageAmazonResults(products) {
+  /**
+   * Extract price from an Amazon result. Will use offer price if available.
+   * @param  {Object} item Amazon search result item
+   * @return {String}      Formatted price of Amazon search result item
+   */
+  function getPrice(item) {
+    var result = 'No Price Information';
+
+    if (item.ItemAttributes[0].ListPrice) {
+      const listPrice = item.ItemAttributes[0].ListPrice[0].FormattedPrice[0];
+      result = `*${listPrice}*`;
+
+      if (item.OfferSummary) {
+        result = `*${item.OfferSummary[0].LowestNewPrice[0].FormattedPrice[0]}* ~${listPrice}~`;
+      }
+    }
+
+    return result;
+  }
+
+  const titleTpl = _.template('<%= title %>');
+  const fallbackTpl = _.template('<%= title %>');
+
   return getAmazonResults(products)
     .then(function (results) {
-      var attachments = _.map(results, function(item) {
+      var attachments = _.map(results.slice(0, numberOfResults), function(item) {
         logger.debug(item);
 
         return {
-          fallback: searchResultTpl({title: item.ItemAttributes.Title}),
-          title: _.template('<%= title %>')({title: item.ItemAttributes.Title}),
-          title_link: util.getRedirectUri(item.DetailPageURL),
+          fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
+          title: titleTpl({title: item.ItemAttributes[0].Title}),
+          title_link: item.DetailPageURL[0],
+          text: getPrice(item),
+          thumb_url: item.SmallImage && item.SmallImage[0].URL[0],
           mrkdwn_in : ['title', 'text']
         };
       });
@@ -79,17 +101,9 @@ function parseProducts(str) {
   return products;
 }
 
-/**
- * Return stock regex string
- * @return {String} to be used by botkit listener
- */
-function getPurchaseIntentRegex() {
-  return purchaseIntentRegex;
-}
-
 module.exports = {
   getAmazonResults: getAmazonResults,
-  getPurchaseIntentRegex: getPurchaseIntentRegex,
+  getPurchaseIntent: getPurchaseIntent,
   messageAmazonResults: messageAmazonResults,
   parseProducts: parseProducts
 };

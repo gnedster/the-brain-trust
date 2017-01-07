@@ -1,10 +1,10 @@
-var _ = require('lodash');
-var bot = require('@the-brain-trust/bot');
-var marcopolo = require('../app/marcopolo');
-var error = require('@the-brain-trust/error');
-var logger = require('@the-brain-trust/logger');
-var metric = require('@the-brain-trust/metric');
-var moment = require('moment');
+const _ = require('lodash');
+const bot = require('@the-brain-trust/bot');
+const marcopolo = require('../app/marcopolo');
+const error = require('@the-brain-trust/error');
+const logger = require('@the-brain-trust/logger');
+const metric = require('@the-brain-trust/metric');
+const moment = require('moment');
 
 const errorMessage = 'something went horribly wrong.';
 
@@ -13,7 +13,7 @@ const errorMessage = 'something went horribly wrong.';
  * @param  {CoreController}
  */
 function hearsHello(controller) {
-  var introduction = ['I\'m marcopolo, it\'s nice to meet you!',
+  const introduction = ['I\'m marcopolo, it\'s nice to meet you!',
     'Type out a sentence like *I\'d like to buy an iPhone 7* and I\'ll get some results for you.',
     'For more information, directly message me with *help*.'
     ].join(' ');
@@ -30,9 +30,9 @@ function hearsHello(controller) {
  * @param  {CoreController}
  */
 function hearsBuy(controller) {
-  controller.hears([marcopolo.getPurchaseIntentRegex()],
+  controller.hears([marcopolo.getPurchaseIntent()],
     'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    var products = marcopolo.parseProducts(message.text);
+    const products = marcopolo.parseProducts(message.text);
 
     if (_.isEmpty(products)) {
       return;
