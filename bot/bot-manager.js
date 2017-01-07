@@ -15,12 +15,16 @@ const platformName = 'slack';
  * @return {Promise} Create bots
  */
 function init(registry) {
-  return Promise.all([_.mapKeys(registry, function(value, key, object) {
-    return rdsHelper.getApplicationPlatformEntities(platformName, key)
+  var promises = [];
+
+  _.forOwn(registry, function(value, key) {
+    promises.push(rdsHelper.getApplicationPlatformEntities(platformName, key)
       .then(function(applicationPlatformEntities) {
         return create(applicationPlatformEntities, value);
-      });
-  })]);
+      }));
+  });
+
+  return Promise.all(promises);
 }
 
 /**
@@ -62,6 +66,7 @@ function create(applicationPlatformEntities, BotClass) {
           return botInstance;
         }
       });
+
       resolve(result);
     } catch (err) {
       reject(err);
@@ -89,7 +94,7 @@ function getStatus(applicationPlatformEntities) {
   if (applicationPlatformEntities) {
     _.each(applicationPlatformEntities, function(applicationPlatformEntity) {
       var bot = bots.get(applicationPlatformEntity.id);
-      var status = bot instanceof bot.Bot ?
+      var status = bot instanceof Bot ?
           bot.getStatusTimestamp() : 'not created';
       result.set(applicationPlatformEntity.id, status);
     });

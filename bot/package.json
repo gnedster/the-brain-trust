@@ -1,6 +1,6 @@
 {
   "name": "@the-brain-trust/bot",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "bot library",
   "main": "bot.js",
   "scripts": {
