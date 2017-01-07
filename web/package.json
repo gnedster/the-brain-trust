@@ -48,8 +48,8 @@
   },
   "devDependencies": {
     "chai-as-promised": "^5.2.0",
-    "factory-girl": "^2.2.1",
-    "factory-girl-sequelize": "^1.0.0",
+    "factory-girl": "^3.0.0",
+    "factory-girl-sequelize": "^1.0.1",
     "faker": "^3.0.1",
     "grunt": "^0.4.5",
     "grunt-forever": "^0.4.7",

@@ -1,9 +1,9 @@
 var _ = require('lodash');
-var botManager = require('./bot-manager');
+var bot = require('@the-brain-trust/bot');
 var logger = require('@the-brain-trust/logger');
 var moment = require('moment');
+var registry = require('../bot/registry.js');
 var sqs = require('@the-brain-trust/sqs');
-
 
 const queueName = 'application';
 
@@ -11,7 +11,7 @@ var status = 'new';
 var lastStatusChangeAt = moment.now();
 
 /**
- * Initialize th function to listen for SQS messages. This function
+ * Initialize the function to listen for SQS messages. This function
  * recursively calls itself indefinitely.
  * @param  {String}   queueName Queue name to listen to messages against
  * @return {Promise}
@@ -23,7 +23,7 @@ function init() {
       // TODO: Use data provided by queue instead of attempting to
       // initialize bots again
       if (_.get(data, 'Messages')) {
-        return botManager.init();
+        return bot.botManager.init(registry);
       } else {
         return new Promise(function(resolve, reject) {
           // Artifical delay of 3 seconds

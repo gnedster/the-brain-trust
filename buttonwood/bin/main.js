@@ -1,10 +1,11 @@
 var app = require('../app.js');
-var botManager = require('../lib/bot-manager.js');
+var bot = require('@the-brain-trust/bot');
 var cron = require('../cron.js');
 var http = require('http');
 var logger = require('@the-brain-trust/logger');
 var sqsListener = require('../lib/sqs-listener.js');
 var rds = require('@the-brain-trust/rds');
+var botRegistry = require('../bot/registry.js');
 require('../rds/registry'); // Load app specific models
 
 /**
@@ -13,7 +14,9 @@ require('../rds/registry'); // Load app specific models
  * but due to time and budget constraints, there is one shared RDS.
  */
 rds.sync()
-  .then(botManager.init)
+  .then(function() {
+    return bot.botManager.init(botRegistry);
+  })
   .then(sqsListener.init)
   .then(cron.init)
   .catch(function(err) {

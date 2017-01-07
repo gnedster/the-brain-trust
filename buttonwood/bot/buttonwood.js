@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var Bot = require('../lib/bot');
+var bot = require('@the-brain-trust/bot');
 var buttonwood = require('../app/buttonwood');
 var error = require('@the-brain-trust/error');
 var logger = require('@the-brain-trust/logger');
@@ -170,12 +170,12 @@ function hearsStart(controller) {
  * @param {ApplicationPlatformEntity} applicationPlatformEntity  Slack token
  */
 function BotButtonwood(applicationPlatformEntity) {
-  Bot.call(this, applicationPlatformEntity);
+  bot.Bot.call(this, applicationPlatformEntity);
   this.listeners = [hearsStop, hearsStart, hearsSymbol];
 }
 
-BotButtonwood.prototype = Object.create(Bot.prototype);
-BotButtonwood.prototype.constructor = Bot;
+BotButtonwood.prototype = Object.create(bot.Bot.prototype);
+BotButtonwood.prototype.constructor = bot.Bot;
 BotButtonwood.prototype.hearsHelp = hearsHelp;
 BotButtonwood.prototype.hearsHello = hearsHello;
 
