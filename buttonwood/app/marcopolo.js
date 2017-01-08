@@ -6,41 +6,21 @@ const amazonProductApiClient = require('../lib/amazon-product-api.js');
 const htmlToText = require('html-to-text');
 const logger = require('@the-brain-trust/logger');
 
+const amazonLinkFormat = 'https?://www.amazon.com/([\\w-]+/)?(dp|gp/product)/(\\w+/)?(\\w{10})';
+const amazonLinkFormatRegex = new RegExp(amazonLinkFormat);
 // Naive filter for purchase intent
 const purchaseIntent = '(buy|shop|purchase)';
 const notFoundText = 'marcopolo couldn\'t find anything in his travels. Perhaps try a different name.';
-const searchTextPretext = 'Here are the top 3 results';
 const numberOfResults = 3; //number of results to show by default
+const searchTextPretext = 'Here are the top 3 results';
 
 /**
- * Return raw list of quotes
- * @param  {String[]} products    String of product names
- * @param  {String[]} isDetailed  Provide more information than necessary
- * @return {Promise}              Promise containing quotes list
+ * @private
+ * Generate a Slack attachment for a given Amazon item
+ * @param {Object}   Amazon product api item
+ * @return {Object}  Slack message
  */
-function getAmazonResults(product) {
-  return amazonProductApiClient.itemSearch({
-    keywords: product,
-    merchantId: 'Amazon',
-    responseGroup: 'ItemAttributes,Offers,Images,EditorialReview',
-    searchIndex: 'All'
-  });
-}
-
-/**
- * Return stock regex string
- * @return {String} to be used by botkit listener
- */
-function getPurchaseIntent() {
-  return purchaseIntent;
-}
-
-/**
- * Return formatted message
- * @param  {Object}   products    Product names to get product quotes for
- * @return {Promise}              Promise containing quotes for Slack
- */
-function messageAmazonResults(product) {
+function generateAttachments(item) {
   /**
    * @private
    * Extract price from an Amazon result. Will use offer price if available.
@@ -58,10 +38,11 @@ function messageAmazonResults(product) {
         item.Offers[0].Offer[0].OfferAttributes[0].Condition[0] === 'New') {
         const offerListing = item.Offers[0].Offer[0].OfferListing[0];
         const offerPrice = offerListing.Price[0].FormattedPrice[0];
-        const amountSaved = offerListing.AmountSaved[0].FormattedPrice[0];
-        const percentageSaved = offerListing.PercentageSaved[0];
 
-        if (offerPrice !== listPrice) {
+        const amountSaved = offerListing.AmountSaved && offerListing.AmountSaved[0].FormattedPrice[0];
+        const percentageSaved = offerListing.PercentageSaved && offerListing.PercentageSaved[0];
+
+        if (offerPrice !== listPrice && amountSaved && percentageSaved) {
           result = `${offerPrice} ~${listPrice}~
 save: ${amountSaved} (${percentageSaved}%)`;
         }
@@ -102,24 +83,71 @@ save: ${amountSaved} (${percentageSaved}%)`;
   const titleTpl = _.template('<%= title %>');
   const fallbackTpl = _.template('<%= title %>');
 
-  return getAmazonResults(product)
-    .then(function (results) {
-      var attachments = _.map(results.slice(0, numberOfResults), function(item) {
-        logger.debug(item);
+  logger.debug(item);
 
-        return {
-          fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
-          text: `*Price*
+  return {
+    fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
+    text: `*Price*
 ${getPrice(item)}
 *Description*
 ${getDescription(item)}
 `,
-          title: titleTpl({title: item.ItemAttributes[0].Title}),
-          title_link: item.DetailPageURL[0],
-          thumb_url: item.SmallImage && item.SmallImage[0].URL[0],
-          mrkdwn_in : ['text']
-        };
-      });
+    title: titleTpl({title: item.ItemAttributes[0].Title}),
+    title_link: item.DetailPageURL[0],
+    thumb_url: item.SmallImage && item.SmallImage[0].URL[0],
+    mrkdwn_in : ['text']
+  };
+}
+
+/**
+ * From https://stackoverflow.com/questions/1764605/scrape-asin-from-amazon-url-using-javascript,
+ * we use the url format to detect when an Amazon link has been pasted into the browser.
+ * @return {String} to be used by botkit listener
+ */
+function getAmazonLinkFormat() {
+  return amazonLinkFormat;
+}
+
+/**
+ * Return stock regex string
+ * @return {String} to be used by botkit listener
+ */
+function getPurchaseIntent() {
+  return purchaseIntent;
+}
+
+/**
+ * From a given message containing an A
+ * @param  {[type]} message [description]
+ * @return {[type]}         [description]
+ */
+function messageAmazonLookup(message) {
+  const matches = message.match(amazonLinkFormatRegex);
+  const asin = matches[4];
+
+  return amazonProductApiClient.itemLookup({
+      itemId: asin,
+      responseGroup: 'ItemAttributes,Offers,Images,EditorialReview'
+    }).then(function(result){
+      return {
+        attachments: [generateAttachments(result[0])]
+      };
+    });
+}
+
+/**
+ * Return formatted message
+ * @param  {Object}   products    Product names to get product quotes for
+ * @return {Promise}              Promise containing quotes for Slack
+ */
+function messageAmazonResults(product) {
+  return amazonProductApiClient.itemSearch({
+      keywords: product,
+      merchantId: 'Amazon',
+      responseGroup: 'ItemAttributes,Offers,Images,EditorialReview',
+      searchIndex: 'All'
+    }).then(function (results) {
+      var attachments = _.map(results.slice(0, numberOfResults), generateAttachments);
 
       if (attachments.length === 0) {
         attachments = [{
@@ -134,7 +162,7 @@ ${getDescription(item)}
       };
 
       return result;
-    });
+  });
 }
 
 /**
@@ -148,8 +176,9 @@ function parseProducts(str) {
 }
 
 module.exports = {
-  getAmazonResults: getAmazonResults,
+  getAmazonLinkFormat: getAmazonLinkFormat,
   getPurchaseIntent: getPurchaseIntent,
   messageAmazonResults: messageAmazonResults,
+  messageAmazonLookup: messageAmazonLookup,
   parseProducts: parseProducts
 };

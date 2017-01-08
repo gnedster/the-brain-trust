@@ -82,6 +82,57 @@ function hearsBuy(controller) {
 }
 
 /**
+ * Return Amazon search results when a user intends to buy
+ * @param  {CoreController}
+ */
+function hearsAmazonLink(controller) {
+  controller.hears([marcopolo.getAmazonLinkFormat()],
+    'direct_message,direct_mention,mention,ambient',function(bot,message) {
+
+    metric.write({
+      teamId: bot.team_info.id,
+      channelId: message.channel,
+      userId: message.user,
+      initiator: 'client x user',
+      timestamp: moment.unix(message.ts),
+      name: 'chat:marcopolo:slack:​*:*​:message',
+      details: {
+        text: message.text
+      }
+    });
+
+    marcopolo.messageAmazonLookup(message.text)
+      .then(function(response) {
+      return new Promise(function(resolve, reject) {
+        bot.reply(message, response, function(err, resp) {
+          if (err) {
+            reject(err);
+          }
+
+          metric.write({
+            teamId: bot.team_info.id,
+            channelId: message.channel,
+            userId: message.user,
+            initiator: 'server x app',
+            timestamp: moment.unix(resp.ts),
+            name: 'chat:marcopolo:slack:​*:*​:reply',
+            details: {
+              text: message.text
+            }
+          });
+
+          resolve();
+        });
+      });
+    }).catch(function(err){
+      bot.reply(message, errorMessage);
+      error.notify('marcopolo', err); // Should be higher up the stack
+      logger.error(err);
+    });
+  });
+}
+
+/**
  * @private
  * @override
  * @param {Slackbot} controller  An instance of Slackbot
@@ -106,7 +157,7 @@ function hearsHelp(controller) {
  */
 function BotMarcopolo(applicationPlatformEntity) {
   bot.Bot.call(this, applicationPlatformEntity);
-  this.listeners = [hearsBuy];
+  this.listeners = [hearsBuy, hearsAmazonLink];
 }
 
 BotMarcopolo.prototype = Object.create(bot.Bot.prototype);
