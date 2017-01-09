@@ -138,7 +138,7 @@ function hearsHelp(controller) {
   controller.hears(['help', 'halp'], 'direct_message,direct_mention,mention', function(bot, message) {
     bot.reply(message, [
       '*Commands available in any channel marcopolo is present:*',
-      '_buy <product name>_: provide Amazon search results',
+      '_search for <product name>_: provide Amazon search results',
       '',
       '*When directly mentioning marcopolo (all of the above and):*',
       '_help_: shows this message'

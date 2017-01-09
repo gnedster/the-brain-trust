@@ -196,6 +196,7 @@ function messageAmazonResults(product) {
 // }
 
 module.exports = {
+  generateAttachments: generateAttachments,
   getAmazonLinkFormat: getAmazonLinkFormat,
   messageAmazonResults: messageAmazonResults,
   messageAmazonLookup: messageAmazonLookup
