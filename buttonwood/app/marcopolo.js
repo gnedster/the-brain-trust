@@ -134,9 +134,8 @@ function messageAmazonLookup(message) {
 function messageAmazonResults(product) {
   return amazonProductApiClient.itemSearch({
       keywords: product,
-      merchantId: 'Amazon',
       responseGroup: 'ItemAttributes,Offers,Images,EditorialReview',
-      searchIndex: 'All'
+      searchIndex: 'Blended'  //All, UnboxVideo, Appliances, MobileApps, ArtsAndCrafts, Automotive, Baby, Beauty, Books, Music, Wireless, Fashion, FashionBaby, FashionBoys, FashionGirls, FashionMen, FashionWomen, Collectibles, PCHardware, MP3Downloads, Electronics, GiftCards, Grocery, HealthPersonalCare, HomeGarden, Industrial, KindleStore, Luggage, Magazines, Movies, MusicalInstruments, OfficeProducts, LawnAndGarden, PetSupplies, Pantry, Software, SportingGoods, Tools, Toys, VideoGames, Wine
     }).then(function (results) {
       var attachments = _.map(results.slice(0, numberOfResults), generateAttachments);
 
