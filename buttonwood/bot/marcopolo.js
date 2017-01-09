@@ -28,8 +28,9 @@ function hearsHello(controller) {
  * Return Amazon search results when a user intends to buy
  * @param  {CoreController}
  */
-function hearsDirectMention(controller) {
-  controller.hears(['.*'],
+function hearsSearchFor(controller) {
+  const searchFor = 'search for';
+  controller.hears([`^${searchFor}`],
     'direct_message,direct_mention,mention',function(bot,message) {
 
     metric.write({
@@ -44,7 +45,7 @@ function hearsDirectMention(controller) {
       }
     });
 
-    marcopolo.messageAmazonResults(message.text)
+    marcopolo.messageAmazonResults(message.text.replace(searchFor, ''))
       .then(function(response) {
       return new Promise(function(resolve, reject) {
         bot.reply(message, response, function(err, resp) {
@@ -152,7 +153,7 @@ function hearsHelp(controller) {
  */
 function BotMarcopolo(applicationPlatformEntity) {
   bot.Bot.call(this, applicationPlatformEntity);
-  this.listeners = [hearsDirectMention, hearsAmazonLink];
+  this.listeners = [hearsSearchFor, hearsAmazonLink];
 }
 
 BotMarcopolo.prototype = Object.create(bot.Bot.prototype);
