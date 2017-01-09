@@ -3,13 +3,14 @@
  */
 const _ = require('lodash');
 const amazonProductApiClient = require('../lib/amazon-product-api.js');
-const htmlToText = require('html-to-text');
+// const htmlToText = require('html-to-text');
 const logger = require('@the-brain-trust/logger');
+// const nodePos = require('node-pos');
 
 const amazonLinkFormat = 'https?://www.amazon.com/([\\w-]+/)?(dp|gp/product)/(\\w+/)?(\\w{10})';
 const amazonLinkFormatRegex = new RegExp(amazonLinkFormat);
 // Naive filter for purchase intent
-const purchaseIntent = '(buy|shop|purchase)';
+
 const notFoundText = 'marcopolo couldn\'t find anything in his travels. Perhaps try a different name.';
 const numberOfResults = 3; //number of results to show by default
 const searchTextPretext = 'Here are the top 3 results';
@@ -59,26 +60,26 @@ save: ${amountSaved} (${percentageSaved}%)`;
    * @return {String}      Description of Amazon search result item
    *                       converted from HTML
    */
-  function getDescription(item) {
-    var result = '_no description found_';
+  // function getDescription(item) {
+  //   var result = '_no description found_';
 
-    if (item.EditorialReviews) {
-      const productDescription = _.find(item.EditorialReviews, function(review) {
-        return review.EditorialReview[0].Source[0] === 'Product Description';
-      });
+  //   if (item.EditorialReviews) {
+  //     const productDescription = _.find(item.EditorialReviews, function(review) {
+  //       return review.EditorialReview[0].Source[0] === 'Product Description';
+  //     });
 
-      if (productDescription) {
-        const content = productDescription.EditorialReview[0].Content[0];
+  //     if (productDescription) {
+  //       const content = productDescription.EditorialReview[0].Content[0];
 
-        if (content.length > 0) {
-          result = `${htmlToText.fromString(content, {
-            wordwrap: false
-          })}`;
-        }
-      }
-    }
-    return result;
-  }
+  //       if (content.length > 0) {
+  //         result = `${htmlToText.fromString(content, {
+  //           wordwrap: false
+  //         })}`;
+  //       }
+  //     }
+  //   }
+  //   return result;
+  // }
 
   const titleTpl = _.template('<%= title %>');
   const fallbackTpl = _.template('<%= title %>');
@@ -89,8 +90,6 @@ save: ${amountSaved} (${percentageSaved}%)`;
     fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
     text: `*Price*
 ${getPrice(item)}
-*Description*
-${getDescription(item)}
 `,
     title: titleTpl({title: item.ItemAttributes[0].Title}),
     title_link: item.DetailPageURL[0],
@@ -106,14 +105,6 @@ ${getDescription(item)}
  */
 function getAmazonLinkFormat() {
   return amazonLinkFormat;
-}
-
-/**
- * Return stock regex string
- * @return {String} to be used by botkit listener
- */
-function getPurchaseIntent() {
-  return purchaseIntent;
 }
 
 /**
@@ -170,15 +161,42 @@ function messageAmazonResults(product) {
  * @param  {String} to be parsed
  * @return {Array} of stock strings
  */
-function parseProducts(str) {
-  var products = 'Harry Potter';
-  return products;
-}
+// function parseProduct(text) {
+//   function extractNouns(phrase) {
+//     return new Promise(function(resolve, reject) {
+//       nodePos.partsOfSpeech(phrase, function(data) {
+//         console.log(data[0]);
+//         const words = _.map(data[0], function(word) {
+
+//           if (word.pos.length === 0 || _.includes(word.pos, 'Noun')) {
+//             return word.word;
+//           }
+//         });
+//         resolve(words.join(' '));
+//       });
+//     });
+//   }
+
+//   return new Promise(function(resolve, reject) {
+//     nodePos.findPhrases(text, function(data) {
+//       var phrase = _.find(data, function(phrase) {
+//         return phrase.type === 'Verb Phrase' && _.includes(purchaseActionWords,
+//           phrase.phrase[0].toLowerCase());
+//       });
+
+//       if (phrase) {
+//         phrase = phrase.phrase.join(' ');
+//       } else {
+//         phrase = text;
+//       }
+
+//       resolve(phrase);
+//     });
+//   }).then(extractNouns);
+// }
 
 module.exports = {
   getAmazonLinkFormat: getAmazonLinkFormat,
-  getPurchaseIntent: getPurchaseIntent,
   messageAmazonResults: messageAmazonResults,
-  messageAmazonLookup: messageAmazonLookup,
-  parseProducts: parseProducts
+  messageAmazonLookup: messageAmazonLookup
 };

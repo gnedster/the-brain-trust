@@ -29,14 +29,9 @@ function hearsHello(controller) {
  * Return Amazon search results when a user intends to buy
  * @param  {CoreController}
  */
-function hearsBuy(controller) {
-  controller.hears([marcopolo.getPurchaseIntent()],
-    'direct_message,direct_mention,mention,ambient',function(bot,message) {
-    const products = marcopolo.parseProducts(message.text);
-
-    if (_.isEmpty(products)) {
-      return;
-    }
+function hearsDirectMention(controller) {
+  controller.hears(['*'],
+    'direct_message,direct_mention,mention',function(bot,message) {
 
     metric.write({
       teamId: bot.team_info.id,
@@ -50,7 +45,7 @@ function hearsBuy(controller) {
       }
     });
 
-    marcopolo.messageAmazonResults(products)
+    marcopolo.messageAmazonResults(message.text)
       .then(function(response) {
       return new Promise(function(resolve, reject) {
         bot.reply(message, response, function(err, resp) {
@@ -66,7 +61,7 @@ function hearsBuy(controller) {
             timestamp: moment.unix(resp.ts),
             name: 'chat:marcopolo:slack:​*:*​:reply',
             details: {
-              products: products
+              product: message.text
             }
           });
 
@@ -78,6 +73,7 @@ function hearsBuy(controller) {
       error.notify('marcopolo', err); // Should be higher up the stack
       logger.error(err);
     });
+
   });
 }
 
@@ -87,7 +83,7 @@ function hearsBuy(controller) {
  */
 function hearsAmazonLink(controller) {
   controller.hears([marcopolo.getAmazonLinkFormat()],
-    'direct_message,direct_mention,mention,ambient',function(bot,message) {
+    'direct_message,direct_mention,mention',function(bot,message) {
 
     metric.write({
       teamId: bot.team_info.id,
@@ -157,7 +153,7 @@ function hearsHelp(controller) {
  */
 function BotMarcopolo(applicationPlatformEntity) {
   bot.Bot.call(this, applicationPlatformEntity);
-  this.listeners = [hearsBuy, hearsAmazonLink];
+  this.listeners = [hearsDirectMention, hearsAmazonLink];
 }
 
 BotMarcopolo.prototype = Object.create(bot.Bot.prototype);
