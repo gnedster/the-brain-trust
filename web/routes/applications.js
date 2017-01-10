@@ -103,19 +103,16 @@ router.get('/:name', function(req, res, next) {
 
       return rds.models.Platform.findAll()
         .then(function(promise) {
-          var params = {
+          const params = {
             application: req.application,
             oAuthState: state.oAuthState,
-            platforms: _.indexBy(promise[0], 'name')
+            platforms: _.indexBy(promise[0], 'name'),
+            flash: {
+              info: req.application.name !== 'marcopolo' ?
+                'Introducing <a href=\"/applications/marcopolo\">marcopolo</a> our Amazon product search app!' :
+                'Thanks for taking a look at marcopolo!'
+            }
           };
-
-          if (req.application.name !== 'marcopolo') {
-            _.extend(params, {
-              flash: {
-                info: 'Introducing <a href=\"/applications/marcopolo\">marcopolo</a> our Amazon product search app!'
-              }
-            });
-          }
 
           metric.write({
             initiator: 'client x user',
