@@ -109,6 +109,14 @@ router.get('/:name', function(req, res, next) {
             platforms: _.indexBy(promise[0], 'name')
           };
 
+          if (req.application.name !== 'marcopolo') {
+            _.extend(params, {
+              flash: {
+                info: 'Introducing <a href=\"/applications/marcopolo\">marcopolo</a> our Amazon product search app!'
+              }
+            });
+          }
+
           metric.write({
             initiator: 'client x user',
             timestamp: moment.now(),

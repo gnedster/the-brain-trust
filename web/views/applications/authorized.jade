@@ -3,10 +3,20 @@ extends ../layout
 block content
   h2 you're in
 
-  p.
-    Looks like you're all set up for
-    #[a(href="#{application.getPath()}") #{application.name}]! To make use of
-    all the features, make sure to invite #{application.name} to the
-    relevant channels.
+  if application.name == "marcopolo"
+    p.
+      Thank you for installing #[a(href="/applications/marcopolo") marcopolo]!
+      Buying Amazon products through links provided by marcopolo helps to keep
+      our services running for free. We appreciate your support!
+  else
+    p.
+      Looks like you're all set up for
+      #[a(href="#{application.getPath()}") #{application.name}]! If you enjoy
+      using #{application.name}, consider installing #[a(href="/applications/marcopolo") marcopolo]
+      to help keep our services running for free. Thanks for your support!
 
-  img(src="/images/bot_help.png" alt="bot help" )
+  p.
+    To make use of all the features, make sure to invite #{application.name}
+    to the relevant channels as below:
+
+  img(src="/images/bot_help.png" alt="bot help")
