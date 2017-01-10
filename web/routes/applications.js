@@ -110,7 +110,7 @@ router.get('/:name', function(req, res, next) {
             flash: {
               info: req.application.name !== 'marcopolo' ?
                 'Introducing <a href=\"/applications/marcopolo\">marcopolo</a> our Amazon product search app!' :
-                'Thanks for taking a look at marcopolo!'
+                'Thanks for taking a look at marcopolo! Using the product links helps to keep our services free!'
             }
           };
 
