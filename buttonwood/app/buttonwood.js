@@ -1,22 +1,93 @@
 /**
  * Contains the business logic for constructing responses
  */
-var _ = require('lodash');
-var accounting = require('accounting');
-var exchangeMap = require('./exchange-mapping.js');
-var logger = require('@the-brain-trust/logger');
-var moment = require('moment');
-var number = require('../lib/number');
-var parseString = require('xml2js').parseString;
-var querystring = require('querystring');
-var rds = require('@the-brain-trust/rds');
-var request = require('request');
-var util = require('@the-brain-trust/utility');
-var yahooFinance = require('yahoo-finance');
+const _ = require('lodash');
+const accounting = require('accounting');
+const logger = require('@the-brain-trust/logger');
+const moment = require('moment');
+const number = require('../lib/number');
+const parseString = require('xml2js').parseString;
+const querystring = require('querystring');
+const rds = require('@the-brain-trust/rds');
+const request = require('request');
+const util = require('@the-brain-trust/utility');
+const yahooFinance = require('yahoo-finance');
 
 const applicationName = 'buttonwood';
-var stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\=\\^:@]*[a-z])([a-z\\.\\d\\=\\^:@]*[a-z\\d])';
-var stockRegex = new RegExp('\\$' + stockRegexString,'gi');
+const stockRegexString = '(?:<http:\/\/)?(?!\\d+(.\\d+)?[gkmb])(?=[\\.\\d\\=\\^:@]*[a-z])([a-z\\.\\d\\=\\^:@]*[a-z\\d])';
+const stockRegex = new RegExp('\\$' + stockRegexString,'gi');
+
+/* These are left out as they only are used for index
+ * exchangeMap.set('NYSE', 'NYSE');
+ * exchangeMap.set('NASDAQ', 'NASDAQ');
+ */
+const exchangeMap = new Map([
+    ['TSX', 'TOR'], ['TOR', 'TOR'],
+    ['PNK', 'PNK'], ['OTCMKTS','PNK'],
+    ['NMS', 'NMS'], ['NASDAQ','NMS'], ['NDAQ','NMS'],
+    ['NYQ', 'NYQ'], ['NYSE','NYQ'],
+    ['KOE', 'KOE'], ['KOSDAQ','KOE'],
+    ['IST', 'IST'], ['BIST','IST'],
+    ['OTCBB','OBB'], ['OBB', 'OBB'],
+    ['BCBA;','BUE'], ['BUE', 'BUE'],
+    ['FWB','FRA'], ['FRA', 'FRA'],
+    ['SEHK','HKG'], ['HKG', 'HKG'],
+    ['SGX','SES'], ['SES', 'SES'],
+    ['BSE', 'BSE'],
+    ['LSE', 'LSE'],
+    ['ASE', 'ASE'],
+    ['JKT', 'JKT'],
+    ['MEX', 'MEX'],
+    ['KLS', 'KLS'],
+    ['TWO', 'TWO'],
+    ['DUS', 'DUS'],
+    ['TAI', 'TAI'],
+    ['BER', 'BER'],
+    ['MUN', 'MUN'],
+    ['EUX', 'EUX'],
+    ['NSI', 'NSI'],
+    ['ISE', 'ISE'],
+    ['NCM', 'NCM'],
+    ['GER', 'GER'],
+    ['VAN', 'VAN'],
+    ['STU', 'STU'],
+    ['HAN', 'HAN'],
+    ['DOH', 'DOH'],
+    ['NGM', 'NGM'],
+    ['ASX', 'ASX'],
+    ['PAR', 'PAR'],
+    ['STO', 'STO'],
+    ['TLV', 'TLV'],
+    ['MCE', 'MCE'],
+    ['KSC', 'KSC'],
+    ['EBS', 'EBS'],
+    ['HAM', 'HAM'],
+    ['SET', 'SET'],
+    ['MCX', 'MCX'],
+    ['SAO', 'SAO'],
+    ['OSL', 'OSL'],
+    ['ATH', 'ATH'],
+    ['NZE', 'NZE'],
+    ['VIE', 'VIE'],
+    ['ICE', 'ICE'],
+    ['MIL', 'MIL'],
+    ['LIS', 'LIS'],
+    ['AMS', 'AMS'],
+    ['HEL', 'HEL'],
+    ['CPH', 'CPH'],
+    ['CCS', 'CCS'],
+    ['BRU', 'BRU'],
+    ['SHH', 'SHH'],
+    ['IOB', 'IOB'],
+    ['RIS', 'RIS'],
+    ['PCX', 'PCX'],
+    ['TLO', 'TLO'],
+    ['VTX', 'VTX'],
+    ['LIT', 'LIT'],
+    ['BTS', 'BTS'],
+    ['SSE', 'SSE']
+  ]
+);
 
 /**
  * Find the best match for symbols given some text. Each term is first
@@ -520,12 +591,13 @@ function getStockListenRegex() {
 }
 
 module.exports = {
-  messageNews: messageNews,
+  getPortfolioSummaries: getPortfolioSummaries,
   getQuotes: getQuotes,
+  getStockListenRegex: getStockListenRegex,
+  exchangeMap: exchangeMap,
+  messageNews: messageNews,
   messageQuote: messageQuote,
   matchSymbols: matchSymbols,
   parseStockQuote: parseStockQuote,
-  getPortfolioSummaries: getPortfolioSummaries,
-  setPortfolioSummary: setPortfolioSummary,
-  getStockListenRegex: getStockListenRegex
+  setPortfolioSummary: setPortfolioSummary
 };

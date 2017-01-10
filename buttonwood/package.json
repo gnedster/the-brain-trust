@@ -24,6 +24,7 @@
     "@the-brain-trust/sqs": "0.0.4",
     "@the-brain-trust/utility": "0.0.4",
     "accounting": "^0.4.1",
+    "amazon-product-api": "^0.4.2",
     "body-parser": "^1.14.2",
     "cron": "^1.1.0",
     "express": "^4.13.3",

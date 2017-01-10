@@ -1,3 +1,4 @@
 module.exports = {
-  buttonwood: require('./buttonwood')
+  buttonwood: require('./buttonwood'),
+  marcopolo: require('./marcopolo')
 };
