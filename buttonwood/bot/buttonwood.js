@@ -6,7 +6,7 @@ var logger = require('@the-brain-trust/logger');
 var metric = require('@the-brain-trust/metric');
 var moment = require('moment');
 
-const errorMessage = 'something went horribly wrong.';
+const errorMessage = 'Looks like buttonwood ran into an error, we\'ve been notified and we\'ll try to fix it promptly. Thanks for your patience.';
 
 /**
  * Return usage information.

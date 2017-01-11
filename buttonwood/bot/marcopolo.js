@@ -5,7 +5,7 @@ const logger = require('@the-brain-trust/logger');
 const metric = require('@the-brain-trust/metric');
 const moment = require('moment');
 
-const errorMessage = 'something went horribly wrong.';
+const errorMessage = 'Looks like marcopolo ran into an error, we\'ve been notified and we\'ll try to fix it promptly. Thanks for your patience.';
 
 /**
  * Return usage information.
