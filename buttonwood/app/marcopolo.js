@@ -31,7 +31,7 @@ function generateAttachments(item) {
   function getPrice(item) {
     var result = '_no pricing found_';
 
-    if (item.ItemAttributes[0].ListPrice) {
+    if (item.ItemAttributes[0] && item.ItemAttributes[0].ListPrice) {
       const listPrice = item.ItemAttributes[0].ListPrice[0].FormattedPrice[0];
       result = `${listPrice}`;
 
@@ -86,16 +86,18 @@ save: ${amountSaved} (${percentageSaved}%)`;
 
   logger.debug(item);
 
-  return {
-    fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
-    text: `*Price*
-${getPrice(item)}
-`,
-    title: titleTpl({title: item.ItemAttributes[0].Title}),
-    title_link: item.DetailPageURL[0],
-    thumb_url: item.SmallImage && item.SmallImage[0].URL[0],
-    mrkdwn_in : ['text']
-  };
+  if (item.ItemAttributes && item.ItemAttributes[0]) {
+    return {
+      fallback: fallbackTpl({title: item.ItemAttributes[0].Title}),
+      text: `*Price*
+  ${getPrice(item)}
+  `,
+      title: titleTpl({title: item.ItemAttributes[0].Title}),
+      title_link: item.DetailPageURL[0],
+      thumb_url: item.SmallImage && item.SmallImage[0].URL[0],
+      mrkdwn_in : ['text']
+    };
+  }
 }
 
 /**
@@ -137,7 +139,12 @@ function messageAmazonResults(product) {
       responseGroup: 'ItemAttributes,Offers,Images,EditorialReview',
       searchIndex: 'Blended'  //All, UnboxVideo, Appliances, MobileApps, ArtsAndCrafts, Automotive, Baby, Beauty, Books, Music, Wireless, Fashion, FashionBaby, FashionBoys, FashionGirls, FashionMen, FashionWomen, Collectibles, PCHardware, MP3Downloads, Electronics, GiftCards, Grocery, HealthPersonalCare, HomeGarden, Industrial, KindleStore, Luggage, Magazines, Movies, MusicalInstruments, OfficeProducts, LawnAndGarden, PetSupplies, Pantry, Software, SportingGoods, Tools, Toys, VideoGames, Wine
     }).then(function (results) {
-      var attachments = _.map(results.slice(0, numberOfResults), generateAttachments);
+      results = _.filter(results, function(result) {
+        return _.has(result, 'ItemAttributes');
+      });
+
+      var attachments = _.map(results.slice(0, numberOfResults),
+        generateAttachments);
 
       if (attachments.length === 0) {
         attachments = [{
