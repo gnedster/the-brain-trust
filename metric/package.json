@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
-    "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/rds": "^0.6.17",
+    "@the-brain-trust/logger": "file:../logger",
+    "@the-brain-trust/rds": "file:../rds",
     "lodash": "^4.0.0"
   },
   "devDependencies": {
