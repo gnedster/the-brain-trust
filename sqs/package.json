@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
-    "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/utility": "0.0.1",
+    "@the-brain-trust/logger": "file:../logger",
+    "@the-brain-trust/utility": "file:../utility",
     "aws-sdk": "^2.2.26",
     "config.json": "0.0.4",
     "lodash": "^3.10.1",

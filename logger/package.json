@@ -17,7 +17,7 @@
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
     "winston": "^2.1.1",
-    "@the-brain-trust/utility": "^0.0.1"
+    "@the-brain-trust/utility": "file:../utility"
   },
   "devDependencies": {
     "mocha": "^2.3.4"

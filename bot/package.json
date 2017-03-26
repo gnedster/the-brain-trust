@@ -16,9 +16,9 @@
   },
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
-    "@the-brain-trust/error": "0.0.8",
-    "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/utility": "0.0.4",
+    "@the-brain-trust/error": "file:../error",
+    "@the-brain-trust/logger": "file:../logger",
+    "@the-brain-trust/utility": "file:../utility",
     "botkit": "^0.0.5",
     "lodash": "^3.10.1",
     "moment": "^2.11.0"

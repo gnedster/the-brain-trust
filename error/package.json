@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/gnedster/the-brain-trust#readme",
   "dependencies": {
-    "@the-brain-trust/logger": "0.0.1",
-    "@the-brain-trust/mailer": "0.0.2",
+    "@the-brain-trust/logger": "file:../logger",
+    "@the-brain-trust/mailer": "file:../mailer",
     "email-templates": "^2.0.1",
     "jade": "^1.11.0",
     "less": "^2.5.3",
