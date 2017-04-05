@@ -2,6 +2,7 @@
   "name": "the-brain-trust",
   "version": "0.0.1",
   "description": "all projects for the brain trust",
+  "license": "MIT",
   "dependencies": {
     "node-wit": "^2.0.0"
   },
