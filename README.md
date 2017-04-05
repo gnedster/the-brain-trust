@@ -1,3 +1,5 @@
+**The Brain Trust has shutdown operations as of April 5, 2017.**
+
 # the brain trust
 
 Welcome to the brain trust.
